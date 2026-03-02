@@ -18,7 +18,7 @@ export function installGitHook(workspacePath: string) {
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 echo "[aigit] Context Engine shifted to branch: $BRANCH"
 
-command -v aigit >/dev/null 2>&1 && aigit load || npx --no-install aigit load || true
+npx --no-install aigit load || npx --no-install aigit load || true
 `;
 
     // 2. post-merge hook (Runs after git pull / git merge)
@@ -29,7 +29,7 @@ command -v aigit >/dev/null 2>&1 && aigit load || npx --no-install aigit load ||
 
 echo "[aigit] Syncing AI contextual memory with newly merged remote ledger..."
 
-command -v aigit >/dev/null 2>&1 && aigit load || npx --no-install aigit load || true
+npx --no-install aigit load || npx --no-install aigit load || true
 `;
 
     // 3. pre-commit hook (Runs before git commit)
@@ -40,7 +40,7 @@ command -v aigit >/dev/null 2>&1 && aigit load || npx --no-install aigit load ||
 
 echo "[aigit] Serializing active memory into ledger.json..."
 
-command -v aigit >/dev/null 2>&1 && aigit dump || npx --no-install aigit dump || true
+npx --no-install aigit dump || npx --no-install aigit dump || true
 
 # Automatically stage the updated ledger if it exists
 if [ -f .aigit/ledger.json ]; then
@@ -56,7 +56,7 @@ fi
 
 echo "[aigit] Running self-healing diagnostics..."
 
-command -v aigit >/dev/null 2>&1 && aigit heal --quiet || npx --no-install aigit heal --quiet || true
+npx --no-install aigit heal --quiet || npx --no-install aigit heal --quiet || true
 
 # If tests failed, print a warning but usually don't block the push aggressively unless configured to
 echo "[aigit] Diagnostics complete. Proceeding with push..."
@@ -71,7 +71,7 @@ echo "[aigit] Diagnostics complete. Proceeding with push..."
 COMMIT_MSG=$(git log -1 --pretty=%B)
 echo "[aigit] Recording commit in Context Timeline..."
 
-command -v aigit >/dev/null 2>&1 && aigit remember "Git Commit: $COMMIT_MSG" || npx --no-install aigit remember "Git Commit: $COMMIT_MSG" || true
+npx --no-install aigit commit memory "Git Commit: $COMMIT_MSG" || npx --no-install aigit commit memory "Git Commit: $COMMIT_MSG" || true
 `;
 
     try {
