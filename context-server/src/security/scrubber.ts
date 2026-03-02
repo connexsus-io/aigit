@@ -48,14 +48,6 @@ export function sanitizeMemory(memory: any): any {
     // Create a copy so we don't mutate DB instances directly (if applicable)
     const sanitized = { ...memory };
 
-    // Scrub memory explanation and summary
-    if (sanitized.explanation) {
-        sanitized.explanation = redactSecrets(sanitized.explanation);
-    }
-    if (sanitized.summary) {
-        sanitized.summary = redactSecrets(sanitized.summary);
-    }
-
     return sanitized;
 }
 

@@ -15,7 +15,7 @@ export async function dumpContextLedger(workspacePath: string) {
 
         // Fetch memories including their raw stringified vector embeddings
         const memories = await prisma.$queryRaw<any[]>`
-            SELECT id, "projectId", "sessionId", "gitBranch", type, content, embedding::text, "createdAt", explanation, summary
+            SELECT id, "projectId", "sessionId", "gitBranch", type, content, embedding::text, "createdAt"
             FROM "Memory"
         `;
 

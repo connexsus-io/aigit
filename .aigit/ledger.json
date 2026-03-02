@@ -1,0 +1,47 @@
+{
+  "projects": [
+    {
+      "id": "008465eb-074f-40e7-8bce-0e6d47927b1a",
+      "name": "aigit",
+      "description": null,
+      "createdAt": "2026-03-02T19:51:19.528Z",
+      "updatedAt": "2026-03-02T19:51:19.528Z"
+    }
+  ],
+  "agents": [],
+  "sessions": [],
+  "tasks": [],
+  "decisions": [],
+  "memories": [
+    {
+      "id": "35ada944-25e9-42d0-af29-e0826a74c0df",
+      "projectId": "008465eb-074f-40e7-8bce-0e6d47927b1a",
+      "sessionId": null,
+      "gitBranch": "main",
+      "type": "architecture",
+      "content": "test commit",
+      "embedding": null,
+      "createdAt": "2026-03-02T19:51:19.534Z"
+    },
+    {
+      "id": "c8376c48-b4e1-419e-b401-4a33e38e30a3",
+      "projectId": "008465eb-074f-40e7-8bce-0e6d47927b1a",
+      "sessionId": null,
+      "gitBranch": "main",
+      "type": "architecture",
+      "content": "test",
+      "embedding": null,
+      "createdAt": "2026-03-02T19:51:46.522Z"
+    },
+    {
+      "id": "59f281a8-f257-4b89-95fe-ad188ebefbd6",
+      "projectId": "008465eb-074f-40e7-8bce-0e6d47927b1a",
+      "sessionId": null,
+      "gitBranch": "main",
+      "type": "architecture",
+      "content": "Git Commit: fix(hooks): update hooks to use local npx aigit",
+      "embedding": null,
+      "createdAt": "2026-03-02T19:53:14.477Z"
+    }
+  ]
+}
