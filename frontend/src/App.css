@@ -985,6 +985,7 @@
     width: 100%;
     height: 100%;
     background: inherit;
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }

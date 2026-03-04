@@ -80,11 +80,13 @@ async function applyColumnMigrations() {
         { table: '"Memory"', column: '"symbolName"', type: 'TEXT' },
         { table: '"Memory"', column: '"symbolType"', type: 'TEXT' },
         { table: '"Memory"', column: '"symbolRange"', type: 'TEXT' },
+        { table: '"Memory"', column: '"issueRef"', type: 'TEXT' },
         { table: '"Decision"', column: '"filePath"', type: 'TEXT' },
         { table: '"Decision"', column: '"lineNumber"', type: 'INTEGER' },
         { table: '"Decision"', column: '"symbolName"', type: 'TEXT' },
         { table: '"Decision"', column: '"symbolType"', type: 'TEXT' },
         { table: '"Decision"', column: '"symbolRange"', type: 'TEXT' },
+        { table: '"Decision"', column: '"issueRef"', type: 'TEXT' },
     ];
 
     for (const m of migrations) {

@@ -109,7 +109,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                         workspacePath: { type: 'string', description: 'The root directory of the workspace.' },
                         message: { type: 'string', description: 'The note message to capture.' },
                         scope: { type: 'string', description: 'Optional. A specific directory or file to bind the note to.' },
-                        isDecision: { type: 'boolean', description: 'Optional. Set to true to categorize this note as an architectural decision.' }
+                        isDecision: { type: 'boolean', description: 'Optional. Set to true to categorize this note as an architectural decision.' },
+                        issueRef: { type: 'string', description: 'Optional. An external issue tracker reference (e.g. "ENG-404", "#45").' }
                     },
                     required: ['projectId', 'workspacePath', 'message']
                 }
@@ -569,13 +570,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                         type: args?.isDecision ? 'architecture' : 'human_note',
                         content: String(args?.message),
                         filePath: args?.scope ? String(args.scope) : null,
+                        issueRef: args?.issueRef ? String(args.issueRef) : null,
                     }
                 });
 
                 const { dumpContextLedger } = require('./cli/sync');
                 await dumpContextLedger(String(args?.workspacePath));
 
-                return { content: [{ type: 'text', text: `✅ [aigit note] Context captured on branch [${branch}]. ID: ${memory.id}` }] };
+                const issueTag = memory.issueRef ? ` 🔗 ${memory.issueRef}` : '';
+                return { content: [{ type: 'text', text: `✅ [aigit note] Context captured on branch [${branch}].${issueTag} ID: ${memory.id}` }] };
             }
 
             case 'commit_memory': {

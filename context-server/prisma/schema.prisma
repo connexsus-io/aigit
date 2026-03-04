@@ -72,6 +72,7 @@ model Decision {
   symbolName  String?  
   symbolType  String?  
   symbolRange String?  
+  issueRef    String?  
   createdAt   DateTime @default(now())
 }
 
@@ -90,6 +91,7 @@ model Memory {
   symbolName  String?  
   symbolType  String?  
   symbolRange String?  
+  issueRef    String?  
   embedding   Unsupported("vector(1536)")? 
   
   createdAt   DateTime @default(now())
