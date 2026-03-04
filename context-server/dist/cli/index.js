@@ -353,6 +353,45 @@ Commands:
         const out = outIdx !== -1 ? args[outIdx + 1] : undefined;
         await exportDocs({ out });
     }
+    else if (command === 'note') {
+        const message = args[1];
+        if (!message) {
+            console.error('⚠️  Error: You must provide a note message.');
+            console.log('Usage: aigit note "<message>" [--scope <path>] [--decision]');
+            process.exit(1);
+        }
+        const workspacePath = process.cwd();
+        const { getActiveBranch } = require('./git');
+        const branch = getActiveBranch(workspacePath);
+        // Ensure a default project exists
+        let project = await db_1.prisma.project.findFirst();
+        if (!project) {
+            const pathModule = require('path');
+            project = await db_1.prisma.project.create({
+                data: { name: pathModule.basename(workspacePath) }
+            });
+        }
+        const scopeIdx = args.indexOf('--scope');
+        const isDecision = args.includes('--decision');
+        const filePath = scopeIdx !== -1 ? args[scopeIdx + 1] : null;
+        const memory = await db_1.prisma.memory.create({
+            data: {
+                projectId: project.id,
+                gitBranch: branch,
+                type: isDecision ? 'architecture' : 'human_note',
+                content: message,
+                filePath,
+            }
+        });
+        const { dumpContextLedger } = require('./sync');
+        await dumpContextLedger(workspacePath);
+        console.log(`\n📝 [aigit note] Context captured on branch [${branch}]`);
+        if (filePath)
+            console.log(`   Scope: 📁 ${filePath}`);
+        if (isDecision)
+            console.log(`   Tag: Architecture Decision`);
+        console.log(`   ID: ${memory.id}\n`);
+    }
     else if (command === 'commit') {
         const subCommand = args[1]; // memory | decision | task
         const workspacePath = process.cwd();
@@ -577,6 +616,7 @@ Commands:
   docs [--out <path>]           Auto-generate ARCHITECTURE.md from memory ledger
 
 Context:
+  note "<message>"              Instantly capture a manual context note
   commit memory "<text>"        Commit a memory entry to current branch
   commit decision "<ctx>" "<chosen>"  Record an architectural decision
   commit task "<title>"         Create a tracked task

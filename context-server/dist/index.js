@@ -125,6 +125,21 @@ server.setRequestHandler(types_js_1.ListToolsRequestSchema, async () => {
                 }
             },
             {
+                name: 'take_note',
+                description: 'Instantly capture a manual context note, architectural decision, or mid-sprint "why" directly into the semantic vector space without waiting for a commit hook (equivalent to `aigit note`).',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        projectId: { type: 'string', description: 'The UUID of the project.' },
+                        workspacePath: { type: 'string', description: 'The root directory of the workspace.' },
+                        message: { type: 'string', description: 'The note message to capture.' },
+                        scope: { type: 'string', description: 'Optional. A specific directory or file to bind the note to.' },
+                        isDecision: { type: 'boolean', description: 'Optional. Set to true to categorize this note as an architectural decision.' }
+                    },
+                    required: ['projectId', 'workspacePath', 'message']
+                }
+            },
+            {
                 name: 'commit_memory',
                 description: 'Explicitly commits learned patterns, architectural rules, or documentation into the workspace Git-aligned memory (equivalent to `aigit commit memory`). If filePath and lineNumber are provided, the memory will be auto-anchored to the enclosing code symbol.',
                 inputSchema: {
@@ -553,6 +568,22 @@ server.setRequestHandler(types_js_1.CallToolRequestSchema, async (request) => {
                     }
                 });
                 return { content: [{ type: 'text', text: `Task Context successfully created on branch [${branch}]. ID: ${task.id} (Slug: ${task.slug}.md)` }] };
+            }
+            case 'take_note': {
+                const args = request.params.arguments;
+                const branch = args?.workspacePath ? (0, git_1.getActiveBranch)(String(args.workspacePath)) : 'main';
+                const memory = await db_1.prisma.memory.create({
+                    data: {
+                        projectId: String(args?.projectId),
+                        gitBranch: branch,
+                        type: args?.isDecision ? 'architecture' : 'human_note',
+                        content: String(args?.message),
+                        filePath: args?.scope ? String(args.scope) : null,
+                    }
+                });
+                const { dumpContextLedger } = require('./cli/sync');
+                await dumpContextLedger(String(args?.workspacePath));
+                return { content: [{ type: 'text', text: `✅ [aigit note] Context captured on branch [${branch}]. ID: ${memory.id}` }] };
             }
             case 'commit_memory': {
                 const args = request.params.arguments;
