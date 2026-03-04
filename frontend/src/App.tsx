@@ -36,14 +36,20 @@ function LandingPage() {
             <header className="hero-section">
                 <div className="hero-content">
                     <h1 className="hero-title">aigit</h1>
-                    <div className="hero-subtitle-box">
-                        <p className="hero-subtitle">
-                            The AI Context Engine for Version-Controlled Semantic Memory. <br />
-                            Stop typing the same prompts. Hook your <span className="hero-primary-accent">AI brain</span> directly into your Git workflow.
-                        </p>
+                    <div className="hero-split">
+                        <div className="hero-text-column">
+                            <div className="hero-subtitle-box">
+                                <p className="hero-subtitle">
+                                    The AI Context Engine for Version-Controlled Semantic Memory. <br />
+                                    Stop typing the same prompts. Hook your <span className="hero-primary-accent">AI brain</span> directly into your Git workflow.
+                                </p>
+                            </div>
+                            <CopyableCommand command="npm install -g aigit-core" />
+                        </div>
+                        <div className="hero-visual-column">
+                            <TerminalSimulator />
+                        </div>
                     </div>
-                    <CopyableCommand command="npm install -g aigit-core" />
-                    <TerminalSimulator />
                 </div>
             </header>
 

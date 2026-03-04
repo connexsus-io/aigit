@@ -10,12 +10,15 @@
    ================================== */
 .hero-section {
     position: relative;
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
+    padding-top: 15vh;
     align-items: center;
-    padding: 2rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    padding-bottom: 2rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     overflow: hidden;
 }
@@ -39,8 +42,23 @@
 .hero-content {
     position: relative;
     z-index: 1;
-    max-width: 1000px;
+    max-width: 1100px;
     width: 100%;
+}
+
+.hero-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: flex-start;
+    margin-top: 2rem;
+}
+
+@media (max-width: 900px) {
+    .hero-split {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
 }
 
 .hero-title {
@@ -50,7 +68,8 @@
     text-shadow:
         -2px -2px 0 var(--electric-cyan),
         2px 2px 0 var(--alert-red);
-    margin-bottom: 2rem;
+    margin-bottom: 0;
+    text-align: left;
     animation: glitch-anim 4s infinite linear alternate-reverse;
 }
 
@@ -130,7 +149,6 @@
    2. TERMINAL MOCKUP (Glassmorphic)
    ================================== */
 .terminal-window {
-    margin-top: 4rem;
     width: 100%;
     max-width: 800px;
     background: var(--bg-glass);
@@ -925,6 +943,7 @@
     color: var(--alert-red);
     border-color: var(--alert-red);
 }
+
 /* NotFoundPage Styles */
 .not-found-page {
     position: relative;
@@ -983,21 +1002,55 @@
 }
 
 @keyframes glitch-anim-1 {
-    0% { clip: rect(20px, 9999px, 15px, 0); }
-    20% { clip: rect(60px, 9999px, 50px, 0); }
-    40% { clip: rect(10px, 9999px, 80px, 0); }
-    60% { clip: rect(40px, 9999px, 20px, 0); }
-    80% { clip: rect(80px, 9999px, 60px, 0); }
-    100% { clip: rect(30px, 9999px, 90px, 0); }
+    0% {
+        clip: rect(20px, 9999px, 15px, 0);
+    }
+
+    20% {
+        clip: rect(60px, 9999px, 50px, 0);
+    }
+
+    40% {
+        clip: rect(10px, 9999px, 80px, 0);
+    }
+
+    60% {
+        clip: rect(40px, 9999px, 20px, 0);
+    }
+
+    80% {
+        clip: rect(80px, 9999px, 60px, 0);
+    }
+
+    100% {
+        clip: rect(30px, 9999px, 90px, 0);
+    }
 }
 
 @keyframes glitch-anim-2 {
-    0% { clip: rect(65px, 9999px, 100px, 0); }
-    20% { clip: rect(30px, 9999px, 20px, 0); }
-    40% { clip: rect(80px, 9999px, 40px, 0); }
-    60% { clip: rect(10px, 9999px, 70px, 0); }
-    80% { clip: rect(50px, 9999px, 30px, 0); }
-    100% { clip: rect(90px, 9999px, 10px, 0); }
+    0% {
+        clip: rect(65px, 9999px, 100px, 0);
+    }
+
+    20% {
+        clip: rect(30px, 9999px, 20px, 0);
+    }
+
+    40% {
+        clip: rect(80px, 9999px, 40px, 0);
+    }
+
+    60% {
+        clip: rect(10px, 9999px, 70px, 0);
+    }
+
+    80% {
+        clip: rect(50px, 9999px, 30px, 0);
+    }
+
+    100% {
+        clip: rect(90px, 9999px, 10px, 0);
+    }
 }
 
 .glitch-wrapper {
@@ -1029,6 +1082,11 @@
 }
 
 @keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
