@@ -334,6 +334,18 @@ Commands:
         const out = outIdx !== -1 ? args[outIdx + 1] : undefined;
         await exportDocs({ out });
 
+    } else if (command === 'replay') {
+        const targetPath = args[1];
+        if (!targetPath) {
+            console.error('⚠️  Error: You must provide a file or directory path to replay.');
+            console.log('Usage: aigit replay <path>');
+            process.exit(1);
+        }
+        const { buildTimeline, formatReplayNarrative } = require('../agents/storyteller');
+        const timeline = await buildTimeline(targetPath);
+        const narrative = formatReplayNarrative(targetPath, timeline);
+        console.log(narrative);
+
     } else if (command === 'note') {
         const message = args[1];
         if (!message) {
@@ -614,6 +626,7 @@ Commands:
   anchor <file>                 Re-anchor existing memories to AST symbols
   query "<question>"            Semantic search across memory
   query "<question>" --commit <hash>  Time-travel: search memory at a past commit
+  replay <path>                 Replay the chronological evolution of a file/module
   docs [--out <path>]           Auto-generate ARCHITECTURE.md from memory ledger
 
 Context:
