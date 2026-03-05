@@ -132,6 +132,16 @@
       "content": "Automatic Git Commit Context (Staged Changes)\nFiles Changed:\nM\tcontext-server/package.json\nM\tfrontend/src/DocsPage.tsx\n\nStatistics:\ncontext-server/package.json |  6 ++--\n frontend/src/DocsPage.tsx   | 71 ++++++++++++++++++++++++++++++++++++++++++++-\n 2 files changed, 73 insertions(+), 4 deletions(-)",
       "embedding": null,
       "createdAt": "2026-03-04T14:08:25.688Z"
+    },
+    {
+      "id": "deb9323f-430f-440f-b894-6b2cd615c5c6",
+      "projectId": "008465eb-074f-40e7-8bce-0e6d47927b1a",
+      "sessionId": null,
+      "gitBranch": "main",
+      "type": "capability",
+      "content": "Automatic Git Commit Context (Staged Changes)\nFiles Changed:\nD\tfrontend/dist/assets/index-BvcMZHEx.js\nD\tfrontend/dist/assets/index-mep9DjFs.css\nM\tfrontend/dist/index.html\nM\tfrontend/package-lock.json\nM\tfrontend/package.json\nM\tfrontend/src/App.tsx\nM\tfrontend/src/main.tsx\nA\tfrontend/src/vite-env.d.ts\n\nStatistics:\nfrontend/dist/assets/index-BvcMZHEx.js  | 403 --------------------------------\n frontend/dist/assets/index-mep9DjFs.css |   1 -\n frontend/dist/index.html                |  26 ++-\n frontend/package-lock.json              | 127 ++++++++++\n frontend/package.json                   |   2 +\n frontend/src/App.tsx                    |   2 +\n frontend/src/main.tsx                   |  12 +\n frontend/src/vite-env.d.ts              |   9 +\n 8 files changed, 167 insertions(+), 415 deletions(-)",
+      "embedding": null,
+      "createdAt": "2026-03-05T20:24:14.550Z"
     }
   ]
 }
