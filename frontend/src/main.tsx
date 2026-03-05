@@ -12,6 +12,8 @@ Sentry.init({
     integrations: [
         Sentry.browserTracingIntegration(),
         Sentry.replayIntegration(),
+        // send console.log, console.warn, and console.error calls as logs to Sentry
+        Sentry.consoleLoggingIntegration({ levels: ["log", "warn", "error"] }),
     ],
     // Tracing
     tracesSampleRate: 1.0, //  Capture 100% of the transactions
@@ -23,6 +25,14 @@ Sentry.init({
     // Enable logs to be sent to Sentry
     enableLogs: true
 });
+
+// Verify logs are arriving in Sentry
+Sentry.logger.info('User triggered test log', { log_source: 'sentry_test' })
+
+// Verify metrics are arriving in Sentry
+Sentry.metrics.count('button_click', 1);
+Sentry.metrics.gauge('page_load_time', 150);
+Sentry.metrics.distribution('response_time', 200);
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
