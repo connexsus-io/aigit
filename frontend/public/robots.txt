@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://aigit.io/sitemap.xml

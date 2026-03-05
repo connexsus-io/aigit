@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { SEO } from './SEO';
 
 interface DocSection {
   id: string;
@@ -695,6 +696,12 @@ export function DocsPage() {
 
   return (
     <div className="docs-page">
+      <SEO
+        title="Documentation"
+        description="Learn how to use aigit to synchronize terminal context and coordinate autonomous AI agents in your codebase."
+        canonicalUrl="https://aigit.io/docs"
+        type="article"
+      />
       <aside className="docs-sidebar">
         <div className="docs-sidebar-title">Documentation</div>
         {sections.map(s => (

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import './App.css';
+import { SEO } from './SEO';
 
 export function FeedbackPage() {
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -34,6 +35,11 @@ export function FeedbackPage() {
 
     return (
         <div className="feedback-page">
+            <SEO
+                title="Feedback"
+                description="Send a direct data stream to the Connexsus team. Report bugs, ask questions, or provide suggestions for aigit."
+                canonicalUrl="https://aigit.io/feedback"
+            />
             <div className="feedback-container">
                 <div className="section-header">
                     <h2>SYS.FEEDBACK</h2>

@@ -6,6 +6,7 @@ import { TerminalSimulator } from './TerminalSimulator'
 import { InteractiveDemo } from './InteractiveDemo'
 import { HowToUse } from './HowToUse'
 import { DocsPage } from './DocsPage'
+import { SEO } from './SEO'
 
 function CopyableCommand({ command }: { command: string }) {
     const [copied, setCopied] = useState(false);
@@ -32,7 +33,11 @@ function CopyableCommand({ command }: { command: string }) {
 
 function LandingPage() {
     return (
-        <>
+        <main>
+            <SEO
+                title="Home"
+                description="aigit effortless aligns your local codebase with AI models, enabling automated context synchronization, intelligent multi-agent orchestration, and native LLM workflows directly from the terminal."
+            />
             <header className="hero-section">
                 <div className="hero-content">
                     <h1 className="hero-title">aigit</h1>
@@ -152,7 +157,7 @@ function LandingPage() {
                     <Link to="/feedback" className="footer-link">Send Feedback</Link>
                 </div>
             </footer>
-        </>
+        </main>
     )
 }
 

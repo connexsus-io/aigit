@@ -1,10 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Network, ArrowLeft } from 'lucide-react';
+import { SEO } from './SEO';
 
 const NotFoundPage: React.FC = () => {
     return (
         <div className="not-found-page max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 flex items-center justify-center min-h-[70vh]">
+            <SEO
+                title="404 - Sector Not Found"
+                description="The requested AI context sector could not be located."
+                canonicalUrl="https://aigit.io/404"
+            />
             <div className="terminal-404-container text-center max-w-2xl w-full">
                 {/* Glitching Logo */}
                 <div className="flex justify-center mb-8 glitch-wrapper">
