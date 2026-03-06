@@ -7,7 +7,7 @@ import { PostHog } from 'posthog-node';
 
 const client = new PostHog(
     process.env.AIGIT_POSTHOG_KEY || 'phc_2iR7j4Lw6qjUzvA3aJwR9GvK0pA7dJt5Rk1Y1L2mNn3',
-    { host: 'https://us.i.posthog.com' }
+    { host: 'https://eu.i.posthog.com' }
 );
 
 // Initialize Sentry with strict strict privacy controls
