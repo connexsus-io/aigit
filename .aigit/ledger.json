@@ -54,6 +54,16 @@
       "createdAt": "2026-03-05T22:11:27.457Z"
     },
     {
+      "id": "4d4ab24e-e7d8-429f-9318-5fb61934b464",
+      "projectId": "008465eb-074f-40e7-8bce-0e6d47927b1a",
+      "sessionId": null,
+      "gitBranch": "main",
+      "type": "capability",
+      "content": "Automatic Git Commit Context (Staged Changes)\nFiles Changed:\nM\tfrontend/dist/index.html\nM\tfrontend/index.html\nM\tfrontend/package-lock.json\nM\tfrontend/package.json\nA\tfrontend/public/robots.txt\nA\tfrontend/public/sitemap.xml\nM\tfrontend/src/App.tsx\nM\tfrontend/src/DocsPage.tsx\nM\tfrontend/src/FeedbackPage.tsx\nM\tfrontend/src/NotFoundPage.tsx\nA\tfrontend/src/SEO.tsx\nM\tfrontend/src/main.tsx\n\nStatistics:\nfrontend/dist/index.html      | 33 ++++++++++++++++++++++++++++-\n frontend/index.html           | 31 +++++++++++++++++++++++++++\n frontend/package-lock.json    | 49 ++++++++++++++++++++++++++++++++++++++++++-\n frontend/package.json         |  1 +\n frontend/public/robots.txt    |  4 ++++\n frontend/public/sitemap.xml   | 27 ++++++++++++++++++++++++\n frontend/src/App.tsx          |  9 ++++++--\n frontend/src/DocsPage.tsx     |  7 +++++++\n frontend/src/FeedbackPage.tsx |  6 ++++++\n frontend/src/NotFoundPage.tsx |  6 ++++++\n frontend/src/SEO.tsx          | 42 +++++++++++++++++++++++++++++++++++++\n frontend/src/main.tsx         |  6 +++++-\n 12 files changed, 216 insertions(+), 5 deletions(-)",
+      "embedding": null,
+      "createdAt": "2026-03-05T22:30:25.320Z"
+    },
+    {
       "id": "e0696389-ada9-4846-b8df-61f2dab5936a",
       "projectId": "008465eb-074f-40e7-8bce-0e6d47927b1a",
       "sessionId": null,
