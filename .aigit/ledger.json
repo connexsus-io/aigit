@@ -202,6 +202,16 @@
       "content": "Replaced the strict commit hard-block with a Smart Hybrid TTY check. Human devs are seamlessly prompted inline for a semantic summary to save their commit momentum, while headless AI agents are strictly blocked to enforce compliance.",
       "embedding": null,
       "createdAt": "2026-03-07T22:50:09.192Z"
+    },
+    {
+      "id": "b066c954-0e3a-41cd-aaff-d34bbb0b4949",
+      "projectId": "008465eb-074f-40e7-8bce-0e6d47927b1a",
+      "sessionId": null,
+      "gitBranch": "main",
+      "type": "architecture",
+      "content": "Updated the DocsPage frontend to detail the new Smart Hybrid Commit Enforcement approach for pre-commit hooks.",
+      "embedding": null,
+      "createdAt": "2026-03-07T22:57:45.226Z"
     }
   ]
 }

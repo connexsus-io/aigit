@@ -54,9 +54,12 @@ This deeply synthesizes the architectural intent *before* the code is committed.
 #### 4. The "Guardian" pre-push Hook (Self-Healing)
 Before pushing broken code or vulnerable dependencies to GitHub, aigit acts as a local CI guardian.
 
-When you run \`git push\`, the custom \`pre-push\` hook triggers \`npx aigit heal\`. This initiates a workflow that runs your test suite, captures stack traces from failures, and parses your AST to map failures to specific functions. It queries \`ledger.json\` to see if the bug has been fixed before, then prints a **Healing Plan** detailing exactly how to fix it. If you run \`aigit heal --auto\`, it automatically patches the code and commits the fix before pushing.
+When you run \`git push\`, the custom \`pre-push\` hook triggers \`npx aigit heal\`. This initiates a workflow that runs your test suite, captures stack traces from failures, and parses your AST to map failures to specific functions. It queries \`ledger.json\` to see if the bug has been fixed before, then prints a **Healing Plan**. If you run \`aigit heal --auto\`, it automatically patches the code and commits the fix.
 
-#### 5. Multi-Agent Swarm Orchestration (For Complex Tasks)
+#### 5. Smart Hybrid Commit Enforcement (The pre-commit Hook)
+To protect your semantic ledger, aigit enforces the memory rule directly in Git. But it behaves completely differently depending on *who* is running the commit:
+- **For AI Agents (Cursor, Windsurf, CI/CD):** Agents usually run headless commands. If they try to \`git commit\` without generating semantic context, aigit detects they lack a TTY and **ruthlessly aborts the commit** with a hard error. This forces AI agents to strictly abide by the rules.
+- **For Human Developers:** If *you* type \`git commit\` and forget, aigit detects your live terminal. Instead of blocking you, it pauses the commit inline, asks you for the architectural summary right there in the prompt, processes it seamlessly, and continues the commit without losing your momentum.
 When a task is too big for a single prompt, you bring in the Swarm.
 
 Simply run the **aigit swarm** command:
