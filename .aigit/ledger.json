@@ -132,6 +132,26 @@
       "content": "Automatic Git Commit Context (Staged Changes)\nFiles Changed:\nM\tvscode-aigit/dist/extension.js\nM\tvscode-aigit/dist/extension.js.map\nM\tvscode-aigit/package-lock.json\nM\tvscode-aigit/package.json\nM\tvscode-aigit/src/extension.ts\nA\tvscode-aigit/vscode-aigit-1.0.1.vsix\n\nStatistics:\nvscode-aigit/dist/extension.js       |  13 +++++++++++++\n vscode-aigit/dist/extension.js.map   |   2 +-\n vscode-aigit/package-lock.json       |   4 ++--\n vscode-aigit/package.json            |   9 +++++++--\n vscode-aigit/src/extension.ts        |  17 +++++++++++++++++\n vscode-aigit/vscode-aigit-1.0.1.vsix | Bin 0 -> 40233 bytes\n 6 files changed, 40 insertions(+), 5 deletions(-)",
       "embedding": null,
       "createdAt": "2026-03-07T22:09:51.913Z"
+    },
+    {
+      "id": "0d1a9818-9d35-4dd1-bd31-ee7238a875b3",
+      "projectId": "008465eb-074f-40e7-8bce-0e6d47927b1a",
+      "sessionId": null,
+      "gitBranch": "main",
+      "type": "architecture",
+      "content": "Updated frontend/src/DocsPage.tsx to document the new Agent-Driven commit workflow.",
+      "embedding": null,
+      "createdAt": "2026-03-07T22:19:36.342Z"
+    },
+    {
+      "id": "b2f63370-cfb0-48da-ab44-702f43481629",
+      "projectId": "008465eb-074f-40e7-8bce-0e6d47927b1a",
+      "sessionId": null,
+      "gitBranch": "main",
+      "type": "architecture",
+      "content": "Added aigit.commitMemory command to vscode-aigit extension allowing developers to commit semantic memory via Command Palette.",
+      "embedding": null,
+      "createdAt": "2026-03-07T22:19:37.496Z"
     }
   ]
 }
