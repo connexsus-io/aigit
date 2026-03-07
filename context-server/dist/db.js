@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.prisma = exports.client = void 0;
+exports.findWorkspaceRoot = findWorkspaceRoot;
 exports.initializeDatabase = initializeDatabase;
 const client_1 = require("@prisma/client");
 const pglite_1 = require("@electric-sql/pglite");
@@ -12,6 +13,16 @@ const pglite_prisma_adapter_1 = require("pglite-prisma-adapter");
 const vector_1 = require("@electric-sql/pglite/vector");
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
+function findWorkspaceRoot(startDir) {
+    let currentDir = startDir;
+    while (currentDir !== path_1.default.parse(currentDir).root) {
+        if (fs_1.default.existsSync(path_1.default.join(currentDir, '.aigit')) || fs_1.default.existsSync(path_1.default.join(currentDir, '.git'))) {
+            return currentDir;
+        }
+        currentDir = path_1.default.dirname(currentDir);
+    }
+    return startDir; // Fallback
+}
 // Check if we are starting MCP with a specific directory argument
 let targetDir = process.cwd();
 const args = process.argv.slice(2);
@@ -23,6 +34,9 @@ if (args[0] === 'mcp' && args[1]) {
     else {
         targetDir = path_1.default.resolve(process.cwd(), potentialDir);
     }
+}
+else {
+    targetDir = findWorkspaceRoot(process.cwd());
 }
 // Define the path to the embedded memory database
 const AIGIT_DIR = path_1.default.join(targetDir, '.aigit');

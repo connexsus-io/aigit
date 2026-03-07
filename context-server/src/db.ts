@@ -6,6 +6,17 @@ import { vector } from '@electric-sql/pglite/vector';
 import path from 'path';
 import fs from 'fs';
 
+export function findWorkspaceRoot(startDir: string): string {
+    let currentDir = startDir;
+    while (currentDir !== path.parse(currentDir).root) {
+        if (fs.existsSync(path.join(currentDir, '.aigit')) || fs.existsSync(path.join(currentDir, '.git'))) {
+            return currentDir;
+        }
+        currentDir = path.dirname(currentDir);
+    }
+    return startDir; // Fallback
+}
+
 // Check if we are starting MCP with a specific directory argument
 let targetDir = process.cwd();
 
@@ -17,6 +28,8 @@ if (args[0] === 'mcp' && args[1]) {
     } else {
         targetDir = path.resolve(process.cwd(), potentialDir);
     }
+} else {
+    targetDir = findWorkspaceRoot(process.cwd());
 }
 
 // Define the path to the embedded memory database

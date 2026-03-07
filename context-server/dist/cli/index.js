@@ -94,7 +94,7 @@ Sentry.init({
     tracesSampleRate: 1.0,
     beforeSend(event) {
         // Path scrubbing: remove the user's local directory paths from exceptions
-        const workspacePath = process.cwd();
+        const workspacePath = (0, db_1.findWorkspaceRoot)(process.cwd());
         const scrubbedEvent = JSON.parse(JSON.stringify(event));
         const scrubString = (str) => str.split(workspacePath).join('[SECURE_WORKSPACE]');
         if (scrubbedEvent.exception?.values) {
@@ -142,7 +142,7 @@ async function main() {
         }
     }
     if (command === 'hydrate') {
-        const workspacePath = process.cwd();
+        const workspacePath = (0, db_1.findWorkspaceRoot)(process.cwd());
         const activeFile = args[1];
         const context = await (0, hydration_1.compileHydratedContext)(workspacePath, activeFile);
         console.log(context);
@@ -152,19 +152,19 @@ async function main() {
         require('../index');
     }
     else if (command === 'init') {
-        const workspacePath = process.cwd();
+        const workspacePath = (0, db_1.findWorkspaceRoot)(process.cwd());
         const { installGitHook } = require('./hooks');
         installGitHook(workspacePath);
         console.log('✅ aigit initialized. Hooks installed, .aigit/ directory ready.');
     }
     else if (command === 'init-hook') {
-        const workspacePath = process.cwd();
+        const workspacePath = (0, db_1.findWorkspaceRoot)(process.cwd());
         const { installGitHook } = require('./hooks');
         installGitHook(workspacePath);
     }
     else if (command === 'check-conflicts') {
         const targetBranch = args[1] || 'main';
-        const workspacePath = process.cwd();
+        const workspacePath = (0, db_1.findWorkspaceRoot)(process.cwd());
         const { checkContextConflicts } = require('./conflict');
         await checkContextConflicts(workspacePath, targetBranch);
     }
@@ -176,27 +176,27 @@ async function main() {
             process.exit(1);
         }
         const targetBranch = args[2] || 'main';
-        const workspacePath = process.cwd();
+        const workspacePath = (0, db_1.findWorkspaceRoot)(process.cwd());
         const { mergeContextBranches } = require('./merge');
         await mergeContextBranches(workspacePath, sourceBranch, targetBranch);
     }
     else if (command === 'dump') {
-        const workspacePath = process.cwd();
+        const workspacePath = (0, db_1.findWorkspaceRoot)(process.cwd());
         const { dumpContextLedger } = require('./sync');
         await dumpContextLedger(workspacePath);
     }
     else if (command === 'load') {
-        const workspacePath = process.cwd();
+        const workspacePath = (0, db_1.findWorkspaceRoot)(process.cwd());
         const { loadContextLedger } = require('./sync');
         await loadContextLedger(workspacePath);
     }
     else if (command === 'log') {
-        const workspacePath = process.cwd();
+        const workspacePath = (0, db_1.findWorkspaceRoot)(process.cwd());
         const { showContextLog } = require('./history');
         await showContextLog(workspacePath);
     }
     else if (command === 'status') {
-        const workspacePath = process.cwd();
+        const workspacePath = (0, db_1.findWorkspaceRoot)(process.cwd());
         const { showContextStatus } = require('./history');
         await showContextStatus(workspacePath);
     }
@@ -207,18 +207,18 @@ async function main() {
             console.log('Usage: aigit revert <context-id>');
             process.exit(1);
         }
-        const workspacePath = process.cwd();
+        const workspacePath = (0, db_1.findWorkspaceRoot)(process.cwd());
         const { revertContextId } = require('./history');
         await revertContextId(workspacePath, targetId);
     }
     else if (command === 'scan') {
-        const workspacePath = process.cwd();
+        const workspacePath = (0, db_1.findWorkspaceRoot)(process.cwd());
         const { detectAgents, printScanReport } = require('../agents/registry');
         const agents = detectAgents(workspacePath);
         printScanReport(agents);
     }
     else if (command === 'sync') {
-        const workspacePath = process.cwd();
+        const workspacePath = (0, db_1.findWorkspaceRoot)(process.cwd());
         const { syncAgents } = require('../agents/sync');
         const dryRun = args.includes('--dry-run');
         const skillsMigrate = args.includes('--skills');
@@ -244,7 +244,7 @@ async function main() {
         }
     }
     else if (command === 'conflicts') {
-        const workspacePath = process.cwd();
+        const workspacePath = (0, db_1.findWorkspaceRoot)(process.cwd());
         const { loadConflicts, printConflicts } = require('../agents/conflicts');
         const conflicts = loadConflicts(workspacePath);
         printConflicts(conflicts);
@@ -256,7 +256,7 @@ async function main() {
             console.log('Usage: aigit query "<question>" [--commit <hash>] [--top <n>]');
             process.exit(1);
         }
-        const workspacePath = process.cwd();
+        const workspacePath = (0, db_1.findWorkspaceRoot)(process.cwd());
         const commitIdx = args.indexOf('--commit');
         const topIdx = args.indexOf('--top');
         const commitHash = commitIdx !== -1 ? args[commitIdx + 1] : undefined;
@@ -307,7 +307,7 @@ async function main() {
             console.log('Usage: aigit anchor <file>');
             process.exit(1);
         }
-        const workspacePath = process.cwd();
+        const workspacePath = (0, db_1.findWorkspaceRoot)(process.cwd());
         const path = require('path');
         const fullPath = path.isAbsolute(targetFile) ? targetFile : path.join(workspacePath, targetFile);
         const { anchorFileToSymbols } = require('../ast/resolver');
@@ -319,7 +319,7 @@ async function main() {
         const { createSwarm, getSwarmStatus, haltSwarm, resumeSwarm, listActiveSwarms } = require('../swarm/swarm');
         const { listConflicts, resolveConflict } = require('../swarm/conflict');
         const subCommand = args[1];
-        const workspacePath = process.cwd();
+        const workspacePath = (0, db_1.findWorkspaceRoot)(process.cwd());
         const { getActiveBranch } = require('./git');
         if (subCommand === 'status') {
             // Find active swarms
@@ -429,7 +429,7 @@ Commands:
     }
     else if (command === 'heal') {
         const { healFromTestFailure, getHealingHistory, retryHealingEvent } = require('../healing/runner');
-        const workspacePath = process.cwd();
+        const workspacePath = (0, db_1.findWorkspaceRoot)(process.cwd());
         const subCommand = args[1];
         if (subCommand === 'status') {
             const history = await getHealingHistory();
@@ -462,7 +462,7 @@ Commands:
     }
     else if (command === 'deps') {
         const { runAudit, buildDepHealPlan, formatDepReport, executeDepAutoHeal } = require('../healing/depAudit');
-        const workspacePath = process.cwd();
+        const workspacePath = (0, db_1.findWorkspaceRoot)(process.cwd());
         const auto = args.includes('--auto');
         console.log('\n📦 Running dependency audit...\n');
         const audit = runAudit(workspacePath);
@@ -506,7 +506,7 @@ Commands:
             console.log('Usage: aigit note "<message>" [--scope <path>] [--decision] [--issue <ref>]');
             process.exit(1);
         }
-        const workspacePath = process.cwd();
+        const workspacePath = (0, db_1.findWorkspaceRoot)(process.cwd());
         const { getActiveBranch } = require('./git');
         const branch = getActiveBranch(workspacePath);
         // Ensure a default project exists
@@ -545,7 +545,7 @@ Commands:
     }
     else if (command === 'commit') {
         const subCommand = args[1]; // memory | decision | task
-        const workspacePath = process.cwd();
+        const workspacePath = (0, db_1.findWorkspaceRoot)(process.cwd());
         const { getActiveBranch } = require('./git');
         const branch = getActiveBranch(workspacePath);
         // Ensure a default project exists
@@ -576,6 +576,8 @@ Commands:
                     filePath,
                 }
             });
+            const { dumpContextLedger } = require('./sync');
+            await dumpContextLedger(workspacePath);
             console.log(`\n✅ [aigit commit] Memory committed to branch [${branch}]`);
             console.log(`   Type: ${memType}`);
             console.log(`   ID: ${memory.id}`);
@@ -612,6 +614,8 @@ Commands:
                     filePath,
                 }
             });
+            const { dumpContextLedger } = require('./sync');
+            await dumpContextLedger(workspacePath);
             console.log(`\n✅ [aigit commit] Decision recorded on branch [${branch}]`);
             console.log(`   Context: ${context}`);
             console.log(`   Chosen: ${chosen}`);
@@ -638,6 +642,8 @@ Commands:
                     status: 'PLANNING'
                 }
             });
+            const { dumpContextLedger } = require('./sync');
+            await dumpContextLedger(workspacePath);
             console.log(`\n✅ [aigit commit] Task created on branch [${branch}]`);
             console.log(`   Title: ${title}`);
             console.log(`   Slug: ${slug}`);
