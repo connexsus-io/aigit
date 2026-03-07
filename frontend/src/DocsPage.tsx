@@ -40,14 +40,16 @@ The most powerful way to use aigit is **not** via the CLI, but as a background b
 
 Simply **configure your AI IDE** (Cursor, Windsurf, Claude) to connect to aigit's local **MCP Server**. When you ask your IDE, *"Why did we choose Redis over Postgres for this feature?"*, the IDE doesn't just guess. It actively queries aigit's Time-Traveling Semantic Ledger, fetching the exact architectural decision you recorded weeks ago.
 
-#### 3. Continuous Semantic Memory (Invisible Documentation)
-Developers hate writing documentation. aigit handles it invisibly.
+#### 3. Agent-Driven Semantic Memory (Context Generation)
+Developers hate writing documentation. aigit handles it seamlessly using your AI agents.
 
-When you **commit code normally**:
+Rather than relying on noisy, token-heavy \`git diff\` blobs, context generation is shifted upstream to your AI agents (Cursor, Windsurf, etc).
+
+When an agent finishes coding, they run:
     \`\`\`bash
-    git commit -m "feat: setup auth"
+    aigit commit memory "Refactored the authentication flow to use JWTs instead of sessions"
     \`\`\`
-The \`pre-commit\` hook seamlessly triggers \`aigit commit auto\`. It automatically captures your commit message, diff stats, and file changes, embedding them directly into \`.aigit/ledger.json\`. You can even run \`aigit docs\` at any time to generate a fresh, Mermaid-diagrammed \`ARCHITECTURE.md\` perfectly synced with your code.
+This deeply synthesizes the architectural intent *before* the code is committed. The \`pre-commit\` hook natively detects these agent-authored memories and optimizes the \`.aigit/ledger.json\` database to remain perfectly clean and token-efficient.
 
 #### 4. The "Guardian" pre-push Hook (Self-Healing)
 Before pushing broken code or vulnerable dependencies to GitHub, aigit acts as a local CI guardian.
@@ -653,8 +655,8 @@ aigit uses **PGlite** — a WASM-compiled PostgreSQL with \`pgvector\` for seman
 ### Branch Isolation
 Each Git branch gets its own context. When you \`git checkout\`, the post-checkout hook automatically loads the correct branch memory.
 
-### Context Tracking
-The \`pre-commit\` hook automatically captures your staged code changes and commit messages, embedding them into the active semantic memory without any manual data entry.
+### Agent-Driven Context Generation
+Instead of raw git diffs, aigit mandates that AI agents use \`aigit commit memory\` to synthesize semantic, token-efficient summaries of their architectural choices. The \`pre-commit\` hook intelligently detects these memories and orchestrates them into the ledger, completely avoiding payload bloat.
 
 ### Ledger Sync
 \`aigit dump\` serializes the in-memory database to \`ledger.json\`. This file is committed to Git, so your semantic memory travels with the repo.

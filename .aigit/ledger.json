@@ -112,6 +112,16 @@
       "content": "Testing fixed ledger dump for Agent-Driven workflow (Attempt 2)",
       "embedding": null,
       "createdAt": "2026-03-07T21:53:54.635Z"
+    },
+    {
+      "id": "f3443c23-c6f0-498d-b4ff-acd12bd9facc",
+      "projectId": "008465eb-074f-40e7-8bce-0e6d47927b1a",
+      "sessionId": null,
+      "gitBranch": "main",
+      "type": "capability",
+      "content": "Automatic Git Commit Context (Staged Changes)\nFiles Changed:\nM\tfrontend/src/DocsPage.tsx\n\nStatistics:\nfrontend/src/DocsPage.tsx | 16 +++++++++-------\n 1 file changed, 9 insertions(+), 7 deletions(-)",
+      "embedding": null,
+      "createdAt": "2026-03-07T22:03:12.145Z"
     }
   ]
 }
