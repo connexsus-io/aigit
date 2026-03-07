@@ -622,7 +622,7 @@ Commands:
                 const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
                 const recentAgentMemory = await prisma.memory.findFirst({
                     where: {
-                        projectId: project.id,
+                        projectId: project!.id,
                         gitBranch: branch,
                         type: { in: ['capability', 'architecture', 'context'] },
                         createdAt: { gte: fiveMinutesAgo }
@@ -633,6 +633,17 @@ Commands:
                     console.log(`\n⏭️  [aigit commit] Skipping automatic raw diff generation.`);
                     console.log(`   └─ Found recent Agent-authored memory: "${recentAgentMemory.content.slice(0, 50)}..."`);
                     process.exit(0);
+                } else {
+                    console.error(`\n======================================================`);
+                    console.error(`🛑 [Aigit] ERROR: Agent-Driven Commit Summaries are REQUIRED.`);
+                    console.error(`======================================================`);
+                    console.error(`To maintain a clean and token-efficient semantic ledger, you`);
+                    console.error(`are not allowed to generate noisy raw 'git diff' payloads.\n`);
+                    console.error(`🤖 AI Agents & Developers MUST run this command FIRST:\n`);
+                    console.error(`   aigit commit memory "<semantic architectural summary>"\n`);
+                    console.error(`Please run the command above, then try your 'git commit' again.`);
+                    console.error(`======================================================\n`);
+                    process.exit(1);
                 }
 
                 // Get the list of staged files and their status (A, M, D, etc.)
@@ -654,7 +665,7 @@ ${diffStats}`;
 
                 const memory = await prisma.memory.create({
                     data: {
-                        projectId: project.id,
+                        projectId: project!.id,
                         gitBranch: branch,
                         type: 'capability', // using capability to denote functional changes
                         content: semanticSummary,

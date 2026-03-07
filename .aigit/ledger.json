@@ -152,6 +152,36 @@
       "content": "Added aigit.commitMemory command to vscode-aigit extension allowing developers to commit semantic memory via Command Palette.",
       "embedding": null,
       "createdAt": "2026-03-07T22:19:37.496Z"
+    },
+    {
+      "id": "7b7c43c0-ddc9-4e2f-adb5-c1a9e15b3f94",
+      "projectId": "008465eb-074f-40e7-8bce-0e6d47927b1a",
+      "sessionId": null,
+      "gitBranch": "main",
+      "type": "architecture",
+      "content": "Dummy summary for strict validation test",
+      "embedding": null,
+      "createdAt": "2026-03-07T22:38:21.917Z"
+    },
+    {
+      "id": "27ca22f5-987f-4d91-ac13-36dceb170e71",
+      "projectId": "008465eb-074f-40e7-8bce-0e6d47927b1a",
+      "sessionId": null,
+      "gitBranch": "main",
+      "type": "architecture",
+      "content": "Replaced interactive bypass prompt with a strict process.exit(1) hard block in the pre-commit hook to physically prevent AI agents from skipping the semantic commit rule.",
+      "embedding": null,
+      "createdAt": "2026-03-07T22:38:48.785Z"
+    },
+    {
+      "id": "da45941d-6e2c-4de6-858d-860ca2c33733",
+      "projectId": "008465eb-074f-40e7-8bce-0e6d47927b1a",
+      "sessionId": null,
+      "gitBranch": "main",
+      "type": "architecture",
+      "content": "Implemented strict non-bypassable git hooks. Replaced interactive TTY prompts with a hard process.exit(1) block to forcefully prevent AI agents from skipping semantic commit requirements.",
+      "embedding": null,
+      "createdAt": "2026-03-07T22:40:09.089Z"
     }
   ]
 }
