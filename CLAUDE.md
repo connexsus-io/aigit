@@ -1,5 +1,3 @@
-
-
 # --- Synced by aigit ---
 
 ## YOUR ENTIRE IDENTITY, SKILLSET, AND CURRENT MISSION ARE LOCATED IN THE REPOSITORY.
@@ -24,9 +22,8 @@ If you are starting a new task, you must use `.agent/templates/task-template.md`
 
 > **MANDATORY:** You MUST read the appropriate agent file and its skills BEFORE performing any implementation. This is the highest priority rule.
 
-## 1. Modular Skill Loading Protocol
-
-```
+### 1. Modular Skill Loading Protocol
+```text
 Agent activated → Check frontmatter "skills:" field
     │
     └── For EACH skill:
@@ -38,8 +35,7 @@ Agent activated → Check frontmatter "skills:" field
 - **Selective Reading:** DO NOT read ALL files in a skill folder. Read `SKILL.md` first, then only read sections matching the user's request.
 - **Rule Priority:** P0 (AGENTS.md) > P1 (Agent .md) > P2 (SKILL.md). All rules are binding.
 
-## 2. Enforcement Protocol
-
+### 2. Enforcement Protocol
 1. **When agent is activated:**
    - ✅ READ all rules inside the agent file.
    - ✅ CHECK frontmatter `skills:` list.
@@ -64,14 +60,16 @@ Agent activated → Check frontmatter "skills:" field
 
 ---
 
-## 🌐 Language Handling
+## TIER 0: UNIVERSAL RULES (Always Active)
+
+### 🌐 Language Handling
 
 When user's prompt is NOT in English:
 1. **Internally translate** for better comprehension
 2. **Respond in user's language** - match their communication
 3. **Code comments/variables** remain in English
 
-## 🧹 Clean Code (Global Mandatory)
+### 🧹 Clean Code (Global Mandatory)
 
 **ALL code MUST follow `@[skills/clean-code]` rules. No exceptions.**
 
@@ -84,14 +82,14 @@ When user's prompt is NOT in English:
 - **Global Performance Mandate:** "Measure first, optimize second." Every agent must ensure their changes adhere to 2025 performance standards (Core Web Vitals for Web, query optimization for DB, bundle limits for FS).
 - **Infrastructure & Safety Mandate:** Every agent is responsible for the deployability and operational safety of their changes. Follow the "5-Phase Deployment Process" (Prepare, Backup, Deploy, Verify, Confirm/Rollback). Always verify environment variables and secrets security.
 
-## 📁 File Dependency Awareness
+### 📁 File Dependency Awareness
 
 **Before modifying ANY file:**
 1. Check `CODEBASE.md` → File Dependencies
 2. Identify dependent files
 3. Update ALL affected files together
 
-## 🗺️ System Map Read
+### 🗺️ System Map Read
 
 > 🔴 **MANDATORY:** Read `ARCHITECTURE.md` at session start to understand Agents, Skills, and Scripts.
 
@@ -100,9 +98,10 @@ When user's prompt is NOT in English:
 - Skills: `.agent/skills/` (Project)
 - Runtime Scripts: `.agent/skills/<skill>/scripts/`
 
-## 🧠 Read → Understand → Apply
 
-```
+### 🧠 Read → Understand → Apply
+
+```text
 ❌ WRONG: Read agent file → Start coding
 ✅ CORRECT: Read → Understand WHY → Apply PRINCIPLES → Code
 ```
@@ -112,25 +111,11 @@ When user's prompt is NOT in English:
 2. What PRINCIPLES must I apply?
 3. How does this DIFFER from generic output?
 
----
-
-## 📱 Project Type Routing
-
-| Project Type | Primary Agent | Skills |
-|--------------|---------------|--------|
-| **MOBILE** (iOS, Android, RN, Flutter) | `mobile-developer` | mobile-design |
-| **WEB** (Next.js, React web) | `frontend-specialist` | frontend-design |
-| **BACKEND** (API, server, DB) | `backend-specialist` | api-patterns, database-design |
-
-> 🔴 **Mobile + frontend-specialist = WRONG.** Mobile = mobile-developer ONLY.
-
-## 🛑 Socratic Gate
-
-**For complex requests, STOP and ASK first:**
-
-## 🛑 GLOBAL SOCRATIC GATE (TIER 0)
+### 🛑 GLOBAL SOCRATIC GATE (TIER 0)
 
 **MANDATORY: Every user request must pass through the Socratic Gate before ANY tool use or implementation.**
+
+**For complex requests, STOP and ASK first:**
 
 | Request Type | Strategy | Required Action |
 |--------------|----------|-----------------|
@@ -146,7 +131,21 @@ When user's prompt is NOT in English:
 3. **Wait:** Do NOT invoke subagents or write code until the user clears the Gate.
 4. **Reference:** Full protocol in `@[skills/brainstorming]`.
 
-## 🏁 Final Checklist Protocol
+---
+
+## TIER 1: CODE RULES (When Writing Code)
+
+### 📱 Project Type Routing
+
+| Project Type | Primary Agent | Skills |
+|--------------|---------------|--------|
+| **MOBILE** (iOS, Android, RN, Flutter) | `mobile-developer` | mobile-design |
+| **WEB** (Next.js, React web) | `frontend-specialist` | frontend-design |
+| **BACKEND** (API, server, DB) | `backend-specialist` | api-patterns, database-design |
+
+> 🔴 **Mobile + frontend-specialist = WRONG.** Mobile = mobile-developer ONLY.
+
+### 🏁 Final Checklist Protocol
 
 **Trigger:** When the user says "son kontrolleri yap", "final checks", "çalıştır tüm testleri", or similar phrases.
 
@@ -181,7 +180,7 @@ When user's prompt is NOT in English:
 
 > 🔴 **Agents & Skills can invoke ANY script** via `python .agent/skills/<skill>/scripts/<script>.py`
 
-## 🎭 Gemini Mode Mapping
+### 🎭 Agent Mode Mapping
 
 | Mode | Agent | Behavior |
 |------|-------|----------|
@@ -218,7 +217,9 @@ When user's prompt is NOT in English:
 
 ---
 
-## Available Master Agents (8)
+## 📁 QUICK REFERENCE
+
+### Available Master Agents (8)
 
 | Agent | Domain & Focus |
 |-------|----------------|
@@ -231,7 +232,7 @@ When user's prompt is NOT in English:
 | `debugger` | Systematic Root Cause Analysis & Bug Fixing |
 | `game-developer` | Specialized Game Logic & Assets & Performance |
 
-## Key Skills
+### Key Skills
 
 | Skill | Purpose |
 |-------|---------|
@@ -244,7 +245,7 @@ When user's prompt is NOT in English:
 | `threejs-mastery` | 2025 3D Web (R3F, WebGPU) |
 | `behavioral-modes` | Mode switching |
 
-## Script Locations
+### Script Locations
 
 | Script | Path |
 |--------|------|
@@ -254,4 +255,3 @@ When user's prompt is NOT in English:
 | Mobile audit | `.agent/skills/mobile-design/scripts/mobile_audit.py` |
 | Lighthouse | `.agent/skills/performance-profiling/scripts/lighthouse_audit.py` |
 | Playwright | `.agent/skills/webapp-testing/scripts/playwright_runner.py` |
-

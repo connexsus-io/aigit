@@ -38,10 +38,59 @@ const hydration_1 = require("./hydration");
 const db_1 = require("../db");
 const Sentry = __importStar(require("@sentry/node"));
 const posthog_node_1 = require("posthog-node");
-const client = new posthog_node_1.PostHog(process.env.AIGIT_POSTHOG_KEY || 'phc_2iR7j4Lw6qjUzvA3aJwR9GvK0pA7dJt5Rk1Y1L2mNn3', { host: 'https://us.i.posthog.com' });
-// Initialize Sentry with strict strict privacy controls
+const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
+const os = __importStar(require("os"));
+const crypto = __importStar(require("crypto"));
+const perf_hooks_1 = require("perf_hooks");
+// Get CLI Version
+let cliVersion = 'unknown';
+try {
+    const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '../../package.json'), 'utf-8'));
+    cliVersion = pkg.version || 'unknown';
+}
+catch (e) {
+    // Ignore if package.json not found
+}
+const POSTHOG_KEY = process.env.AIGIT_POSTHOG_KEY || 'phc_vgRl0mE57cbfKhECqT55sep3xVwggbmUvM82YK9781Y';
+const client = new posthog_node_1.PostHog(POSTHOG_KEY, { host: 'https://eu.i.posthog.com' });
+const isTelemetryEnabled = process.env.DO_NOT_TRACK !== '1' && process.env.DO_NOT_TRACK !== 'true';
+function getOrGenerateTelemetryId() {
+    const configDir = path.join(os.homedir(), '.aigit');
+    const configFile = path.join(configDir, 'telemetry.json');
+    try {
+        if (fs.existsSync(configFile)) {
+            const data = JSON.parse(fs.readFileSync(configFile, 'utf-8'));
+            if (data.distinctId)
+                return data.distinctId;
+        }
+        else {
+            if (!fs.existsSync(configDir))
+                fs.mkdirSync(configDir, { recursive: true });
+        }
+        const distinctId = crypto.randomUUID();
+        fs.writeFileSync(configFile, JSON.stringify({ distinctId }));
+        return distinctId;
+    }
+    catch (e) {
+        return 'anonymous_cli_user_fallback';
+    }
+}
+const TELEMETRY_ID = getOrGenerateTelemetryId();
+if (isTelemetryEnabled) {
+    client.identify({
+        distinctId: TELEMETRY_ID,
+        properties: {
+            cli_version: cliVersion,
+            node_version: process.version,
+            os_platform: os.platform(),
+            os_release: os.release(),
+        }
+    });
+}
+// Initialize Sentry with strict privacy controls
 Sentry.init({
-    dsn: process.env.AIGIT_SENTRY_DSN || 'https://ebddaa251f22aa52a225de9c322b7a8a@o4508930438103040.ingest.us.sentry.io/4508930440331264', // Provide a default/fallback or expect it in env
+    dsn: process.env.AIGIT_SENTRY_DSN || 'https://b7b2bf74b578153299cf94bc66e89175@o4510993965907968.ingest.de.sentry.io/4510993978490960', // Provided by user
     tracesSampleRate: 1.0,
     beforeSend(event) {
         // Path scrubbing: remove the user's local directory paths from exceptions
@@ -65,19 +114,28 @@ Sentry.init({
         return scrubbedEvent;
     },
 });
+if (isTelemetryEnabled) {
+    Sentry.setUser({ id: TELEMETRY_ID });
+}
 const args = process.argv.slice(2);
 const command = args[0];
+let startTime = perf_hooks_1.performance.now();
 async function main() {
     await (0, db_1.initializeDatabase)();
     // Anonymous Telemetry (Respects DO_NOT_TRACK)
-    if (process.env.DO_NOT_TRACK !== '1' && process.env.DO_NOT_TRACK !== 'true') {
+    if (isTelemetryEnabled) {
         try {
             client.capture({
-                distinctId: 'anonymous_cli_user',
+                distinctId: TELEMETRY_ID,
                 event: 'cli_command_executed',
-                properties: { command }
+                properties: {
+                    command,
+                    cli_version: cliVersion,
+                    node_version: process.version,
+                    os_platform: os.platform(),
+                    os_release: os.release()
+                }
             });
-            await client.shutdown();
         }
         catch (e) {
             // Silently fail telemetry if network issue
@@ -589,6 +647,21 @@ Commands:
         else if (subCommand === 'staged') {
             const { execSync } = require('child_process');
             try {
+                // Check if an AI Agent already supplied a semantic semantic memory in the last 5 minutes
+                const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+                const recentAgentMemory = await db_1.prisma.memory.findFirst({
+                    where: {
+                        projectId: project.id,
+                        gitBranch: branch,
+                        type: { in: ['capability', 'architecture', 'context'] },
+                        createdAt: { gte: fiveMinutesAgo }
+                    }
+                });
+                if (recentAgentMemory) {
+                    console.log(`\n⏭️  [aigit commit] Skipping automatic raw diff generation.`);
+                    console.log(`   └─ Found recent Agent-authored memory: "${recentAgentMemory.content.slice(0, 50)}..."`);
+                    process.exit(0);
+                }
                 // Get the list of staged files and their status (A, M, D, etc.)
                 const fileChanges = execSync('git diff --cached --name-status').toString().trim();
                 if (!fileChanges) {
@@ -751,8 +824,38 @@ Other:
   telemetry off                 Show instructions to disable anonymous usage tracking
         `);
     }
+    if (command !== 'mcp' && isTelemetryEnabled) {
+        // Track success with duration
+        try {
+            client.capture({
+                distinctId: TELEMETRY_ID,
+                event: 'cli_command_completed',
+                properties: {
+                    command,
+                    duration_ms: Math.round(perf_hooks_1.performance.now() - startTime)
+                }
+            });
+        }
+        catch (e) { }
+        await client.shutdown();
+    }
 }
-main().catch((err) => {
+main().catch(async (err) => {
+    if (isTelemetryEnabled) {
+        try {
+            client.capture({
+                distinctId: TELEMETRY_ID,
+                event: 'cli_command_failed',
+                properties: {
+                    command,
+                    error: err.message,
+                    duration_ms: Math.round(perf_hooks_1.performance.now() - startTime)
+                }
+            });
+            await client.shutdown();
+        }
+        catch (e) { }
+    }
     console.error('aigit error:', err.message);
     process.exit(1);
 });

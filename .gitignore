@@ -26,4 +26,7 @@ yarn-error.log*
 
 # aigit specific
 **/.aigit/memory.db*
+**/.aigit/conflicts.json
 .gemini/
+
+/context-server/.env

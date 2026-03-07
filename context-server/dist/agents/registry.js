@@ -72,6 +72,38 @@ const AGENT_DEFINITIONS = [
         skillsDir: null,
         configDir: '.aider',
     },
+    {
+        id: 'continue',
+        name: 'Continue.dev',
+        rulesFiles: ['.continuerules'],
+        memoryFiles: ['.continuerules'],
+        skillsDir: '.continue/skills',
+        configDir: '.continue',
+    },
+    {
+        id: 'roo',
+        name: 'Roo Code',
+        rulesFiles: ['.roorules'],
+        memoryFiles: ['.roorules'],
+        skillsDir: '.roo/skills',
+        configDir: '.roo',
+    },
+    {
+        id: 'cody',
+        name: 'Sourcegraph Cody',
+        rulesFiles: ['.codyrules'],
+        memoryFiles: ['.codyrules'],
+        skillsDir: '.cody/skills',
+        configDir: '.cody',
+    },
+    {
+        id: 'devin',
+        name: 'Devin',
+        rulesFiles: ['.devinrules'],
+        memoryFiles: ['.devinrules'],
+        skillsDir: '.devin/skills',
+        configDir: null,
+    },
 ];
 /**
  * Scan a workspace and return all detected AI coding tools.
