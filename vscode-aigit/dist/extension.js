@@ -70,6 +70,19 @@ function activate(context) {
         timelineProvider.refresh();
         vscode.window.showInformationMessage('Aigit: Timeline refreshed.');
     }));
+    context.subscriptions.push(vscode.commands.registerCommand('aigit.commitMemory', async () => {
+        const summary = await vscode.window.showInputBox({
+            prompt: 'Enter a semantic summary of your architectural changes',
+            placeHolder: 'e.g. Refactored the authentication flow to use JWTs instead of sessions'
+        });
+        if (summary) {
+            const terminal = getOrCreateTerminal();
+            terminal.sendText(`aigit commit memory "${summary}"`);
+            terminal.show();
+            // Refresh the timeline after a short delay so the new memory appears
+            setTimeout(() => timelineProvider.refresh(), 2000);
+        }
+    }));
     context.subscriptions.push(vscode.commands.registerCommand('aigit.hydrate', () => {
         const terminal = getOrCreateTerminal();
         terminal.sendText('aigit hydrate');

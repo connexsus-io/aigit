@@ -122,6 +122,16 @@
       "content": "Automatic Git Commit Context (Staged Changes)\nFiles Changed:\nM\tfrontend/src/DocsPage.tsx\n\nStatistics:\nfrontend/src/DocsPage.tsx | 16 +++++++++-------\n 1 file changed, 9 insertions(+), 7 deletions(-)",
       "embedding": null,
       "createdAt": "2026-03-07T22:03:12.145Z"
+    },
+    {
+      "id": "1e5d8068-b273-4106-834e-0cbb825d7002",
+      "projectId": "008465eb-074f-40e7-8bce-0e6d47927b1a",
+      "sessionId": null,
+      "gitBranch": "main",
+      "type": "capability",
+      "content": "Automatic Git Commit Context (Staged Changes)\nFiles Changed:\nM\tvscode-aigit/dist/extension.js\nM\tvscode-aigit/dist/extension.js.map\nM\tvscode-aigit/package-lock.json\nM\tvscode-aigit/package.json\nM\tvscode-aigit/src/extension.ts\nA\tvscode-aigit/vscode-aigit-1.0.1.vsix\n\nStatistics:\nvscode-aigit/dist/extension.js       |  13 +++++++++++++\n vscode-aigit/dist/extension.js.map   |   2 +-\n vscode-aigit/package-lock.json       |   4 ++--\n vscode-aigit/package.json            |   9 +++++++--\n vscode-aigit/src/extension.ts        |  17 +++++++++++++++++\n vscode-aigit/vscode-aigit-1.0.1.vsix | Bin 0 -> 40233 bytes\n 6 files changed, 40 insertions(+), 5 deletions(-)",
+      "embedding": null,
+      "createdAt": "2026-03-07T22:09:51.913Z"
     }
   ]
 }
