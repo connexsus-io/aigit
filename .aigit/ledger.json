@@ -64,6 +64,16 @@
       "createdAt": "2026-03-05T22:30:25.320Z"
     },
     {
+      "id": "78e50f73-d306-431b-bd4a-342a2f520707",
+      "projectId": "008465eb-074f-40e7-8bce-0e6d47927b1a",
+      "sessionId": null,
+      "gitBranch": "main",
+      "type": "architecture",
+      "content": "Refined frontend UI to support a professional Light Mode. Abstracted hardcoded transparent dark grays into CSS variables and customized the contrast of terminal simulation blocks, documentation grids, and feature cards.",
+      "embedding": null,
+      "createdAt": "2026-03-08T18:57:23.779Z"
+    },
+    {
       "id": "e0696389-ada9-4846-b8df-61f2dab5936a",
       "projectId": "008465eb-074f-40e7-8bce-0e6d47927b1a",
       "sessionId": null,

@@ -1,6 +1,18 @@
 import { useState } from 'react'
 import './App.css'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
+import {
+    BrainCircuit,
+    GitMerge,
+    RefreshCcw,
+    Database,
+    Network,
+    Code,
+    Stethoscope,
+    ShieldAlert,
+    Search,
+    FileText
+} from 'lucide-react'
 import { Navbar } from './Navbar'
 import { TerminalSimulator } from './TerminalSimulator'
 import { InteractiveDemo } from './InteractiveDemo'
@@ -70,7 +82,7 @@ function LandingPage() {
 
                 <div className="features-grid">
                     <div className="feature-card">
-                        <div className="feature-icon">01</div>
+                        <div className="feature-icon"><BrainCircuit size={40} strokeWidth={1.5} /></div>
                         <h3>Branch-Aware Memory</h3>
                         <p>
                             Your agent's brain shifts automatically when you switch branches.
@@ -78,7 +90,7 @@ function LandingPage() {
                         </p>
                     </div>
                     <div className="feature-card">
-                        <div className="feature-icon">02</div>
+                        <div className="feature-icon"><GitMerge size={40} strokeWidth={1.5} /></div>
                         <h3>Semantic Conflict Checking</h3>
                         <p>
                             Merging code? <code>aigit</code> detects conflicting architectural decisions
@@ -86,7 +98,7 @@ function LandingPage() {
                         </p>
                     </div>
                     <div className="feature-card">
-                        <div className="feature-icon">03</div>
+                        <div className="feature-icon"><RefreshCcw size={40} strokeWidth={1.5} /></div>
                         <h3>Universal Agent Sync</h3>
                         <p>
                             Switch between Gemini, Claude, Cursor, Windsurf freely.
@@ -94,7 +106,7 @@ function LandingPage() {
                         </p>
                     </div>
                     <div className="feature-card">
-                        <div className="feature-icon">04</div>
+                        <div className="feature-icon"><Database size={40} strokeWidth={1.5} /></div>
                         <h3>Zero-Config Embedded Engine</h3>
                         <p>
                             Powered by an embedded, WASM-compiled Vector Database (PGlite).
@@ -102,7 +114,7 @@ function LandingPage() {
                         </p>
                     </div>
                     <div className="feature-card">
-                        <div className="feature-icon">05</div>
+                        <div className="feature-icon"><Network size={40} strokeWidth={1.5} /></div>
                         <h3>Multi-Agent Swarm</h3>
                         <p>
                             Orchestrate multiple AI agents in a single task. <code>aigit swarm</code> creates
@@ -110,7 +122,7 @@ function LandingPage() {
                         </p>
                     </div>
                     <div className="feature-card">
-                        <div className="feature-icon">06</div>
+                        <div className="feature-icon"><Code size={40} strokeWidth={1.5} /></div>
                         <h3>AST-Anchored RAG</h3>
                         <p>
                             Decisions are physically linked to code symbols via AST parsing.
@@ -118,7 +130,7 @@ function LandingPage() {
                         </p>
                     </div>
                     <div className="feature-card">
-                        <div className="feature-icon">07</div>
+                        <div className="feature-icon"><Stethoscope size={40} strokeWidth={1.5} /></div>
                         <h3>Self-Healing Codebases</h3>
                         <p>
                             Shift from assist to maintain. <code>aigit heal</code> intercepts failing tests,
@@ -126,7 +138,7 @@ function LandingPage() {
                         </p>
                     </div>
                     <div className="feature-card">
-                        <div className="feature-icon">08</div>
+                        <div className="feature-icon"><ShieldAlert size={40} strokeWidth={1.5} /></div>
                         <h3>Autonomous Dependency Updates</h3>
                         <p>
                             Secure your supply chain automatically. <code>aigit deps</code> audits vulnerabilities,
@@ -134,7 +146,7 @@ function LandingPage() {
                         </p>
                     </div>
                     <div className="feature-card">
-                        <div className="feature-icon">09</div>
+                        <div className="feature-icon"><Search size={40} strokeWidth={1.5} /></div>
                         <h3>Semantic Security Auditing</h3>
                         <p>
                             Actively audit memory for vulnerabilities. <code>security-auditor</code> automatically flags
@@ -142,7 +154,7 @@ function LandingPage() {
                         </p>
                     </div>
                     <div className="feature-card">
-                        <div className="feature-icon">10</div>
+                        <div className="feature-icon"><FileText size={40} strokeWidth={1.5} /></div>
                         <h3>Auto-Generating Documentation</h3>
                         <p>
                             Nobody should write <code>ARCHITECTURE.md</code> manually again. <code>aigit docs</code> generates a holistic overview and Semantic DAG from context memory.

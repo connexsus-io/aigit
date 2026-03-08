@@ -14,7 +14,7 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    padding-top: 15vh;
+    padding-top: 18vh;
     align-items: center;
     padding-left: 2rem;
     padding-right: 2rem;
@@ -322,11 +322,12 @@
 
 .feature-card {
     position: relative;
-    background: rgba(10, 10, 10, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--bg-feature-card);
+    border: var(--border-glass);
     padding: 2.5rem;
     transition: all 0.3s ease;
     overflow: hidden;
+    cursor: pointer;
 }
 
 .feature-card::before {
@@ -415,13 +416,14 @@
    ================================== */
 .navbar {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    border-radius: 12px;
     z-index: 100;
-    background: rgba(0, 0, 0, 0.7);
+    background: var(--bg-navbar);
     backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border: var(--border-glass);
 }
 
 .navbar-inner {
@@ -483,7 +485,7 @@
 .how-to-section {
     padding: 8rem 2rem 6rem;
     background-color: var(--bg-primary);
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: var(--border-glass);
 }
 
 .workflow-pills {
@@ -500,7 +502,7 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     padding: 6px 16px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: var(--border-glass);
     background: transparent;
     color: var(--text-muted);
     cursor: pointer;
@@ -527,8 +529,8 @@
 }
 
 .cmd-card {
-    background: rgba(10, 10, 10, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--bg-feature-card);
+    border: var(--border-glass);
     padding: 1.25rem;
     cursor: pointer;
     transition: all 0.25s ease;
@@ -559,7 +561,7 @@
 
 .cmd-card.expanded {
     border-color: rgba(214, 250, 0, 0.2);
-    background: rgba(15, 15, 15, 1);
+    background: var(--bg-secondary);
 }
 
 .cmd-card-header {
@@ -604,7 +606,7 @@
     font-family: var(--font-mono);
     font-size: 0.8rem;
     padding: 6px 10px;
-    background: rgba(0, 0, 0, 0.4);
+    background: var(--bg-glass);
     border-radius: 3px;
     margin-bottom: 8px;
 }
@@ -647,7 +649,7 @@
     width: 280px;
     min-width: 280px;
     background: var(--bg-secondary);
-    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    border-right: var(--border-glass);
     padding: 2rem 0;
     position: sticky;
     top: 56px;
@@ -1090,4 +1092,203 @@
     to {
         transform: rotate(360deg);
     }
+}
+
+/* ==================================
+   LIGHT THEME OVERRIDES
+   ================================== */
+
+/* Feature Card Hover Override */
+body.light-theme .feature-card:hover {
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    /* softer shadow */
+    border-color: rgba(0, 0, 0, 0.15);
+    /* darker border for contrast */
+}
+
+body.light-theme .feature-card:hover::before {
+    background-color: var(--primary-color);
+}
+
+body.light-theme .feature-card:hover .feature-icon {
+    color: var(--primary-color);
+}
+
+/* Workflow Pills and Grid Overrides */
+body.light-theme .pill.active {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    background: rgba(14, 165, 233, 0.05);
+}
+
+body.light-theme .cmd-card::before {
+    background: var(--primary-color);
+}
+
+body.light-theme .cmd-card.expanded {
+    border-color: rgba(14, 165, 233, 0.2);
+    background: var(--bg-secondary);
+}
+
+body.light-theme .cmd-badge.core {
+    background: rgba(14, 165, 233, 0.1);
+    color: #0284c7;
+    /* Sky 600 */
+}
+
+body.light-theme .cmd-badge.git {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    /* Emerald 600 */
+}
+
+body.light-theme .cmd-badge.sync {
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+    /* Amber 600 */
+}
+
+body.light-theme .docs-link {
+    color: #0284c7;
+}
+
+body.light-theme .docs-link:hover {
+    color: #059669;
+}
+
+/* Feedback Page Overrides */
+body.light-theme .feedback-form {
+    background: var(--bg-feature-card);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme .feedback-form::before {
+    background-color: var(--primary-color);
+}
+
+body.light-theme .terminal-input {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    color: var(--text-main);
+}
+
+body.light-theme .terminal-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 10px rgba(14, 165, 233, 0.15);
+}
+
+body.light-theme .submit-btn {
+    color: #fff;
+    background: var(--primary-color);
+}
+
+body.light-theme .submit-btn:hover:not(:disabled) {
+    background: #0284c7;
+    box-shadow: 0 0 15px rgba(14, 165, 233, 0.4);
+}
+
+body.light-theme .form-message.success {
+    background: rgba(16, 185, 129, 0.05);
+    color: #059669;
+    /* Emerald */
+    border-color: #059669;
+}
+
+body.light-theme .form-message.error {
+    background: rgba(239, 68, 68, 0.05);
+    color: #dc2626;
+    /* Red */
+    border-color: #dc2626;
+}
+
+body.light-theme .terminal-404-container {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.05), inset 0 0 20px rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme .terminal-404-container::before {
+    background: linear-gradient(90deg, transparent, rgba(14, 165, 233, 0.5), transparent);
+}
+
+/* CLI and Terminal Box Overrides */
+
+body.light-theme .hero-install-box {
+    background: var(--bg-secondary);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme .hero-install-box:hover {
+    border-color: rgba(14, 165, 233, 0.4);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+body.light-theme .hero-install-cmd {
+    color: var(--text-main);
+}
+
+body.light-theme .copy-btn {
+    color: var(--text-muted);
+}
+
+body.light-theme .hero-install-box:hover .copy-btn {
+    color: var(--primary-color);
+}
+
+body.light-theme .copy-btn.copied {
+    color: var(--primary-color) !important;
+}
+
+body.light-theme .cmd-terminal-inline {
+    background: rgba(0, 0, 0, 0.04);
+    color: var(--text-main);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme .terminal-window {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+}
+
+body.light-theme .terminal-window:hover {
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+body.light-theme .terminal-header {
+    background: rgba(240, 240, 240, 0.8);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme .terminal-title {
+    color: var(--text-muted);
+}
+
+body.light-theme .terminal-body {
+    color: var(--text-main);
+}
+
+body.light-theme .terminal-body .prompt {
+    color: var(--primary-color);
+}
+
+body.light-theme .terminal-body .command {
+    color: var(--text-main);
+}
+
+body.light-theme .terminal-body .output {
+    color: var(--text-muted);
+}
+
+/* Docs Page Code Blocks */
+body.light-theme .docs-body pre {
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme .docs-body code {
+    color: var(--text-main);
 }

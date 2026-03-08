@@ -330,3 +330,103 @@
         height: 400px;
     }
 }
+
+/* ==================================
+   LIGHT THEME OVERRIDES
+   ================================== */
+body.light-theme .demo-container {
+    background: rgba(226, 232, 240, 0.6);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme .demo-container::before {
+    background: radial-gradient(circle, rgba(14, 165, 233, 0.05) 0%, transparent 70%);
+}
+
+body.light-theme .demo-pane {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) inset;
+}
+
+body.light-theme .pane-header {
+    background: rgba(0, 0, 0, 0.03);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme .pane-content::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+body.light-theme .term-prompt {
+    color: var(--neon-chartreuse);
+}
+
+body.light-theme .chat-user {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light-theme .chat-ai {
+    background: rgba(14, 165, 233, 0.05);
+    border: 1px solid rgba(14, 165, 233, 0.1);
+}
+
+body.light-theme .chat-tool-call {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    color: #b45309;
+}
+
+body.light-theme .chat-tool-result {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: #059669;
+}
+
+body.light-theme .chat-user .chat-avatar {
+    background: var(--text-main);
+    color: var(--bg-primary);
+}
+
+body.light-theme .chat-ai .chat-avatar {
+    background: var(--neon-chartreuse);
+    color: #000;
+    box-shadow: 0 0 10px var(--neon-chartreuse);
+}
+
+body.light-theme .demo-controls {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light-theme .progress-dot {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+body.light-theme .progress-dot.active {
+    background: var(--neon-chartreuse);
+    box-shadow: 0 0 8px var(--neon-chartreuse);
+}
+
+body.light-theme .demo-btn {
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    color: var(--text-main);
+}
+
+body.light-theme .demo-btn:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: var(--text-main);
+}
+
+body.light-theme .demo-btn.demo-next {
+    background: var(--neon-chartreuse);
+    border-color: var(--neon-chartreuse);
+    color: #000;
+}
+
+body.light-theme .demo-btn.demo-next:hover:not(:disabled) {
+    background: #bceb00;
+    box-shadow: 0 0 15px rgba(214, 250, 0, 0.5);
+}
