@@ -1,3 +1,16 @@
+# --- Synced by aigit ---
+
+## YOUR ENTIRE IDENTITY, SKILLSET, AND CURRENT MISSION ARE LOCATED IN THE REPOSITORY.
+
+DO NOT ASSUME YOUR CONTEXT. YOU MUST READ THE FOLLOWING BEFORE STARTING ANY WORK:
+
+1. READ `AGENTS.md` to understand your global constraints, Socratic gates, and clean code mandate.
+2. READ `ARCHITECTURE.md` to understand the system map.
+3. READ `.agent/orchestrator.md` (or the specific agent identity mapped to your task).
+4. READ `MEMORY.md` to understand what happened previously.
+
+If you are starting a new task, you must use `.agent/templates/task-template.md` to create a new `{task-slug}.md` file to maintain the task handoff API.
+
 # AGENTS.md - Maestro Configuration
 
 > Maestro AI Development Orchestrator

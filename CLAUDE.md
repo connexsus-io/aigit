@@ -11,7 +11,7 @@ DO NOT ASSUME YOUR CONTEXT. YOU MUST READ THE FOLLOWING BEFORE STARTING ANY WORK
 
 If you are starting a new task, you must use `.agent/templates/task-template.md` to create a new `{task-slug}.md` file to maintain the task handoff API.
 
-## AGENTS.md - Maestro Configuration
+# AGENTS.md - Maestro Configuration
 
 > Maestro AI Development Orchestrator
 > This file defines how the AI behaves in this workspace.
@@ -144,6 +144,15 @@ When user's prompt is NOT in English:
 | **BACKEND** (API, server, DB) | `backend-specialist` | api-patterns, database-design |
 
 > 🔴 **Mobile + frontend-specialist = WRONG.** Mobile = mobile-developer ONLY.
+
+### 💾 Agent-Driven Semantic Commits (Mandatory)
+
+**Whenever you (the AI Agent) finish code implementation and are ready to run `git commit`, you MUST generate a semantic memory first.**
+
+- Do NOT rely on the raw git diff hook. 
+- You wrote the code, so you must summarize the architectural intent before committing.
+- **Action:** Run `aigit commit memory "<dense 2-sentence architectural summary of changes>"` right before running `git commit`.
+- **⚠️ FATAL CONSEQUENCE:** The project has a strict `isTTY` Git hook installed. Because you run headless, if you attempt to run `git commit` without prior semantic memory, the hook will instantly detect you are an AI and **fatally abort your commit** with `process.exit(1)`. Do not skip this step or you will fail your task.
 
 ### 🏁 Final Checklist Protocol
 

@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon, Github } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export function Navbar() {
@@ -41,6 +41,16 @@ export function Navbar() {
                     <Link to="/" className={`nav-link ${isHome ? 'active' : ''}`}>Home</Link>
                     <Link to="/docs" className={`nav-link ${location.pathname.includes('/docs') ? 'active' : ''}`}>Docs</Link>
                     <Link to="/feedback" className={`nav-link ${location.pathname === '/feedback' ? 'active' : ''}`}>Feedback</Link>
+                    <a 
+                        href="https://github.com/connexsus-io/aigit" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="nav-link"
+                        style={{ display: 'flex', alignItems: 'center', color: 'var(--text-main)', transition: 'color 0.2s' }}
+                        aria-label="GitHub Repository"
+                    >
+                        <Github size={20} />
+                    </a>
                     <button
                         onClick={toggleTheme}
                         style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-main)', display: 'flex', alignItems: 'center', transition: 'color 0.2s' }}
