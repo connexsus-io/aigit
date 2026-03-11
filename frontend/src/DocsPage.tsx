@@ -59,14 +59,58 @@ When you run \`git push\`, the custom \`pre-push\` hook triggers \`npx aigit hea
 #### 5. Smart Hybrid Commit Enforcement (The pre-commit Hook)
 To protect your semantic ledger, aigit enforces the memory rule directly in Git. But it behaves completely differently depending on *who* is running the commit:
 - **For AI Agents (Cursor, Windsurf, CI/CD):** Agents usually run headless commands. If they try to \`git commit\` without generating semantic context, aigit detects they lack a TTY and **ruthlessly aborts the commit** with a hard error. This forces AI agents to strictly abide by the rules.
-- **For Human Developers:** If *you* type \`git commit\` and forget, aigit detects your live terminal. Instead of blocking you, it pauses the commit inline, asks you for the architectural summary right there in the prompt, processes it seamlessly, and continues the commit without losing your momentum.
-When a task is too big for a single prompt, you bring in the Swarm.
+- **For Human Developers:** If *you* type \`git commit\` and forget, aigit detects your live terminal. Instead of blocking you, it pauses the commit inline, asks you for the architectural summary right there in the prompt, processes it seamlessly, and continues the commit without losing your momentum.`
+  },
+  {
+    id: 'core-funnels',
+    title: 'Core Capabilities & Funnels',
+    content: `### 🎯 Core Capabilities & Funnels
 
-Simply run the **aigit swarm** command:
-    \`\`\`bash
-    aigit swarm "Build the JWT authentication middleware"
-    \`\`\`
-It instantly spins up specialized agents (e.g., frontend, backend, security). The Architect outlines the schema, the Security Auditor reviews it for vulnerabilities, and the Frontend Specialist generates components once the API is approved. They communicate over a local message bus, resolving architectural conflicts autonomously.`
+To truly master aigit, you should understand its advanced orchestration paradigms:
+
+#### 📝 Working with Tasks (Agent Handoffs)
+When a feature is too complex for a single prompt, you need a task plan.
+1. **Create the Task**: Start by defining what needs to be built: \`aigit commit task "Implement User Dashboard"\`
+2. **Author the Plan**: Instruct your orchestrator agent to create a \`[task-slug].md\` file detailing the sub-tasks in your workspace.
+3. **The Handoff**: When Agent A (Orchestrator) finishes planning, they can hand off execution to Agent B (Frontend Specialist). Agent B queries the task status via MCP and resumes exactly where Agent A left off.
+4. **Update Status**: Keep the ledger in sync by running \`aigit update task <slug> DONE\` (or \`IN_PROGRESS\`, \`BLOCKED\`) as you progress.
+
+#### 🐝 Working with Swarm (Multi-Agent Orchestration)
+When a task requires disparate domains of expertise simultaneously, you bring in the Swarm.
+1. **Initiate Swarm**: Ask your orchestrator or run: \`aigit swarm "Build the JWT authentication middleware"\`
+2. **Registration**: Specialized agents (e.g., Backend Architect, Security Auditor) register for the swarm via their MCP tools.
+3. **Turn-Taking**: They collaborate sequentially over a local message bus. The Architect builds the schema, then the Security Auditor reviews it for vulnerabilities. 
+4. **Resolution**: If the Auditor flags an endpoint as too permissive, the swarm halts. You arbitrate the conflict (\`aigit swarm resolve <id> "Use REST instead"\`), and they resume coding.
+
+#### 🕰️ Searching History (Time-Traveling RAG)
+Don't guess *why* something was built a certain way—ask the ledger.
+1. **Live Search**: Use \`aigit query "Why did we drop Redux?"\` to fetch the semantic architectural decision.
+2. **Time-Traveling**: If checking out an old branch or commit, use \`aigit query "Why auth flow?" --commit a1b2c3d\` to see the context *as it existed* at that specific point in time.
+3. **Replaying Scopes**: Run \`aigit replay src/auth/jwt.ts\` to generate a narrative timeline of every architectural decision ever made impacting that specific file.
+
+#### 🏥 Self-Healing & CI Pipelines
+Use aigit proactively to prevent bit-rot and handle security vulnerabilities.
+1. **Garbage Collection**: Run \`aigit heal\` to detect "Context Drift." aigit will scan your codebase to find and flag architectural decisions tied to files or functions that no longer exist.
+2. **Test Driven Healing**: If a test fails on CI or locally, \`aigit heal\` intercepts the stack trace, parses the local AST to find the broken symbol, and queries the ledger to see if this bug occurred before, providing a suggested "Healing Plan."
+3. **Dependency Auditing**: Run \`aigit deps --auto\` to automatically branch, audit vulnerable npm packages, cross-reference them with your semantic rules, and auto-commit the safest fixes.
+
+#### 🔄 Universal Agent Synchronization
+Stop copy-pasting your \`.cursorrules\` to your teammates.
+1. **Initial Scan**: Run \`aigit scan\` to automatically detect all AI tools currently used in the repository (Windsurf, Cline, Cursor, Gemini, Copilot).
+2. **Dry Run**: Run \`aigit sync --dry-run\` to compare the underlying rules and memory constraints across all detected text files.
+3. **Resolve & Merge**: Run \`aigit sync\`. aigit collapses fragmented rules into \`.aigit/skills\` and bidirectionally synchronizes the constraints down to all local tools, guaranteeing your entire team follows the same architectural master plan.
+
+#### 🛡️ Semantic Security Auditing
+Don't let rogue prompts leak secrets or inject vulnerabilities.
+1. **Scrubbing**: Run \`aigit dump\`. While serializing your ledger, aigit runs a heuristic scrubbing engine to redact API keys and PII before they hit the tracked json file.
+2. **Adversarial Red-Teaming**: Spin up the \`security-auditor\` agent profile. Give it permission to invoke \`audit_semantic_decisions\`. It will hunt your recent context history for prompt injections or weak architectures.
+3. **Flagging Issues**: The auditor uses \`flag_vulnerability\` to log warnings directly into the semantic DB, which spawns a blocked task reviewing the security flaw.
+
+#### 🔍 Advanced Graph Queries
+Unlock dense relational context through graph queries across your semantic ledger.
+1. **Detect Dependencies**: Use \`aigit query <id> --graph deps\` to trace all downstream code files that rely on a specific recorded architecture decision.
+2. **Impact Analysis**: When refactoring a core module, use \`aigit replay src/core/index.ts --graph\` to see the blast radius of connected historical tasks and active decisions.
+3. **AST Symbol Mapping**: Keep your memories tightly bound. Whenever you do a massive codebase move, run \`aigit anchor .\` to automatically cross-reference all floating memories using exact AST token mapping back to their new line numbers.`
   },
   {
     id: 'quickstart',

@@ -17,8 +17,9 @@ export function generateMermaidGraph(
 
     // 2. Memory Nodes
     memories.forEach(mem => {
-        const content = mem.content.substring(0, 40).replace(/"/g, "'") + '...';
-        m += `  Mem_${mem.id.replace(/-/g, '')}("🧠 ${content}"):::memory\n`;
+        let cleanContent = mem.content.split('\n')[0].replace(/"/g, "'");
+        cleanContent = cleanContent.length > 40 ? cleanContent.substring(0, 40) + '...' : cleanContent;
+        m += `  Mem_${mem.id.replace(/-/g, '')}("🧠 ${cleanContent}"):::memory\n`;
     });
 
     // 3. Decision Nodes

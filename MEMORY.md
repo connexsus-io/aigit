@@ -13,9 +13,9 @@
 - **Decision**: Embed the intelligence into the file system (`AGENTS.md`, `.agent/`) and use `.cursorrules`/`.windsurfrules` to redirect the LLM to read the repository.
 - **Status**: Implemented.
 
-### ADR-002: `{task-slug}.md` Handoff API
+### ADR-002: `.aigit/tasks/{task-slug}.md` Handoff API
 - **Context**: Inter-agent and inter-IDEs need a standardized format to hand off tasks.
-- **Decision**: Agents must create a localized `{task-slug}.md` derived from `.agent/templates/task-template.md`. This file holds the actionable `[ ]` checklist, bridging state between tools.
+- **Decision**: Agents must create a localized `.aigit/tasks/{task-slug}.md` derived from `.agent/templates/task-template.md`. This file holds the actionable `[ ]` checklist, bridging state between tools.
 - **Status**: Implemented.
 
 ### ADR-003: Vector-Backed Context Server

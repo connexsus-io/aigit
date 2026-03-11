@@ -41,8 +41,8 @@ Agent activated → Check frontmatter "skills:" field
 | **QUESTION** | "what is", "how does", "explain" | TIER 0 only | Text Response |
 | **SURVEY/INTEL**| "analyze", "list files", "overview" | TIER 0 + Explorer | Session Intel (No File) |
 | **SIMPLE CODE** | "fix", "add", "change" (single file) | TIER 0 + TIER 1 (lite) | Inline Edit |
-| **COMPLEX CODE**| "build", "create", "implement", "refactor" | TIER 0 + TIER 1 (full) + Agent | **{task-slug}.md Required** |
-| **DESIGN/UI** | "design", "UI", "page", "dashboard" | TIER 0 + TIER 1 + Agent | **{task-slug}.md Required** |
+| **COMPLEX CODE**| "build", "create", "implement", "refactor" | TIER 0 + TIER 1 (full) + Agent | **.aigit/tasks/{task-slug}.md Required** |
+| **DESIGN/UI** | "design", "UI", "page", "dashboard" | TIER 0 + TIER 1 + Agent | **.aigit/tasks/{task-slug}.md Required** |
 | **SLASH CMD** | /create, /orchestrate, /debug | Command-specific flow | Variable |
 
 ---
@@ -181,15 +181,15 @@ When user's prompt is NOT in English:
 |------|-------|----------|
 | **plan** | `project-planner` | 4-phase methodology. NO CODE before Phase 4. |
 | **ask** | - | Focus on understanding. Ask questions. |
-| **edit** | `orchestrator` | Execute. Check `{task-slug}.md` first. |
+| **edit** | `orchestrator` | Execute. Check `.aigit/tasks/{task-slug}.md` first. |
 
 **Plan Mode (4-Phase):**
 1. ANALYSIS → Research, questions
-2. PLANNING → `{task-slug}.md`, task breakdown
+2. PLANNING → `.aigit/tasks/{task-slug}.md`, task breakdown
 3. SOLUTIONING → Architecture, design (NO CODE!)
 4. IMPLEMENTATION → Code + tests
 
-> 🔴 **Edit mode:** If multi-file or structural change → Offer to create `{task-slug}.md`. For single-file fixes → Proceed directly.
+> 🔴 **Edit mode:** If multi-file or structural change → Offer to create `.aigit/tasks/{task-slug}.md`. For single-file fixes → Proceed directly.
 
 ---
 
@@ -236,7 +236,7 @@ When user's prompt is NOT in English:
 | `app-builder` | Full-stack orchestration |
 | `frontend-design` | Web UI patterns |
 | `mobile-design` | Mobile UI patterns |
-| `plan-writing` | {task-slug}.md format |
+| `plan-writing` | .aigit/tasks/{task-slug}.md format |
 | `threejs-mastery` | 2025 3D Web (R3F, WebGPU) |
 | `behavioral-modes` | Mode switching |
 

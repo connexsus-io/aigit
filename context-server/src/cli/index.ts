@@ -614,6 +614,46 @@ Commands:
             console.log(`   ID: ${task.id}`);
             console.log();
 
+        } else if (subCommand === 'update') {
+            const updateType = args[2];
+            if (updateType === 'task') {
+                const slug = args[3];
+                const status = args[4];
+                if (!slug || !status) {
+                    console.error('⚠️  Error: You must provide a task slug and new status.');
+                    console.log('Usage: aigit commit update task <slug> <status>');
+                    console.log('       Statuses: PLANNING, IN_PROGRESS, REVIEW, DONE, BLOCKED, CANCELLED');
+                    process.exit(1);
+                }
+
+                const validStatuses = ['PLANNING', 'IN_PROGRESS', 'REVIEW', 'DONE', 'BLOCKED', 'CANCELLED'];
+                if (!validStatuses.includes(status)) {
+                    console.error(`⚠️  Error: Invalid status '${status}'.`);
+                    console.log(`Available statuses: ${validStatuses.join(', ')}`);
+                    process.exit(1);
+                }
+
+                try {
+                    const updateResult = await prisma.task.updateMany({
+                        where: { projectId: project.id, gitBranch: branch, slug },
+                        data: { status }
+                    });
+                    if (updateResult.count === 0) {
+                        console.log(`⚠️  Warning: No task found with slug '${slug}' on branch [${branch}].`);
+                    } else {
+                        console.log(`\n✅ [aigit update task] Task '${slug}' marked as ${status} on branch [${branch}]`);
+                    }
+                    const { dumpContextLedger } = require('./sync');
+                    await dumpContextLedger(workspacePath);
+                } catch (error: any) {
+                    console.error('⚠️  Failed to update task:', error.message);
+                    process.exit(1);
+                }
+            } else {
+                console.error(`⚠️  Error: Unknown update type '${updateType}'.`);
+                console.log('Usage: aigit commit update task <slug> <status>');
+                process.exit(1);
+            }
         } else if (subCommand === 'staged') {
             const { execSync } = require('child_process');
 
@@ -794,10 +834,15 @@ Commands:
   commit task "<title>" [--slug <slug>]
       Create a new tracked task on the current branch.
 
+  commit update task <slug> <status>
+      Update the status of an existing task.
+      Statuses: PLANNING, IN_PROGRESS, REVIEW, DONE, BLOCKED, CANCELLED
+
 Examples:
   aigit commit memory "Using Redis for session caching" --type architecture
   aigit commit decision "API protocol" "REST" --reasoning "Team prefers REST for simplicity"
   aigit commit task "Implement JWT authentication"
+  aigit commit update task "jwt-auth" IN_PROGRESS
             `);
         }
 

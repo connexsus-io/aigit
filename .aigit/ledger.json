@@ -10,7 +10,18 @@
   ],
   "agents": [],
   "sessions": [],
-  "tasks": [],
+  "tasks": [
+    {
+      "id": "7bcd2685-2f78-4433-b063-23a5dfbaf92f",
+      "slug": "clean-architecture-generator",
+      "projectId": "008465eb-074f-40e7-8bce-0e6d47927b1a",
+      "title": "clean-architecture-generator",
+      "gitBranch": "main",
+      "status": "DONE",
+      "createdAt": "2026-03-11T07:52:30.028Z",
+      "updatedAt": "2026-03-11T08:03:05.480Z"
+    }
+  ],
   "decisions": [],
   "memories": [
     {
@@ -72,6 +83,26 @@
       "content": "Refined frontend UI to support a professional Light Mode. Abstracted hardcoded transparent dark grays into CSS variables and customized the contrast of terminal simulation blocks, documentation grids, and feature cards.",
       "embedding": null,
       "createdAt": "2026-03-08T18:57:23.779Z"
+    },
+    {
+      "id": "fd3e3e0c-e4c2-4619-a75c-795110236c40",
+      "projectId": "008465eb-074f-40e7-8bce-0e6d47927b1a",
+      "sessionId": null,
+      "gitBranch": "main",
+      "type": "architecture",
+      "content": "Optimized context-server/ARCHITECTURE.md generator to strip redundant git stats and truncate bloated Git Commit Contexts from file-based tracking structure directly.",
+      "embedding": null,
+      "createdAt": "2026-03-11T07:44:47.763Z"
+    },
+    {
+      "id": "ee7f15d5-3257-4178-a53a-ab25369bd2ad",
+      "projectId": "008465eb-074f-40e7-8bce-0e6d47927b1a",
+      "sessionId": null,
+      "gitBranch": "main",
+      "type": "architecture",
+      "content": "Refactored DocsPage UI to split usage funnels into 'Core Capabilities' and introduced new workflows for Self-Healing, Agent Sync, and Security Auditing. Redirected all multi-agent Task file generation from root to .aigit/tasks directory.",
+      "embedding": null,
+      "createdAt": "2026-03-11T08:34:46.139Z"
     },
     {
       "id": "e0696389-ada9-4846-b8df-61f2dab5936a",

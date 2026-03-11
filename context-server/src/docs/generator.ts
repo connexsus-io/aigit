@@ -66,11 +66,20 @@ export async function generateArchitectureDocs(projectName: string, branch: stri
             md += `### \`${file}\`\n\n`;
 
             const fileMemories = memories.filter(m => m.filePath === file);
-            if (fileMemories.length > 0) {
+            // Filter out default fallback git hooks so we only show dense semantic memories per file
+            const semanticFileMemories = fileMemories.filter(m => !m.content.startsWith('Automatic Git Commit Context'));
+            
+            if (semanticFileMemories.length > 0) {
                 md += `**Memories:**\n`;
-                fileMemories.forEach(m => {
+                semanticFileMemories.forEach(m => {
                     const symbol = m.symbolName ? ` \`@${m.symbolName}\`` : '';
-                    md += `- [${m.type}]${symbol}: ${m.content}\n`;
+                    let cleanContent = m.content;
+                    if (cleanContent.includes('Files Changed:') && cleanContent.includes('Statistics:')) {
+                        cleanContent = cleanContent.split('\n')[0].trim() + ' *(Diff omitted for brevity)*';
+                    } else if (cleanContent.length > 300) {
+                        cleanContent = cleanContent.substring(0, 300) + '...';
+                    }
+                    md += `- [${m.type}]${symbol}: ${cleanContent}\n`;
                 });
                 md += `\n`;
             }
