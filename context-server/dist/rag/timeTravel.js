@@ -62,8 +62,12 @@ function queryHistoricalContext(options) {
     const ranked = (0, embeddings_1.rankBySimilarity)(query, docs, topK);
     // Enrich with original metadata
     const allEntries = [...(ledger.memories || []), ...(ledger.decisions || [])];
+    const entryMap = new Map();
+    for (const entry of allEntries) {
+        entryMap.set(entry.id, entry);
+    }
     const results = ranked.map(r => {
-        const original = allEntries.find(e => e.id === r.id);
+        const original = entryMap.get(r.id);
         return {
             ...r,
             filePath: original?.filePath || null,
