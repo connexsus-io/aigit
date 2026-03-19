@@ -372,7 +372,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 const v = parseArgs(MergeContextArgs, raw);
                 if (!v.ok) return validationError(tool, v.error);
                 const { projectId, sourceBranch: src, targetBranch: tgt } = v.data;
-                const { v4: uuidv4 } = await import('uuid');
 
                 const [memories, decisions, tasks, targetMemories, targetTasks] = await Promise.all([
                     prisma.memory.findMany({ where: { projectId, gitBranch: src } }),
@@ -443,14 +442,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     }
                 }
 
-                if (tasksToInsert.length > 0) {
-                    await prisma.task.createMany({ data: tasksToInsert });
-                    ported += tasksToInsert.length;
-                }
-                if (decisionsToInsert.length > 0) {
-                    await prisma.decision.createMany({ data: decisionsToInsert });
-                    ported += decisionsToInsert.length;
-                }
+
 
                 return {
                     content: [{ type: 'text', text: `🔀 Merged ${ported} context entries from ${src} → ${tgt}.` }]

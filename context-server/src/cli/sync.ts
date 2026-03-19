@@ -83,6 +83,9 @@ export async function loadContextLedger(workspacePath: string) {
         await prisma.task.deleteMany();
         await prisma.session.deleteMany();
         await prisma.agent.deleteMany();
+        await prisma.swarmMessage.deleteMany();
+        await prisma.swarmAgent.deleteMany();
+        await prisma.swarmSession.deleteMany();
         await prisma.project.deleteMany();
 
         // Utility to revive ISO strings to Date objects for Prisma

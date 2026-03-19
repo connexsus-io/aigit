@@ -1,9 +1,13 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, beforeAll, vi } from 'vitest';
 import { prisma, initializeDatabase } from '../db';
 import { resolveConflict, reportConflict } from './conflict';
 
 describe('conflict resolution performance', () => {
     let projectId: string;
+
+    beforeAll(async () => {
+        await initializeDatabase();
+    });
     let swarmId: string;
 
     beforeEach(async () => {
