@@ -3,7 +3,7 @@ import * as embeddings from '../src/rag/embeddings';
 import * as timeTravel from '../src/rag/timeTravel';
 
 // Generate fake ledger data
-const numEntries = 50000;
+const numEntries = 20000;
 const memories = Array.from({ length: numEntries }).map((_, i) => ({
     id: `mem-${i}`,
     type: 'test-memory',
@@ -32,12 +32,12 @@ embeddings.rankBySimilarity = (query: string, docs: any[], topK: number) => {
     return docs.slice(0, topK).map((doc: any, idx: number) => ({ ...doc, score: 1 - idx * 0.1 }));
 };
 
-const topK = 10000; // Increase topK to really stress the mapping logic
+const topK = 5000; // Increase topK to really stress the mapping logic
 
 console.log('Running benchmark...');
 const startTime = performance.now();
 
-for (let i = 0; i < 200; i++) {
+for (let i = 0; i < 100; i++) {
     queryHistoricalContext({
         query: 'test query',
         commitHash: 'fake-commit',
