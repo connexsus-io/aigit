@@ -1,12 +1,17 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { prisma } from '../db';
+import { describe, it, expect, beforeEach, beforeAll, vi } from 'vitest';
+import { prisma, initializeDatabase } from '../db';
 import { resolveConflict, reportConflict } from './conflict';
 
 describe('conflict resolution performance', () => {
     let projectId: string;
+
+    beforeAll(async () => {
+        await initializeDatabase();
+    });
     let swarmId: string;
 
     beforeEach(async () => {
+        await initializeDatabase();
         // Clean up or setup test data
         const project = await prisma.project.create({
             data: { name: 'test-project-' + Date.now() }
