@@ -1,46 +1,11 @@
 {
   "projects": [
     {
-      "id": "008465eb-074f-40e7-8bce-0e6d47927b1a",
+      "id": "52454783-6f42-488a-951f-b54e5519b45f",
       "name": "aigit",
       "description": null,
-      "createdAt": "2026-03-02T19:51:19.528Z",
-      "updatedAt": "2026-03-02T19:51:19.528Z"
-    },
-    {
-      "id": "775049d5-a4d7-4814-b0b4-1828d85b9370",
-      "name": "aigit-monorepo",
-      "description": "Root workspace to execute tests across sub-packages",
-      "createdAt": "2026-03-11T21:48:04.313Z",
-      "updatedAt": "2026-03-11T21:48:04.312Z"
-    },
-    {
-      "id": "ad8f387e-7ae6-479f-8e55-0f5b68940127",
-      "name": "test-project-1773933282616",
-      "description": null,
-      "createdAt": "2026-03-19T15:14:42.671Z",
-      "updatedAt": "2026-03-19T15:14:42.671Z"
-    },
-    {
-      "id": "cb31b3af-9427-4995-be3d-6936d1489a4a",
-      "name": "test-project-1773933370032",
-      "description": null,
-      "createdAt": "2026-03-19T15:16:10.083Z",
-      "updatedAt": "2026-03-19T15:16:10.083Z"
-    },
-    {
-      "id": "d383782f-e217-4b1f-adbb-dd5d84cb1fb5",
-      "name": "test-project-1773933550061",
-      "description": null,
-      "createdAt": "2026-03-19T15:19:10.110Z",
-      "updatedAt": "2026-03-19T15:19:10.110Z"
-    },
-    {
-      "id": "bb1fc8c6-a17e-4dfe-86f4-c9a45187c397",
-      "name": "test-project-1773933612211",
-      "description": null,
-      "createdAt": "2026-03-19T15:20:12.282Z",
-      "updatedAt": "2026-03-19T15:20:12.282Z"
+      "createdAt": "2026-03-20T19:21:15.886Z",
+      "updatedAt": "2026-03-20T19:21:15.886Z"
     }
   ],
   "agents": [],
@@ -49,24 +14,14 @@
   "decisions": [],
   "memories": [
     {
-      "id": "8942efdf-ccc7-48af-b0bc-0b8a6821ee0f",
-      "projectId": "008465eb-074f-40e7-8bce-0e6d47927b1a",
+      "id": "e5bedd60-fd1b-4490-8e7c-86178add2241",
+      "projectId": "52454783-6f42-488a-951f-b54e5519b45f",
       "sessionId": null,
       "gitBranch": "main",
       "type": "architecture",
-      "content": "Resolved upstream Swarm merge conflicts in db schema and fixed corresponding test markers. Fixed the sync hook's foreign key deletion order for Swarm capability tables, added missing uuid dependency for context merging, and safely untracked the context-server dist folder.",
+      "content": "Fixed Vercel GitHub Action by injecting the VERCEL_ACCESS_TOKEN directly into the 'VERCEL_TOKEN' environment variable instead of using the --token CLI flag to resolve authentication failures.",
       "embedding": null,
-      "createdAt": "2026-03-19T20:56:46.898Z"
-    },
-    {
-      "id": "0f40e872-1091-4ecc-9287-5563e379bc57",
-      "projectId": "008465eb-074f-40e7-8bce-0e6d47927b1a",
-      "sessionId": null,
-      "gitBranch": "main",
-      "type": "architecture",
-      "content": "Configured Vercel GitHub Action for automated frontend deployments. Enforced local build validation and scoped execution triggers to the frontend path with appropriate secret mappings.",
-      "embedding": null,
-      "createdAt": "2026-03-20T11:38:12.594Z"
+      "createdAt": "2026-03-20T19:21:15.891Z"
     }
   ],
   "healingEvents": []
