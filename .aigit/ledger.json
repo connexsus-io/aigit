@@ -57,6 +57,16 @@
       "content": "Resolved upstream Swarm merge conflicts in db schema and fixed corresponding test markers. Fixed the sync hook's foreign key deletion order for Swarm capability tables, added missing uuid dependency for context merging, and safely untracked the context-server dist folder.",
       "embedding": null,
       "createdAt": "2026-03-19T20:56:46.898Z"
+    },
+    {
+      "id": "0f40e872-1091-4ecc-9287-5563e379bc57",
+      "projectId": "008465eb-074f-40e7-8bce-0e6d47927b1a",
+      "sessionId": null,
+      "gitBranch": "main",
+      "type": "architecture",
+      "content": "Configured Vercel GitHub Action for automated frontend deployments. Enforced local build validation and scoped execution triggers to the frontend path with appropriate secret mappings.",
+      "embedding": null,
+      "createdAt": "2026-03-20T11:38:12.594Z"
     }
   ],
   "healingEvents": []
