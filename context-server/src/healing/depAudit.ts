@@ -1,4 +1,4 @@
-import { execSync } from 'child_process';
+import { execSync, execFileSync } from 'child_process';
 import path from 'path';
 import { prisma } from '../db';
 import { getActiveBranch } from '../cli/git';
@@ -194,14 +194,27 @@ export function formatDepReport(plan: DepHealPlan): string {
 export function executeDepAutoHeal(workspacePath: string, branchName: string): { success: boolean; message: string } {
     try {
         // Create healing branch
-        execSync(`git checkout -b ${branchName}`, { cwd: workspacePath, encoding: 'utf-8', stdio: 'pipe' });
+        execFileSync('git', ['checkout', '-b', branchName], {
+            cwd: workspacePath,
+            encoding: 'utf-8',
+            stdio: 'pipe',
+        });
 
         // Run npm audit fix
-        execSync('npm audit fix', { cwd: workspacePath, encoding: 'utf-8', stdio: 'pipe', timeout: 120_000 });
+        execFileSync('npm', ['audit', 'fix'], {
+            cwd: workspacePath,
+            encoding: 'utf-8',
+            stdio: 'pipe',
+            timeout: 120_000,
+        });
 
         // Commit the fix
-        execSync('git add package.json package-lock.json', { cwd: workspacePath, encoding: 'utf-8', stdio: 'pipe' });
-        execSync(`git commit -m "fix(deps): auto-heal vulnerabilities via aigit deps --auto"`, {
+        execFileSync('git', ['add', 'package.json', 'package-lock.json'], {
+            cwd: workspacePath,
+            encoding: 'utf-8',
+            stdio: 'pipe',
+        });
+        execFileSync('git', ['commit', '-m', 'fix(deps): auto-heal vulnerabilities via aigit deps --auto'], {
             cwd: workspacePath,
             encoding: 'utf-8',
             stdio: 'pipe',
