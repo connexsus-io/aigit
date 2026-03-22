@@ -84,12 +84,12 @@ export function loadConflicts(workspacePath: string): Conflict[] {
 export function printConflicts(conflicts: Conflict[]): void {
     if (conflicts.length === 0) {
         console.log();
-        ok('No conflicts detected. All tools are in sync.\n');
+        ok('✅ No conflicts detected. All tools are in sync.\n');
         return;
     }
 
     console.log();
-    warn(`${conflicts.length} CONFLICT(S) DETECTED\n`);
+    warn(`⚠️  ${conflicts.length} CONFLICT(S) DETECTED\n`);
     for (const conflict of conflicts) {
         console.log(`  Topic: "${c.highlight(conflict.topic)}"`);
         for (const e of conflict.entries) {
