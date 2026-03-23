@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 import { Activity, Brain, Database, CheckCircle2 } from 'lucide-react';
@@ -72,7 +72,7 @@ export default function DashboardPage() {
 
         <motion.div className="glass-card stagger-2" whileHover={{ y: -4 }}>
           <div className="flex gap-4 items-center mb-4">
-            <div className="p-3 rounded-full" style={{ background: 'hsla(190, 85%, 55%, 0.2)' }}>
+            <div className="p-3 rounded-full" style={{ background: 'var(--brand-secondary-glow)' }}>
               <Brain size={24} color="var(--brand-secondary)" />
             </div>
             <h3 className="text-muted">Architectural Decisions</h3>
@@ -82,7 +82,7 @@ export default function DashboardPage() {
 
         <motion.div className="glass-card stagger-3" whileHover={{ y: -4 }}>
           <div className="flex gap-4 items-center mb-4">
-            <div className="p-3 rounded-full" style={{ background: 'hsla(150, 70%, 45%, 0.2)' }}>
+            <div className="p-3 rounded-full" style={{ background: 'var(--success-glow)' }}>
               <CheckCircle2 size={24} color="var(--success)" />
             </div>
             <h3 className="text-muted">Tasks Orchestrated</h3>
@@ -106,7 +106,7 @@ export default function DashboardPage() {
                     contentStyle={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-dim)', borderRadius: '8px', color: 'var(--text-primary)' }} 
                   />
                   <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                    {memChartData.map((entry, index) => (
+                    {memChartData.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Bar>
@@ -134,7 +134,7 @@ export default function DashboardPage() {
                     contentStyle={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-dim)', borderRadius: '8px', color: 'var(--text-primary)' }} 
                   />
                   <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                    {decChartData.map((entry, index) => (
+                    {decChartData.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[(index + 1) % COLORS.length]} />
                     ))}
                   </Bar>

@@ -109,13 +109,14 @@ const handler: CommandHandler = async ({ workspacePath }) => {
         console.log(chalk.cyan(`\\n🚀 Aigit API Server running on http://localhost:${port}`));
         
         // Start the Vite app
-        const uiPath = path.resolve(__dirname, '../../../context-ui');
+        const uiPath = path.resolve(__dirname, '../../../../context-ui');
         console.log(chalk.gray(`Starting UI from ${uiPath}...`));
         
-        const vite = spawn('npm', ['run', 'dev'], {
+        const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+        const vite = spawn(npmCmd, ['run', 'dev'], {
             cwd: uiPath,
             stdio: 'inherit',
-            shell: true
+            shell: false
         });
 
         vite.on('error', (err) => {
