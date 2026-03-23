@@ -39,6 +39,7 @@ jobs:
         run: |
           cd context-server
           npm install
+          npx prisma generate
           npm run build
           npm link
 
