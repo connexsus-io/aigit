@@ -5,7 +5,8 @@ import chalk from 'chalk';
 import path from 'path';
 import { spawn } from 'child_process';
 import { getActiveBranch } from '../git';
-
+import { semanticSearch } from '../../rag/search';
+import { buildDependencyGraph } from '../../diagnostics/depGraph';
 const handler: CommandHandler = async ({ workspacePath }) => {
     const app = express();
     const port = 3001;
@@ -100,6 +101,58 @@ const handler: CommandHandler = async ({ workspacePath }) => {
                 }
             }
             res.json({ success: true });
+        } catch (error) {
+            res.status(500).json({ error: String(error) });
+        }
+    });
+
+    // API: Search Semantic Memories
+    app.get('/api/search', async (req: Request, res: Response) => {
+        try {
+            const query = req.query.q as string;
+            if (!query) {
+                return res.json([]);
+            }
+            const results = await semanticSearch({ query, topK: 20 });
+            res.json(results);
+        } catch (error) {
+            res.status(500).json({ error: String(error) });
+        }
+    });
+
+    // API: Dependency Architecture Graph
+    app.get('/api/graph', async (req: Request, res: Response) => {
+        try {
+            const graph = await buildDependencyGraph(workspacePath);
+            res.json(graph);
+        } catch (error) {
+            res.status(500).json({ error: String(error) });
+        }
+    });
+
+    // API: Garbage Collection
+    app.post('/api/gc', async (req: Request, res: Response) => {
+        try {
+            const keepDays = 30;
+            const cutoffDate = new Date();
+            cutoffDate.setDate(cutoffDate.getDate() - keepDays);
+            
+            const deletedMemories = await prisma.memory.deleteMany({
+                where: { type: { in: ['capability', 'context'] }, createdAt: { lt: cutoffDate } }
+            });
+
+            const emptyTasks = await prisma.task.findMany({
+                where: { decisions: { none: {} }, status: { in: ['DONE', 'CANCELLED'] } }
+            });
+            if (emptyTasks.length > 0) {
+                await prisma.task.deleteMany({
+                    where: { id: { in: emptyTasks.map(t => t.id) } }
+                });
+            }
+
+            try { await prisma.$executeRawUnsafe(`VACUUM ANALYZE;`); } catch(e) {}
+            
+            res.json({ success: true, deleted: deletedMemories.count + emptyTasks.length });
         } catch (error) {
             res.status(500).json({ error: String(error) });
         }

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GitMerge, Check, X, ShieldAlert, Sparkles, AlertCircle } from 'lucide-react';
+import { GitMerge, Check, X, Sparkles } from 'lucide-react';
 
 interface ConflictItem {
   id: string;
