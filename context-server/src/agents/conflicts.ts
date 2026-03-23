@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { RuleSection } from './parsers';
-import { ok, warn, info, c } from '../cli/output';
+import { ok, warn, info, c, blank, out, label } from '../cli/output';
 
 export interface Conflict {
     topic: string;
@@ -82,23 +82,25 @@ export function loadConflicts(workspacePath: string): Conflict[] {
  * Print conflicts to the console.
  */
 export function printConflicts(conflicts: Conflict[]): void {
-    console.log();
+    blank();
     if (conflicts.length === 0) {
-        ok('No conflicts detected. All tools are in sync.');
-        console.log();
+        out('✅ No conflicts detected. All tools are in sync.');
+        blank();
         return;
     }
 
-    warn(`${conflicts.length} CONFLICT(S) DETECTED\n`);
+    out(`⚠️  ${conflicts.length} CONFLICT(S) DETECTED`);
+    blank();
     for (const conflict of conflicts) {
-        console.log(`  Topic: "${c.highlight(conflict.topic)}"`);
+        label('Topic', c.highlight(conflict.topic));
         for (const e of conflict.entries) {
             const preview = e.content.split('\n')[0].slice(0, 80);
-            console.log(`    [${c.warn(e.toolId)}] ${c.muted(e.file + ':L' + e.line)} → "${c.info(preview)}..."`);
+            out(`    [${c.warn(e.toolId)}] ${c.muted(e.file + ':L' + e.line)} → "${c.info(preview)}..."`);
         }
-        console.log();
+        blank();
     }
-    info('Action required: Fix conflicts manually, then run `aigit sync` again.\n');
+    info('Action required: Fix conflicts manually, then run `aigit sync` again.');
+    blank();
 }
 
 function normalizeHeading(h: string): string {
