@@ -11,3 +11,7 @@
 **Vulnerability:** A command injection vulnerability was found in `context-server/src/cli/commands/bisect.ts` where `execSync` was used with a string command containing user-controlled input (`from` and `to` arguments in `git log ${range}`). This allowed a malicious user to execute arbitrary commands by injecting them into the arguments.
 **Learning:** In Node.js, using `execSync` or `exec` with a string command and untrusted input leads to shell command injection because the string is executed in a shell environment where special shell characters are interpreted.
 **Prevention:** To prevent command injection, always use `execFileSync` or `spawnSync` instead of `execSync`, and pass the executable as the first argument, and the arguments as an array as the second argument. This bypasses the shell and prevents shell metacharacter interpretation.
+## 2024-05-18 - [Fix Command Injection in CLI commands]
+**Vulnerability:** Command injection risks due to the use of `child_process.execSync` allowing arbitrary shell command execution when combining user input or branch names with system commands.
+**Learning:** `execSync` is inherently vulnerable when parameters are dynamically formatted as parts of a command string, especially when those string arguments pass through untested or unbounded paths.
+**Prevention:** Consistently use `child_process.execFileSync` and pass arguments as structured arrays to completely bypass the system shell, isolating variables from executable targets.
