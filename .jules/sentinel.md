@@ -22,3 +22,7 @@
 **Vulnerability:** Cross-Site Scripting (XSS) vulnerabilities found in `frontend/src/InteractiveDemo.tsx` and `frontend/src/DocsPage.tsx` where un-sanitized markdown text was passed directly to React's `dangerouslySetInnerHTML`.
 **Learning:** Directly injecting unescaped user-generated or external text content into the DOM using `dangerouslySetInnerHTML` bypasses React's built-in XSS protection and executes potentially malicious `<script>` tags or malicious HTML payload.
 **Prevention:** Always sanitize any untrusted or dynamically generated HTML input with a reputable sanitization library like `DOMPurify` before injecting it into React components with `dangerouslySetInnerHTML`. Use `DOMPurify.sanitize(htmlString)` as the wrapper.
+## 2024-05-24 - [Data Leakage in Memory Serialization]
+**Vulnerability:** The `sanitizeMemory` function in `context-server/src/security/scrubber.ts` returned the memory object without scrubbing the `content` field.
+**Learning:** During serialization and synchronization of memory logs (e.g., `dumpContextLedger`), sensitive information such as API keys and tokens embedded within memory `content` fields was being exported in plaintext due to an incomplete sanitization implementation.
+**Prevention:** Always verify that security/scrubber functions handle all sensitive fields for data structures they are responsible for. Writing unit tests that specifically inject secrets into these fields ensures the scrubber is effective.
