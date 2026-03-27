@@ -2,6 +2,7 @@
 **Vulnerability:** Found arbitrary command injection vulnerabilities in `context-server/src/rag/timeTravel.ts` and `context-server/src/cli/commands/commit.ts` where unvalidated user input (`commitHash` and `trimmedSummary`) was directly interpolated into shell command strings executed via `execSync`.
 **Learning:** Node.js `execSync` executes commands in a shell environment which will interpret shell metacharacters (e.g., `;`, `&&`, `|`), allowing arbitrary commands to be executed alongside or instead of the intended command. Trying to manually sanitize input (like escaping quotes with `.replace(/"/g, '\\"')`) is brittle and error-prone.
 **Prevention:** Always use `execFileSync` or `spawnSync` instead of `execSync` for subprocess execution involving dynamic input. These functions bypass the shell execution and pass arguments safely as an array directly to the executable, inherently preventing shell injection vulnerabilities.
+
 ## 2024-11-06 - [Authorization Data Leakage in sanitizeDecision]
 **Vulnerability:** The `sanitizeDecision` function in `context-server/src/security/scrubber.ts` attempted to redact sensitive data from incorrect fields (`summary`, `justification`, `alternatives`), resulting in the actual data stored in Prisma `Decision` objects (`context`, `chosen`, `reasoning`, `rejected`) being left completely unredacted when serialized into the `.aigit/ledger.json` file.
 **Learning:** Hardcoded mapping logic must be strictly synchronized with the backing data schema. A mismatch between data layer types (Prisma) and security scrubbing layer types leads to silent security failures.
@@ -11,11 +12,16 @@
 **Vulnerability:** A command injection vulnerability was found in `context-server/src/cli/commands/bisect.ts` where `execSync` was used with a string command containing user-controlled input (`from` and `to` arguments in `git log ${range}`). This allowed a malicious user to execute arbitrary commands by injecting them into the arguments.
 **Learning:** In Node.js, using `execSync` or `exec` with a string command and untrusted input leads to shell command injection because the string is executed in a shell environment where special shell characters are interpreted.
 **Prevention:** To prevent command injection, always use `execFileSync` or `spawnSync` instead of `execSync`, and pass the executable as the first argument, and the arguments as an array as the second argument. This bypasses the shell and prevents shell metacharacter interpretation.
+
 ## 2024-05-18 - [Fix Command Injection in CLI commands]
 **Vulnerability:** Command injection risks due to the use of `child_process.execSync` allowing arbitrary shell command execution when combining user input or branch names with system commands.
 **Learning:** `execSync` is inherently vulnerable when parameters are dynamically formatted as parts of a command string, especially when those string arguments pass through untested or unbounded paths.
 **Prevention:** Consistently use `child_process.execFileSync` and pass arguments as structured arrays to completely bypass the system shell, isolating variables from executable targets.
 
+## 2024-07-25 - [HIGH] XSS Vulnerabilities with dangerouslySetInnerHTML in React
+**Vulnerability:** Cross-Site Scripting (XSS) vulnerabilities found in `frontend/src/InteractiveDemo.tsx` and `frontend/src/DocsPage.tsx` where un-sanitized markdown text was passed directly to React's `dangerouslySetInnerHTML`.
+**Learning:** Directly injecting unescaped user-generated or external text content into the DOM using `dangerouslySetInnerHTML` bypasses React's built-in XSS protection and executes potentially malicious `<script>` tags or malicious HTML payload.
+**Prevention:** Always sanitize any untrusted or dynamically generated HTML input with a reputable sanitization library like `DOMPurify` before injecting it into React components with `dangerouslySetInnerHTML`. Use `DOMPurify.sanitize(htmlString)` as the wrapper.
 ## 2024-05-24 - [Data Leakage in Memory Serialization]
 **Vulnerability:** The `sanitizeMemory` function in `context-server/src/security/scrubber.ts` returned the memory object without scrubbing the `content` field.
 **Learning:** During serialization and synchronization of memory logs (e.g., `dumpContextLedger`), sensitive information such as API keys and tokens embedded within memory `content` fields was being exported in plaintext due to an incomplete sanitization implementation.

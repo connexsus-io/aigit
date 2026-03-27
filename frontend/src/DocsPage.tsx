@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import DOMPurify from 'dompurify';
 import { SEO } from './SEO';
 
 interface DocSection {
@@ -811,7 +812,7 @@ function renderMarkdown(md: string): string {
     .replace(/\n/g, '<br/>');
 }
 
-const processedSections = sections.map(s => ({ ...s, htmlContent: renderMarkdown(s.content) }));
+const processedSections = sections.map(s => ({ ...s, htmlContent: DOMPurify.sanitize(renderMarkdown(s.content)) }));
 
 export function DocsPage() {
   const [activeSection, setActiveSection] = useState('quickstart');

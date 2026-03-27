@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import DOMPurify from 'dompurify';
 import './InteractiveDemo.css';
 
 interface DemoStep {
@@ -374,7 +375,7 @@ export function InteractiveDemo() {
                             return (
                                 <div key={idx} className={`chat-message ${msg.sender === 'user' ? 'chat-user' : 'chat-ai'}`}>
                                     <div className="chat-avatar">{msg.sender === 'user' ? 'U' : 'AI'}</div>
-                                    <span dangerouslySetInnerHTML={{ __html: msg.text.replace(/`([^`]+)`/g, '<code>$1</code>') }} />
+                                    <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(msg.text.replace(/`([^`]+)`/g, '<code>$1</code>')) }} />
                                 </div>
                             );
                         })}
