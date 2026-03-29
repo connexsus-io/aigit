@@ -39,7 +39,9 @@ export default function GraphPage() {
         if (element && graphData.mermaid) {
             element.innerHTML = '';
             try {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore - Handle hybrid return types in newer mermaid vs older typings
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const result: any = await mermaid.render('mermaid-svg', graphData.mermaid);
                 const rawHtml = typeof result === 'string' ? result : result.svg;
                 element.innerHTML = DOMPurify.sanitize(rawHtml);
