@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { RefreshCw } from 'lucide-react';
 import mermaid from 'mermaid';
+import DOMPurify from 'dompurify';
 
 export default function GraphPage() {
   const [graphData, setGraphData] = useState<{ mermaid: string, totalFiles: number, totalLinks: number } | null>(null);
@@ -40,9 +41,11 @@ export default function GraphPage() {
             try {
                 // @ts-ignore - Handle hybrid return types in newer mermaid vs older typings
                 const result: any = await mermaid.render('mermaid-svg', graphData.mermaid);
-                element.innerHTML = typeof result === 'string' ? result : result.svg;
+                const rawHtml = typeof result === 'string' ? result : result.svg;
+                element.innerHTML = DOMPurify.sanitize(rawHtml);
             } catch (e: any) {
-                element.innerHTML = `<div class="text-danger p-4 border border-danger/30 rounded bg-danger/10">Mermaid Render Error: ${e.message}</div>`;
+                const errorHtml = `<div class="text-danger p-4 border border-danger/30 rounded bg-danger/10">Mermaid Render Error: ${e.message}</div>`;
+                element.innerHTML = DOMPurify.sanitize(errorHtml);
             }
         }
       }, 100);
