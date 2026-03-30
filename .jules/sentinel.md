@@ -26,3 +26,7 @@
 **Vulnerability:** The `sanitizeMemory` function in `context-server/src/security/scrubber.ts` returned the memory object without scrubbing the `content` field.
 **Learning:** During serialization and synchronization of memory logs (e.g., `dumpContextLedger`), sensitive information such as API keys and tokens embedded within memory `content` fields was being exported in plaintext due to an incomplete sanitization implementation.
 **Prevention:** Always verify that security/scrubber functions handle all sensitive fields for data structures they are responsible for. Writing unit tests that specifically inject secrets into these fields ensures the scrubber is effective.
+## 2024-03-30 - Add Input Validation to Serverless API Endpoint
+**Vulnerability:** Missing input validation and length bounds on serverless API route (`frontend/api/feedback.ts`) allows DoS via excessive payloads and spam via arbitrary `type` values reflected in the email subject.
+**Learning:** Serverless functions lacking basic type checks and size limits are vulnerable to excessive payload processing, potentially hitting third-party API limits (like Resend) or causing execution timeouts.
+**Prevention:** Always implement strict payload size limits and type validation on all incoming request parameters before processing or forwarding to downstream services.
