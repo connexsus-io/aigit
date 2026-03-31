@@ -51,7 +51,7 @@ aigit init-hook
 
 2. **Commit Semantic Memory**
    ```bash
-   aigit commit_memory "Refactored user sessions to rely strictly on Redis caching."
+   aigit commit memory "Refactored user sessions to rely strictly on Redis caching."
    ```
    *Explicitly instructs the embedded engine to record a new reasoning path logic directly into the active branch history.*
 
@@ -72,6 +72,12 @@ aigit init-hook
    aigit revert <UUID>
    ```
 
+6. **CI Context Report** *(GitHub Actions)*
+   ```bash
+   aigit ci-report
+   ```
+   *Generates a structured context report for the current PR, posted as a GitHub comment.*
+
 ## 📖 Architecture
 
 aigit operates by intercepting agent prompts and appending rules to look up semantic history locally. 
@@ -79,6 +85,13 @@ aigit operates by intercepting agent prompts and appending rules to look up sema
 - **The Sync Layer:** Vectors are exported cleanly line-by-line via `aigit dump` to `.aigit/ledger.json`—making Git commits completely transparent.
 
 By executing `aigit init`, you enforce universal, standardized rules through generated `.cursorrules` / `.windsurfrules` that automatically intercept requests, telling agents "You are an integrated persona, read `AGENTS.md` and query the `$DATABASE_URL`."
+
+## 📦 What's New in v1.1.9
+
+*   **⚡ Performance:** Parallelized all independent DB queries with `Promise.all` across UI API and documentation generator — measurably lower API latency.
+*   **🧹 Code Health:** Replaced all raw `console.log` calls with the structured CLI output formatter (`output.ts`) across `registry.ts` and `sync.ts`.
+*   **🛡️ Security:** Fixed two HIGH XSS vulnerabilities in the Graph renderer; added Zod-based input validation and length limits to the feedback API.
+*   **♿ Accessibility:** Added ARIA labels and `aria-live` region to Search Input for full screen-reader support.
 
 ## 📄 License
 
