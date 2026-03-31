@@ -29,19 +29,20 @@ const handler: CommandHandler = async ({ workspacePath }) => {
     // API: Get Project Stats
     app.get('/api/stats', async (req: Request, res: Response) => {
         try {
-            const memoryCount = await prisma.memory.count();
-            const decisionCount = await prisma.decision.count();
-            const taskCount = await prisma.task.count();
-            
-            // Agent breakdown
-            const memAgents = await prisma.memory.groupBy({
-                by: ['agentName'],
-                _count: { agentName: true }
-            });
-            const decAgents = await prisma.decision.groupBy({
-                by: ['agentName'],
-                _count: { agentName: true }
-            });
+            const [memoryCount, decisionCount, taskCount, memAgents, decAgents] = await Promise.all([
+                prisma.memory.count(),
+                prisma.decision.count(),
+                prisma.task.count(),
+                // Agent breakdown
+                prisma.memory.groupBy({
+                    by: ['agentName'],
+                    _count: { agentName: true }
+                }),
+                prisma.decision.groupBy({
+                    by: ['agentName'],
+                    _count: { agentName: true }
+                })
+            ]);
 
             res.json({
                 totalMemories: memoryCount,
@@ -59,19 +60,20 @@ const handler: CommandHandler = async ({ workspacePath }) => {
     // API: Get Conflicts
     app.get('/api/conflicts', async (req: Request, res: Response) => {
         try {
-            const memories = await prisma.memory.findMany({
-                where: {
-                    gitBranch: currentBranch,
-                    originBranch: { not: null, notIn: [currentBranch] }
-                }
-            });
-
-            const decisions = await prisma.decision.findMany({
-                where: {
-                    gitBranch: currentBranch,
-                    originBranch: { not: null, notIn: [currentBranch] }
-                }
-            });
+            const [memories, decisions] = await Promise.all([
+                prisma.memory.findMany({
+                    where: {
+                        gitBranch: currentBranch,
+                        originBranch: { not: null, notIn: [currentBranch] }
+                    }
+                }),
+                prisma.decision.findMany({
+                    where: {
+                        gitBranch: currentBranch,
+                        originBranch: { not: null, notIn: [currentBranch] }
+                    }
+                })
+            ]);
 
             res.json({ memories, decisions });
         } catch (error) {
@@ -137,13 +139,15 @@ const handler: CommandHandler = async ({ workspacePath }) => {
             const cutoffDate = new Date();
             cutoffDate.setDate(cutoffDate.getDate() - keepDays);
             
-            const deletedMemories = await prisma.memory.deleteMany({
-                where: { type: { in: ['capability', 'context'] }, createdAt: { lt: cutoffDate } }
-            });
+            const [deletedMemories, emptyTasks] = await Promise.all([
+                prisma.memory.deleteMany({
+                    where: { type: { in: ['capability', 'context'] }, createdAt: { lt: cutoffDate } }
+                }),
+                prisma.task.findMany({
+                    where: { decisions: { none: {} }, status: { in: ['DONE', 'CANCELLED'] } }
+                })
+            ]);
 
-            const emptyTasks = await prisma.task.findMany({
-                where: { decisions: { none: {} }, status: { in: ['DONE', 'CANCELLED'] } }
-            });
             if (emptyTasks.length > 0) {
                 await prisma.task.deleteMany({
                     where: { id: { in: emptyTasks.map(t => t.id) } }
