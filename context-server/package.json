@@ -1,7 +1,16 @@
 {
   "name": "aigit-core",
-  "version": "1.1.9",
+  "version": "1.1.10",
   "description": "AI Context Protocol Engine - Memory & State",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/connexsus-io/aigit.git",
+    "directory": "context-server"
+  },
+  "homepage": "https://github.com/connexsus-io/aigit#readme",
+  "bugs": {
+    "url": "https://github.com/connexsus-io/aigit/issues"
+  },
   "main": "dist/index.js",
   "scripts": {
     "start": "ts-node src/index.ts",
