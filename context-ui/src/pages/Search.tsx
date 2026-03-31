@@ -43,10 +43,11 @@ export default function SearchPage() {
           <p className="text-muted">Query architectural decisions and code memories using native Vector embeddings.</p>
         </div>
         
-        <form onSubmit={handleSearch} className="w-full flex gap-3 mt-4" style={{ width: '100%', display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+        <form aria-label="Semantic Context Search" onSubmit={handleSearch} className="w-full flex gap-3 mt-4" style={{ width: '100%', display: 'flex', gap: '1rem', marginTop: '1rem' }}>
           <div className="relative" style={{ flex: 1, position: 'relative' }}>
             <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={20} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input 
+              aria-label="Search query"
               type="text" 
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -61,7 +62,7 @@ export default function SearchPage() {
         </form>
       </header>
 
-      <div className="mt-8" style={{ marginTop: '2rem' }}>
+      <div aria-live="polite" className="mt-8" style={{ marginTop: '2rem' }}>
         {loading && <div className="text-muted p-4 text-center">Interrogating hyperspace vector embeddings...</div>}
 
         {!loading && searched && results.length === 0 && (
