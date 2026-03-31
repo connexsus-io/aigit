@@ -3,6 +3,7 @@ import path from 'path';
 import { detectAgents, DetectedAgent } from './registry';
 import { autoparse, RuleSection } from './parsers';
 import { detectConflicts, saveConflicts, printConflicts } from './conflicts';
+import { info } from '../cli/output';
 
 interface SyncDiff {
     toolId: string;
@@ -27,7 +28,7 @@ export async function syncAgents(
     const agents = detectAgents(workspacePath);
 
     if (agents.length < 2) {
-        console.log('\n⚡ Only one AI tool detected. Nothing to sync.\n');
+        info('⚡ Only one AI tool detected. Nothing to sync.');
         return { diffs: [], conflictCount: 0 };
     }
 
