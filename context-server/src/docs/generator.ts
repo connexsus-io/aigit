@@ -12,22 +12,22 @@ export async function generateArchitectureDocs(projectName: string, branch: stri
         throw new Error(`Project ${projectName} not found.`);
     }
 
-    // 2. Fetch all data for the branch
-    const tasks = await prisma.task.findMany({
-        where: { projectId: project.id, gitBranch: branch },
-        include: { decisions: true },
-        orderBy: { createdAt: 'asc' }
-    });
-
-    const memories = await prisma.memory.findMany({
-        where: { projectId: project.id, gitBranch: branch },
-        orderBy: { createdAt: 'asc' }
-    });
-
-    const decisions = await prisma.decision.findMany({
-        where: { task: { projectId: project.id }, gitBranch: branch },
-        orderBy: { createdAt: 'asc' }
-    });
+    // 2. Fetch all data for the branch concurrently
+    const [tasks, memories, decisions] = await Promise.all([
+        prisma.task.findMany({
+            where: { projectId: project.id, gitBranch: branch },
+            include: { decisions: true },
+            orderBy: { createdAt: 'asc' }
+        }),
+        prisma.memory.findMany({
+            where: { projectId: project.id, gitBranch: branch },
+            orderBy: { createdAt: 'asc' }
+        }),
+        prisma.decision.findMany({
+            where: { task: { projectId: project.id }, gitBranch: branch },
+            orderBy: { createdAt: 'asc' }
+        })
+    ]);
 
     // 3. Assemble Markdown
     let md = `# ARCHITECTURE.md\n\n`;
