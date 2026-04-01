@@ -9,6 +9,9 @@ export interface CodeSymbol {
     filePath: string;
 }
 
+// Cache the Project instance to avoid expensive reinstantiation (~10-20ms per file)
+const projectCache = new Project({ compilerOptions: { allowJs: true } });
+
 export function extractSymbols(filePath: string): CodeSymbol[] {
     const ext = path.extname(filePath).toLowerCase();
     if (!['.ts', '.tsx', '.js', '.jsx', '.mts', '.mjs'].includes(ext)) {
@@ -16,10 +19,16 @@ export function extractSymbols(filePath: string): CodeSymbol[] {
     }
 
     try {
-        const project = new Project({ compilerOptions: { allowJs: true } });
-        const sourceFile = project.addSourceFileAtPath(filePath);
+        let sourceFile = projectCache.getSourceFile(filePath);
+        if (!sourceFile) {
+            sourceFile = projectCache.addSourceFileAtPath(filePath);
+        } else {
+            // Ensure we have the latest version of the file from disk if it already existed
+            sourceFile.refreshFromFileSystemSync();
+        }
         return extractFromSourceFile(sourceFile, filePath);
-    } catch {
+    } catch (err) {
+        console.error(`[aigit] AST extraction failed for ${filePath}:`, err);
         return [];
     }
 }
