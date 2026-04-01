@@ -58,6 +58,9 @@ class SyncProvider {
                 case 'aigit.syncDryRun':
                     vscode.commands.executeCommand('aigit.syncDryRun');
                     break;
+                case 'aigit.syncSkills':
+                    vscode.commands.executeCommand('aigit.syncSkills');
+                    break;
                 case 'aigit.showConflicts':
                     vscode.commands.executeCommand('aigit.showConflicts');
                     break;
@@ -111,11 +114,25 @@ class SyncProvider {
         let conflictCount = 0;
         if (tools.length >= 2) {
             try {
-                const result = cp.execSync('aigit sync --dry-run 2>&1', {
-                    cwd: this.workspaceRoot,
-                    timeout: 10000,
-                    encoding: 'utf8',
-                });
+                // Determine aigit command path
+                const aigitPath = fs.existsSync(path.join(this.workspaceRoot, 'node_modules', '.bin', 'aigit'))
+                    ? path.join(this.workspaceRoot, 'node_modules', '.bin', 'aigit')
+                    : 'aigit';
+                let result = '';
+                try {
+                    result = cp.execFileSync(aigitPath === 'aigit' ? 'aigit' : process.execPath, aigitPath === 'aigit' ? ['sync', '--dry-run'] : [aigitPath, 'sync', '--dry-run'], {
+                        cwd: this.workspaceRoot,
+                        timeout: 10000,
+                        encoding: 'utf8',
+                        stdio: ['pipe', 'pipe', 'pipe']
+                    });
+                }
+                catch (err) {
+                    // execFileSync throws if exit code > 0, but we still want the output
+                    result = err.stdout ? err.stdout.toString() : '';
+                    const stderr = err.stderr ? err.stderr.toString() : '';
+                    result += '\n' + stderr;
+                }
                 const addMatches = result.match(/\+ "/g);
                 pendingSections = addMatches ? addMatches.length : 0;
             }
@@ -249,6 +266,7 @@ class SyncProvider {
         <button class="btn" onclick="send('aigit.scan')">🔍 Scan</button>
         <button class="btn" onclick="send('aigit.syncDryRun')">📋 Dry Run</button>
         <button class="btn btn-primary" onclick="send('aigit.sync')">🔄 Sync</button>
+        <button class="btn" onclick="send('aigit.syncSkills')">🛠️ Sync Skills</button>
         <button class="btn" onclick="send('aigit.showConflicts')">⚠️ Conflicts</button>
     </div>
 
