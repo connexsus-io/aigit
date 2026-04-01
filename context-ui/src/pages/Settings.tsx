@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { DatabaseZap, ShieldAlert, Check } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 
 export default function SettingsPage() {
   const [running, setRunning] = useState(false);
@@ -9,7 +10,7 @@ export default function SettingsPage() {
     setRunning(true);
     setResult(null);
     try {
-      const res = await fetch('http://localhost:3001/api/gc', { method: 'POST' });
+      const res = await fetch(`${API_BASE_URL}/api/gc`, { method: 'POST' });
       const data = await res.json();
       if (data.success) {
           setResult({ success: true, deleted: data.deleted });

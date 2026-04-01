@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 import { Activity, Brain, Database, CheckCircle2 } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 
 interface StatsData {
   totalMemories: number;
@@ -19,7 +20,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/stats')
+    fetch(`${API_BASE_URL}/api/stats`)
       .then(res => res.json())
       .then(data => {
         setStats(data);

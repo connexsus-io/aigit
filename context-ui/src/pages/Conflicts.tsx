@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GitMerge, Check, X, Sparkles } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 
 interface ConflictItem {
   id: string;
@@ -25,7 +26,7 @@ export default function ConflictsPage() {
 
   const fetchConflicts = () => {
     setLoading(true);
-    fetch('http://localhost:3001/api/conflicts')
+    fetch(`${API_BASE_URL}/api/conflicts`)
       .then(res => res.json())
       .then(data => {
         const mems = (data.memories || []).map((m: any) => ({ ...m, _renderType: 'memory' }));
@@ -45,7 +46,7 @@ export default function ConflictsPage() {
 
   const handleAction = async (id: string, type: string, action: string, content?: string) => {
     try {
-      await fetch('http://localhost:3001/api/resolve', {
+      await fetch(`${API_BASE_URL}/api/resolve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, type, action, content })

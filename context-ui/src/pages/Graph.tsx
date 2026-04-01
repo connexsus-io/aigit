@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { RefreshCw } from 'lucide-react';
 import mermaid from 'mermaid';
 import DOMPurify from 'dompurify';
+import { API_BASE_URL } from '../config';
 
 export default function GraphPage() {
   const [graphData, setGraphData] = useState<{ mermaid: string, totalFiles: number, totalLinks: number } | null>(null);
@@ -9,7 +10,7 @@ export default function GraphPage() {
 
   const fetchGraph = () => {
     setLoading(true);
-    fetch('http://localhost:3001/api/graph')
+    fetch(`${API_BASE_URL}/api/graph`)
       .then(res => res.json())
       .then(data => {
         setGraphData(data);
