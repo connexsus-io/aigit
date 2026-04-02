@@ -115,12 +115,18 @@ class ContextPrefetchCache {
         try {
             // Use aigit's JSON output mode for structured data
             const relPath = path.relative(this.workspaceRoot, filePath);
-            const raw = (0, child_process_1.execSync)(`node "${path.join(this.workspaceRoot, 'node_modules/.bin/aigit')}" hydrate "${relPath}" --json 2>/dev/null || echo '{"memories":[],"decisions":[]}'`, {
-                cwd: this.workspaceRoot,
-                encoding: 'utf-8',
-                timeout: 5000,
-                stdio: ['pipe', 'pipe', 'pipe'],
-            });
+            let raw;
+            try {
+                raw = (0, child_process_1.execFileSync)('node', [path.join(this.workspaceRoot, 'node_modules/.bin/aigit'), 'hydrate', relPath, '--json'], {
+                    cwd: this.workspaceRoot,
+                    encoding: 'utf-8',
+                    timeout: 5000,
+                    stdio: ['pipe', 'pipe', 'pipe'],
+                });
+            }
+            catch (err) {
+                raw = err.stdout?.toString() || '{"memories":[],"decisions":[]}';
+            }
             // Try parsing as JSON first
             try {
                 const parsed = JSON.parse(raw.trim());
