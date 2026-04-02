@@ -35,7 +35,7 @@ describe('buildProjectStats', () => {
         vi.mocked(prisma.task.count).mockResolvedValue(2);
         vi.mocked(prisma.healingEvent.count).mockResolvedValue(1);
 
-        vi.mocked(prisma.memory.groupBy).mockImplementation((args: any) => {
+        vi.mocked(prisma.memory.groupBy).mockImplementation(((args: any) => {
             if (args.by[0] === 'agentName') {
                 return Promise.resolve([
                     { agentName: 'planner', _count: { _all: 2 } },
@@ -48,9 +48,9 @@ describe('buildProjectStats', () => {
                 ]);
             }
             return Promise.resolve([]);
-        });
+        }) as any);
 
-        vi.mocked(prisma.decision.groupBy).mockImplementation((args: any) => {
+        vi.mocked(prisma.decision.groupBy).mockImplementation(((args: any) => {
             if (args.by[0] === 'agentName') {
                 return Promise.resolve([
                     { agentName: 'planner', _count: { _all: 1 } },
@@ -63,7 +63,7 @@ describe('buildProjectStats', () => {
                 ]);
             }
             return Promise.resolve([]);
-        });
+        }) as any);
 
         const now = new Date();
         const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
