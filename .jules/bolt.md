@@ -9,3 +9,7 @@
 ## 2024-03-24 - ts-morph Project Re-instantiation Bottleneck
 **Learning:** Instantiating a new `Project` from `ts-morph` per file in a loop (e.g., during drift detection where `extractAllSymbols` is called for every database memory) caused immense latency (e.g. ~50s for 50 records). The overhead of initializing the TypeScript compiler wrapper repeatedly is massive (~10-20ms per file).
 **Action:** Always cache and reuse the `Project` instance at the module level when performing batch AST parsing. Use `project.getSourceFile(path) || project.addSourceFileAtPath(path)` and optionally `sourceFile.refreshFromFileSystemSync()` to ensure data freshness without the compiler initialization penalty, reducing 50 parses from 50s down to ~15ms.
+
+## 2024-03-25 - GroupBy Query Aggregation
+**Learning:** When trying to build aggregate statistics for agents, using `findMany` followed by a JS array map and group adds a substantial performance hit and memory load in the app server, scaling with $O(N)$. Furthermore, when counting rows in Prisma where certain fields may be nullable, counting by the specific field ignores null rows (changing behavior).
+**Action:** Always utilize Prisma's native `groupBy` functionality paired with `_count: { _all: true }` to offload aggregation $O(N)$ calculations to the underlying engine. Mocking these appropriately requires inspecting the `args.by[0]` parameter.

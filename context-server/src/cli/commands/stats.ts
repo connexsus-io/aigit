@@ -32,8 +32,17 @@ export async function buildProjectStats(limit: number = 10): Promise<string> {
     lines.push(`  📋 Tasks:          ${taskCount}`);
     lines.push(`  🩹 Healing Events: ${healingCount}\n`);
 
-    const memories = await prisma.memory.findMany({ select: { agentName: true } });
-    const decisions = await prisma.decision.findMany({ select: { agentName: true } });
+    // ⚡ Bolt: Use Prisma groupBy to aggregate agent stats instead of transferring and iterating over all records
+    const [memoryGroup, decisionGroup] = await Promise.all([
+        prisma.memory.groupBy({
+            by: ['agentName'],
+            _count: { _all: true }
+        }),
+        prisma.decision.groupBy({
+            by: ['agentName'],
+            _count: { _all: true }
+        })
+    ]);
 
     const agentMap = new Map<string, AgentStats>();
     const getAgent = (name: string): AgentStats => {
@@ -41,17 +50,17 @@ export async function buildProjectStats(limit: number = 10): Promise<string> {
         return agentMap.get(name)!;
     };
 
-    for (const m of memories) {
-        const name = m.agentName || 'unknown';
+    for (const mg of memoryGroup) {
+        const name = mg.agentName || 'unknown';
         const a = getAgent(name);
-        a.memories++;
-        a.total++;
+        a.memories += mg._count._all;
+        a.total += mg._count._all;
     }
-    for (const d of decisions) {
-        const name = d.agentName || 'unknown';
+    for (const dg of decisionGroup) {
+        const name = dg.agentName || 'unknown';
         const a = getAgent(name);
-        a.decisions++;
-        a.total++;
+        a.decisions += dg._count._all;
+        a.total += dg._count._all;
     }
 
     const agentRanking = Array.from(agentMap.values()).sort((a, b) => b.total - a.total);
