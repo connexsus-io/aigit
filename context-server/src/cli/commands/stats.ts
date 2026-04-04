@@ -32,6 +32,9 @@ export async function buildProjectStats(limit: number = 10): Promise<string> {
     lines.push(`  📋 Tasks:          ${taskCount}`);
     lines.push(`  🩹 Healing Events: ${healingCount}\n`);
 
+    // ⚡ Bolt Optimization: Use Promise.all to run independent aggregation queries concurrently
+    // to minimize latency. We use database-native groupBy instead of fetching all records
+    // via findMany to severely reduce Node.js memory overhead and network payload size.
     const [agentMemories, agentDecisions] = await Promise.all([
         prisma.memory.groupBy({ by: ['agentName'], _count: { id: true } }),
         prisma.decision.groupBy({ by: ['agentName'], _count: { id: true } }),
