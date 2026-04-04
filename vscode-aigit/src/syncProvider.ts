@@ -94,11 +94,29 @@ export class SyncProvider implements vscode.WebviewViewProvider {
 
         if (tools.length >= 2) {
             try {
-                const result = cp.execSync('aigit sync --dry-run 2>&1', {
-                    cwd: this.workspaceRoot,
-                    timeout: 10000,
-                    encoding: 'utf8',
-                });
+                // Determine aigit command path
+                const aigitPath = fs.existsSync(path.join(this.workspaceRoot, 'node_modules', '.bin', 'aigit'))
+                    ? path.join(this.workspaceRoot, 'node_modules', '.bin', 'aigit')
+                    : 'aigit';
+
+                let result = '';
+                try {
+                    result = cp.execFileSync(
+                        aigitPath === 'aigit' ? 'aigit' : process.execPath,
+                        aigitPath === 'aigit' ? ['sync', '--dry-run'] : [aigitPath, 'sync', '--dry-run'],
+                        {
+                            cwd: this.workspaceRoot,
+                            timeout: 10000,
+                            encoding: 'utf8',
+                            stdio: ['pipe', 'pipe', 'pipe']
+                        }
+                    );
+                } catch (err: any) {
+                    // execFileSync throws if exit code > 0, but we still want the output
+                    result = err.stdout ? err.stdout.toString() : '';
+                    const stderr = err.stderr ? err.stderr.toString() : '';
+                    result += '\n' + stderr;
+                }
                 const addMatches = result.match(/\+ "/g);
                 pendingSections = addMatches ? addMatches.length : 0;
             } catch { /* aigit not available, skip */ }
