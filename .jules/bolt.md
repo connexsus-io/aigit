@@ -9,3 +9,7 @@
 ## 2024-03-24 - ts-morph Project Re-instantiation Bottleneck
 **Learning:** Instantiating a new `Project` from `ts-morph` per file in a loop (e.g., during drift detection where `extractAllSymbols` is called for every database memory) caused immense latency (e.g. ~50s for 50 records). The overhead of initializing the TypeScript compiler wrapper repeatedly is massive (~10-20ms per file).
 **Action:** Always cache and reuse the `Project` instance at the module level when performing batch AST parsing. Use `project.getSourceFile(path) || project.addSourceFileAtPath(path)` and optionally `sourceFile.refreshFromFileSystemSync()` to ensure data freshness without the compiler initialization penalty, reducing 50 parses from 50s down to ~15ms.
+
+## 2024-04-04 - Database Aggregation Overhead
+**Learning:** Fetching all records into memory using `findMany` solely to aggregate counts (e.g., counting memories/decisions per agent) incurs massive Node.js memory footprint and computational overhead.
+**Action:** Always use Prisma's native `groupBy` capabilities to let the database handle aggregation. Also, parallelize independent database queries (like stats counters) using `Promise.all` to minimize latency by overlapping I/O-bound operations.
