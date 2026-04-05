@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GitMerge, Check, X, Sparkles } from 'lucide-react';
+import { GitMerge, Check, X, Sparkles, Loader2 } from 'lucide-react';
 
 interface ConflictItem {
   id: string;
@@ -18,6 +18,7 @@ interface ConflictItem {
 export default function ConflictsPage() {
   const [items, setItems] = useState<ConflictItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [processingId, setProcessingId] = useState<string | null>(null);
 
   // For synthesis mode
   const [synthesizeTarget, setSynthesizeTarget] = useState<string | null>(null);
@@ -44,6 +45,7 @@ export default function ConflictsPage() {
   }, []);
 
   const handleAction = async (id: string, type: string, action: string, content?: string) => {
+    setProcessingId(id);
     try {
       await fetch('http://localhost:3001/api/resolve', {
         method: 'POST',
@@ -55,6 +57,8 @@ export default function ConflictsPage() {
       if (synthesizeTarget === id) setSynthesizeTarget(null);
     } catch (err) {
       console.error("Failed to resolve", err);
+    } finally {
+      setProcessingId(null);
     }
   };
 
@@ -133,8 +137,13 @@ export default function ConflictsPage() {
                         onChange={(e) => setSynthText(e.target.value)}
                     />
                     <div className="flex gap-2">
-                         <button className="btn btn-primary" onClick={() => handleAction(item.id, (item as any)._renderType, 'synthesize', synthText)}>
-                            <Check size={16} /> Save & Assimilate
+                         <button
+                            className="btn btn-primary"
+                            onClick={() => handleAction(item.id, (item as any)._renderType, 'synthesize', synthText)}
+                            disabled={processingId === item.id}
+                            aria-busy={processingId === item.id}
+                        >
+                            {processingId === item.id ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />} Save & Assimilate
                         </button>
                         <button className="btn" onClick={() => setSynthesizeTarget(null)}>
                             Cancel
@@ -146,8 +155,10 @@ export default function ConflictsPage() {
                     <button 
                         className="btn btn-primary" 
                         onClick={() => handleAction(item.id, (item as any)._renderType, 'assimilate')}
+                        disabled={processingId === item.id}
+                        aria-busy={processingId === item.id}
                     >
-                        <Check size={16} /> Keep & Assimilate
+                        {processingId === item.id ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />} Keep & Assimilate
                     </button>
                     
                     {(item as any)._renderType === 'memory' && (
@@ -165,8 +176,10 @@ export default function ConflictsPage() {
                     <button 
                         className="btn btn-danger"
                         onClick={() => handleAction(item.id, (item as any)._renderType, 'discard')}
+                        disabled={processingId === item.id}
+                        aria-busy={processingId === item.id}
                     >
-                        <X size={16} /> Discard Context
+                        {processingId === item.id ? <Loader2 size={16} className="animate-spin" /> : <X size={16} />} Discard Context
                     </button>
                 </div>
               )}
