@@ -13,3 +13,11 @@
 ## 2024-04-04 - Database Aggregation Overhead
 **Learning:** Fetching all records into memory using `findMany` solely to aggregate counts (e.g., counting memories/decisions per agent) incurs massive Node.js memory footprint and computational overhead.
 **Action:** Always use Prisma's native `groupBy` capabilities to let the database handle aggregation. Also, parallelize independent database queries (like stats counters) using `Promise.all` to minimize latency by overlapping I/O-bound operations.
+
+## 2024-03-25 - GroupBy Query Aggregation
+**Learning:** When trying to build aggregate statistics for agents, using `findMany` followed by a JS array map and group adds a substantial performance hit and memory load in the app server, scaling with $O(N)$. Furthermore, when counting rows in Prisma where certain fields may be nullable, counting by the specific field ignores null rows (changing behavior).
+**Action:** Always utilize Prisma's native `groupBy` functionality paired with `_count: { _all: true }` to offload aggregation $O(N)$ calculations to the underlying engine. Mocking these appropriately requires inspecting the `args.by[0]` parameter.
+
+## 2024-04-05 - File-Based Filtering O(N*M)
+**Learning:** During Markdown architecture generation, filtering a large array of `memories` and `decisions` by `filePath` inside a loop iterating over all unique files caused severe performance degradation ($O(N \times F)$ where F is the number of files). The same occurred inside the Mermaid graph generation.
+**Action:** Pre-group memories and decisions by `filePath` into a `Map` prior to iterating. This shifts complexity to $O(N)$ and yields major speedups (e.g. 640ms -> 240ms for Markdown generation; effectively instantaneous for Mermaid).
