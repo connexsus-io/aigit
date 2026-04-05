@@ -67,7 +67,7 @@ export default function DashboardPage() {
           <h2>Platform Knowledge</h2>
           <p className="text-muted">Currently active on branch <code className="text-gradient font-bold">{stats.currentBranch}</code></p>
         </div>
-        <button className="btn btn-primary" onClick={() => fetchStats(true)} disabled={isRefreshing}>
+        <button className="btn btn-primary" onClick={() => fetchStats(true)} disabled={isRefreshing} aria-busy={isRefreshing}>
           <Activity size={16} className={isRefreshing ? 'animate-spin' : ''} /> {isRefreshing ? 'Refreshing...' : 'Refresh Telemetry'}
         </button>
       </header>
