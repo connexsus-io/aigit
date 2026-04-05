@@ -32,16 +32,12 @@ export async function buildProjectStats(limit: number = 10): Promise<string> {
     lines.push(`  📋 Tasks:          ${taskCount}`);
     lines.push(`  🩹 Healing Events: ${healingCount}\n`);
 
-    // ⚡ Bolt: Use Prisma groupBy to aggregate agent stats instead of transferring and iterating over all records
-    const [memoryGroup, decisionGroup] = await Promise.all([
-        prisma.memory.groupBy({
-            by: ['agentName'],
-            _count: { _all: true }
-        }),
-        prisma.decision.groupBy({
-            by: ['agentName'],
-            _count: { _all: true }
-        })
+    // ⚡ Bolt Optimization: Use Promise.all to run independent aggregation queries concurrently
+    // to minimize latency. We use database-native groupBy instead of fetching all records
+    // via findMany to severely reduce Node.js memory overhead and network payload size.
+    const [agentMemories, agentDecisions] = await Promise.all([
+        prisma.memory.groupBy({ by: ['agentName'], _count: { id: true } }),
+        prisma.decision.groupBy({ by: ['agentName'], _count: { id: true } }),
     ]);
 
     const agentMap = new Map<string, AgentStats>();
@@ -50,17 +46,17 @@ export async function buildProjectStats(limit: number = 10): Promise<string> {
         return agentMap.get(name)!;
     };
 
-    for (const mg of memoryGroup) {
-        const name = mg.agentName || 'unknown';
+    for (const m of agentMemories) {
+        const name = m.agentName || 'unknown';
         const a = getAgent(name);
-        a.memories += mg._count._all;
-        a.total += mg._count._all;
+        a.memories += m._count.id;
+        a.total += m._count.id;
     }
-    for (const dg of decisionGroup) {
-        const name = dg.agentName || 'unknown';
+    for (const d of agentDecisions) {
+        const name = d.agentName || 'unknown';
         const a = getAgent(name);
-        a.decisions += dg._count._all;
-        a.total += dg._count._all;
+        a.decisions += d._count.id;
+        a.total += d._count.id;
     }
 
     const agentRanking = Array.from(agentMap.values()).sort((a, b) => b.total - a.total);

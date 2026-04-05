@@ -35,35 +35,29 @@ describe('buildProjectStats', () => {
         vi.mocked(prisma.task.count).mockResolvedValue(2);
         vi.mocked(prisma.healingEvent.count).mockResolvedValue(1);
 
-        vi.mocked(prisma.memory.groupBy).mockImplementation(((args: any) => {
+        (vi.mocked(prisma.memory.groupBy) as any).mockImplementation((args: any) => {
             if (args.by[0] === 'agentName') {
                 return Promise.resolve([
-                    { agentName: 'planner', _count: { _all: 2 } },
-                    { agentName: 'coder', _count: { _all: 1 } }
+                    { agentName: 'planner', _count: { id: 2 } },
+                    { agentName: 'coder', _count: { id: 1 } },
                 ]);
             }
-            if (args.by[0] === 'gitBranch') {
-                return Promise.resolve([
-                    { gitBranch: 'main', _count: { id: 10 } }
-                ]);
-            }
-            return Promise.resolve([]);
-        }) as any);
+            return Promise.resolve([
+                { gitBranch: 'main', _count: { id: 10 } },
+            ]);
+        });
 
-        vi.mocked(prisma.decision.groupBy).mockImplementation(((args: any) => {
+        (vi.mocked(prisma.decision.groupBy) as any).mockImplementation((args: any) => {
             if (args.by[0] === 'agentName') {
                 return Promise.resolve([
-                    { agentName: 'planner', _count: { _all: 1 } },
-                    { agentName: 'coder', _count: { _all: 1 } }
+                    { agentName: 'planner', _count: { id: 1 } },
+                    { agentName: 'coder', _count: { id: 1 } },
                 ]);
             }
-            if (args.by[0] === 'gitBranch') {
-                return Promise.resolve([
-                    { gitBranch: 'main', _count: { id: 5 } }
-                ]);
-            }
-            return Promise.resolve([]);
-        }) as any);
+            return Promise.resolve([
+                { gitBranch: 'main', _count: { id: 5 } },
+            ]);
+        });
 
         const now = new Date();
         const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
