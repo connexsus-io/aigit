@@ -37,11 +37,36 @@ export function generateMermaidGraph(
         });
     });
 
+    // Pre-group decisions by filePath for faster lookups
+    const decisionsByFile = new Map<string, typeof decisions>();
+    for (const d of decisions) {
+        if (!d.filePath) continue;
+        let group = decisionsByFile.get(d.filePath);
+        if (!group) {
+            group = [];
+            decisionsByFile.set(d.filePath, group);
+        }
+        group.push(d);
+    }
+
+    // Pre-group memories by filePath
+    const memoriesByFile = new Map<string, typeof memories>();
+    for (const mem of memories) {
+        if (!mem.filePath) continue;
+        let group = memoriesByFile.get(mem.filePath);
+        if (!group) {
+            group = [];
+            memoriesByFile.set(mem.filePath, group);
+        }
+        group.push(mem);
+    }
+
     // Link Memories -> Decisions (heuristic: if they share a file/symbol or just generic linkage)
     // For a cleaner graph, let's link Memories to Decisions if they share the same filePath and symbolName
     memories.forEach(mem => {
         if (mem.filePath) {
-            const relatedDecisions = decisions.filter(d => d.filePath === mem.filePath && d.symbolName === mem.symbolName);
+            const fileDecisions = decisionsByFile.get(mem.filePath) || [];
+            const relatedDecisions = fileDecisions.filter(d => d.symbolName === mem.symbolName);
             relatedDecisions.forEach(d => {
                 m += `  Mem_${mem.id.replace(/-/g, '')} -.->|Influenced| Dec_${d.id.replace(/-/g, '')}\n`;
             });
@@ -50,15 +75,19 @@ export function generateMermaidGraph(
 
     m += '\n  %% Subgraphs by File Path\n';
     const files = new Set<string>();
-    memories.forEach(m => m.filePath && files.add(m.filePath));
-    decisions.forEach(d => d.filePath && files.add(d.filePath));
+    for (const f of memoriesByFile.keys()) files.add(f);
+    for (const f of decisionsByFile.keys()) files.add(f);
 
     Array.from(files).forEach((file, i) => {
         m += `  subgraph File${i} ["📁 ${file}"]\n`;
-        memories.filter(mem => mem.filePath === file).forEach(mem => {
+
+        const fileMemories = memoriesByFile.get(file) || [];
+        fileMemories.forEach(mem => {
             m += `    Mem_${mem.id.replace(/-/g, '')}\n`;
         });
-        decisions.filter(d => d.filePath === file).forEach(d => {
+
+        const fileDecisions = decisionsByFile.get(file) || [];
+        fileDecisions.forEach(d => {
             m += `    Dec_${d.id.replace(/-/g, '')}\n`;
         });
         m += `  end\n\n`;
