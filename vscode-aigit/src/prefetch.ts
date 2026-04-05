@@ -151,12 +151,12 @@ export class ContextPrefetchCache {
         try {
             // Use aigit's JSON output mode for structured data
             const relPath = path.relative(this.workspaceRoot, filePath);
-
-            let raw = '';
+            let raw: string;
             try {
+                // Use execFileSync to prevent command injection from user-controlled relPath
                 raw = execFileSync(
-                    process.execPath,
-                    [path.join(this.workspaceRoot, 'node_modules', '.bin', 'aigit'), 'hydrate', relPath, '--json'],
+                    'node',
+                    [path.join(this.workspaceRoot, 'node_modules/.bin/aigit'), 'hydrate', relPath, '--json'],
                     {
                         cwd: this.workspaceRoot,
                         encoding: 'utf-8',
@@ -164,8 +164,7 @@ export class ContextPrefetchCache {
                         stdio: ['pipe', 'pipe', 'pipe'],
                     }
                 );
-            } catch (err: any) {
-                // Ignore error output, simulate `|| echo '{"memories":[],"decisions":[]}'`
+            } catch (err) {
                 raw = '{"memories":[],"decisions":[]}';
             }
 
