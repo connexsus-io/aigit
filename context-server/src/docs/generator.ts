@@ -12,22 +12,22 @@ export async function generateArchitectureDocs(projectName: string, branch: stri
         throw new Error(`Project ${projectName} not found.`);
     }
 
-    // 2. Fetch all data for the branch
-    const tasks = await prisma.task.findMany({
-        where: { projectId: project.id, gitBranch: branch },
-        include: { decisions: true },
-        orderBy: { createdAt: 'asc' }
-    });
-
-    const memories = await prisma.memory.findMany({
-        where: { projectId: project.id, gitBranch: branch },
-        orderBy: { createdAt: 'asc' }
-    });
-
-    const decisions = await prisma.decision.findMany({
-        where: { task: { projectId: project.id }, gitBranch: branch },
-        orderBy: { createdAt: 'asc' }
-    });
+    // 2. Fetch all data for the branch concurrently
+    const [tasks, memories, decisions] = await Promise.all([
+        prisma.task.findMany({
+            where: { projectId: project.id, gitBranch: branch },
+            include: { decisions: true },
+            orderBy: { createdAt: 'asc' }
+        }),
+        prisma.memory.findMany({
+            where: { projectId: project.id, gitBranch: branch },
+            orderBy: { createdAt: 'asc' }
+        }),
+        prisma.decision.findMany({
+            where: { task: { projectId: project.id }, gitBranch: branch },
+            orderBy: { createdAt: 'asc' }
+        })
+    ]);
 
     // 3. Assemble Markdown
     let md = `# ARCHITECTURE.md\n\n`;
@@ -54,9 +54,34 @@ export async function generateArchitectureDocs(projectName: string, branch: stri
 
     // ── File-Based Context ────────────────────────────────────────
     md += `## Implementation Details (By File)\n\n`;
+
+    // Pre-group decisions by filePath for faster lookups
+    const decisionsByFile = new Map<string, typeof decisions>();
+    for (const d of decisions) {
+        if (!d.filePath) continue;
+        let group = decisionsByFile.get(d.filePath);
+        if (!group) {
+            group = [];
+            decisionsByFile.set(d.filePath, group);
+        }
+        group.push(d);
+    }
+
+    // Pre-group memories by filePath
+    const memoriesByFile = new Map<string, typeof memories>();
+    for (const mem of memories) {
+        if (!mem.filePath) continue;
+        let group = memoriesByFile.get(mem.filePath);
+        if (!group) {
+            group = [];
+            memoriesByFile.set(mem.filePath, group);
+        }
+        group.push(mem);
+    }
+
     const files = new Set<string>();
-    memories.forEach(m => m.filePath && files.add(m.filePath));
-    decisions.forEach(d => d.filePath && files.add(d.filePath));
+    for (const f of memoriesByFile.keys()) files.add(f);
+    for (const f of decisionsByFile.keys()) files.add(f);
 
     if (files.size === 0) {
         md += `*No file-specific context recorded yet.*\n\n`;
@@ -65,7 +90,7 @@ export async function generateArchitectureDocs(projectName: string, branch: stri
         for (const file of sortedFiles) {
             md += `### \`${file}\`\n\n`;
 
-            const fileMemories = memories.filter(m => m.filePath === file);
+            const fileMemories = memoriesByFile.get(file) || [];
             // Filter out default fallback git hooks so we only show dense semantic memories per file
             const semanticFileMemories = fileMemories.filter(m => !m.content.startsWith('Automatic Git Commit Context'));
             
@@ -84,7 +109,7 @@ export async function generateArchitectureDocs(projectName: string, branch: stri
                 md += `\n`;
             }
 
-            const fileDecisions = decisions.filter(d => d.filePath === file);
+            const fileDecisions = decisionsByFile.get(file) || [];
             if (fileDecisions.length > 0) {
                 md += `**Decisions:**\n`;
                 fileDecisions.forEach(d => {

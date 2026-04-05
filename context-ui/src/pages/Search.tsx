@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search as SearchIcon, SearchX, Cpu, Fingerprint, FileCode2 } from 'lucide-react';
+import { Search as SearchIcon, SearchX, Cpu, Fingerprint, FileCode2, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { API_BASE_URL } from '../config';
 
@@ -44,10 +44,11 @@ export default function SearchPage() {
           <p className="text-muted">Query architectural decisions and code memories using native Vector embeddings.</p>
         </div>
         
-        <form onSubmit={handleSearch} className="w-full flex gap-3 mt-4" style={{ width: '100%', display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+        <form aria-label="Semantic Context Search" onSubmit={handleSearch} className="w-full flex gap-3 mt-4" style={{ width: '100%', display: 'flex', gap: '1rem', marginTop: '1rem' }}>
           <div className="relative" style={{ flex: 1, position: 'relative' }}>
             <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={20} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input 
+              aria-label="Search query"
               type="text" 
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -56,13 +57,13 @@ export default function SearchPage() {
               style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 3rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-dim)', borderRadius: '8px', color: '#fff', fontSize: '1rem' }}
             />
           </div>
-          <button type="submit" className="btn btn-primary px-6" disabled={loading}>
-            {loading ? 'Scanning...' : 'Search'}
+          <button type="submit" className="btn btn-primary px-6" disabled={loading} aria-busy={loading}>
+            {loading ? <><Loader2 size={16} className="animate-spin" /> Scanning...</> : 'Search'}
           </button>
         </form>
       </header>
 
-      <div className="mt-8" style={{ marginTop: '2rem' }}>
+      <div aria-live="polite" className="mt-8" style={{ marginTop: '2rem' }}>
         {loading && <div className="text-muted p-4 text-center">Interrogating hyperspace vector embeddings...</div>}
 
         {!loading && searched && results.length === 0 && (

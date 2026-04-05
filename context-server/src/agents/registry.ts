@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { info, c } from '../cli/output';
 
 export interface AgentTool {
     id: string;
@@ -173,14 +174,17 @@ export function detectAgents(workspacePath: string): DetectedAgent[] {
  */
 export function printScanReport(agents: DetectedAgent[]): void {
     if (agents.length === 0) {
-        console.log('\n🔍 No AI coding tools detected in this workspace.\n');
+        console.log();
+        info('No AI coding tools detected in this workspace.');
+        console.log();
         return;
     }
 
-    console.log(`\n🔍 [aigit scan] Detected ${agents.length} AI tool(s):\n`);
+    console.log();
+    info(`[aigit scan] Detected ${agents.length} AI tool(s):\n`);
     for (const a of agents) {
-        const fileList = a.foundFiles.map(f => `    • ${f}`).join('\n');
-        console.log(`  🤖 ${a.tool.name} (${a.tool.id})`);
+        const fileList = a.foundFiles.map(f => `    • ${c.id(f)}`).join('\n');
+        console.log(`  🤖 ${c.highlight(a.tool.name)} (${c.id(a.tool.id)})`);
         console.log(fileList);
         console.log();
     }

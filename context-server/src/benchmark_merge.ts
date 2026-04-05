@@ -92,6 +92,16 @@ async function main() {
         ported += memoriesToInsert.length;
     }
 
+    const decisionsByTaskId = new Map<string, typeof decisions>();
+    for (const d of decisions) {
+        let group = decisionsByTaskId.get(d.taskId);
+        if (!group) {
+            group = [];
+            decisionsByTaskId.set(d.taskId, group);
+        }
+        group.push(d);
+    }
+
     const tasksToInsert: any[] = [];
     const decisionsToInsert: any[] = [];
 
@@ -106,7 +116,7 @@ async function main() {
                 projectId: t.projectId, gitBranch: tgt, slug: mergedSlug, title: t.title, status: t.status,
             });
 
-            const taskDecisions = decisions.filter(d => d.taskId === t.id);
+            const taskDecisions = decisionsByTaskId.get(t.id) || [];
             if (taskDecisions.length > 0) {
                 decisionsToInsert.push(...taskDecisions.map(d => ({
                     taskId: newTaskId, gitBranch: tgt, context: d.context, chosen: d.chosen,

@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import * as path from 'path';
 
 export interface CachedSymbolContext {
@@ -151,15 +151,22 @@ export class ContextPrefetchCache {
         try {
             // Use aigit's JSON output mode for structured data
             const relPath = path.relative(this.workspaceRoot, filePath);
-            const raw = execSync(
-                `node "${path.join(this.workspaceRoot, 'node_modules/.bin/aigit')}" hydrate "${relPath}" --json 2>/dev/null || echo '{"memories":[],"decisions":[]}'`,
-                {
-                    cwd: this.workspaceRoot,
-                    encoding: 'utf-8',
-                    timeout: 5000,
-                    stdio: ['pipe', 'pipe', 'pipe'],
-                }
-            );
+            let raw: string;
+            try {
+                // Use execFileSync to prevent command injection from user-controlled relPath
+                raw = execFileSync(
+                    'node',
+                    [path.join(this.workspaceRoot, 'node_modules/.bin/aigit'), 'hydrate', relPath, '--json'],
+                    {
+                        cwd: this.workspaceRoot,
+                        encoding: 'utf-8',
+                        timeout: 5000,
+                        stdio: ['pipe', 'pipe', 'pipe'],
+                    }
+                );
+            } catch (err) {
+                raw = '{"memories":[],"decisions":[]}';
+            }
 
             // Try parsing as JSON first
             try {

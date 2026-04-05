@@ -18,6 +18,7 @@ const COLORS = ['var(--brand-primary)', 'var(--brand-secondary)', 'var(--success
 export default function DashboardPage() {
   const [stats, setStats] = useState<StatsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/stats`)
@@ -25,11 +26,18 @@ export default function DashboardPage() {
       .then(data => {
         setStats(data);
         setLoading(false);
+        setIsRefreshing(false);
       })
       .catch(err => {
         console.error(err);
         setLoading(false);
+        setIsRefreshing(false);
       });
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchStats();
   }, []);
 
   if (loading) {
@@ -55,8 +63,8 @@ export default function DashboardPage() {
           <h2>Platform Knowledge</h2>
           <p className="text-muted">Currently active on branch <code className="text-gradient font-bold">{stats.currentBranch}</code></p>
         </div>
-        <button className="btn btn-primary" onClick={() => window.location.reload()}>
-          <Activity size={16} /> Refresh Telemetry
+        <button className="btn btn-primary" onClick={() => fetchStats(true)} disabled={isRefreshing} aria-busy={isRefreshing}>
+          <Activity size={16} className={isRefreshing ? 'animate-spin' : ''} /> {isRefreshing ? 'Refreshing...' : 'Refresh Telemetry'}
         </button>
       </header>
 
