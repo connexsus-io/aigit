@@ -10,9 +10,12 @@ export async function mergeContextBranches(workspacePath: string, sourceBranch: 
     try {
         await initializeDatabase();
         // 1. Dry run: Count how many records belong to the source branch
-        const tasksCount = await prisma.task.count({ where: { gitBranch: sourceBranch } });
-        const decisionsCount = await prisma.decision.count({ where: { gitBranch: sourceBranch } });
-        const memoriesCount = await prisma.memory.count({ where: { gitBranch: sourceBranch } });
+        // ⚡ Bolt: Parallelize independent I/O queries to reduce overall latency
+        const [tasksCount, decisionsCount, memoriesCount] = await Promise.all([
+            prisma.task.count({ where: { gitBranch: sourceBranch } }),
+            prisma.decision.count({ where: { gitBranch: sourceBranch } }),
+            prisma.memory.count({ where: { gitBranch: sourceBranch } })
+        ]);
 
         const totalRecords = tasksCount + decisionsCount + memoriesCount;
 
