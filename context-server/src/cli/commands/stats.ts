@@ -32,8 +32,13 @@ export async function buildProjectStats(limit: number = 10): Promise<string> {
     lines.push(`  📋 Tasks:          ${taskCount}`);
     lines.push(`  🩹 Healing Events: ${healingCount}\n`);
 
-    const memories = await prisma.memory.findMany({ select: { agentName: true } });
-    const decisions = await prisma.decision.findMany({ select: { agentName: true } });
+    // ⚡ Bolt Optimization: Use Promise.all to run independent aggregation queries concurrently
+    // to minimize latency. We use database-native groupBy instead of fetching all records
+    // via findMany to severely reduce Node.js memory overhead and network payload size.
+    const [agentMemories, agentDecisions] = await Promise.all([
+        prisma.memory.groupBy({ by: ['agentName'], _count: { id: true } }),
+        prisma.decision.groupBy({ by: ['agentName'], _count: { id: true } }),
+    ]);
 
     const agentMap = new Map<string, AgentStats>();
     const getAgent = (name: string): AgentStats => {
@@ -41,17 +46,17 @@ export async function buildProjectStats(limit: number = 10): Promise<string> {
         return agentMap.get(name)!;
     };
 
-    for (const m of memories) {
+    for (const m of agentMemories) {
         const name = m.agentName || 'unknown';
         const a = getAgent(name);
-        a.memories++;
-        a.total++;
+        a.memories += m._count.id;
+        a.total += m._count.id;
     }
-    for (const d of decisions) {
+    for (const d of agentDecisions) {
         const name = d.agentName || 'unknown';
         const a = getAgent(name);
-        a.decisions++;
-        a.total++;
+        a.decisions += d._count.id;
+        a.total += d._count.id;
     }
 
     const agentRanking = Array.from(agentMap.values()).sort((a, b) => b.total - a.total);

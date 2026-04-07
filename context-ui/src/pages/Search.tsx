@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Search as SearchIcon, SearchX, Cpu, Fingerprint, FileCode2 } from 'lucide-react';
+import { Search as SearchIcon, SearchX, Cpu, Fingerprint, FileCode2, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { API_BASE_URL } from '../config';
 
 interface SearchResult {
   id: string;
@@ -25,7 +26,7 @@ export default function SearchPage() {
     setLoading(true);
     setSearched(true);
     try {
-      const res = await fetch(`http://localhost:3001/api/search?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`${API_BASE_URL}/api/search?q=${encodeURIComponent(query)}`);
       const data = await res.json();
       setResults(data);
     } catch (err) {
@@ -56,8 +57,8 @@ export default function SearchPage() {
               style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 3rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-dim)', borderRadius: '8px', color: '#fff', fontSize: '1rem' }}
             />
           </div>
-          <button type="submit" className="btn btn-primary px-6" disabled={loading}>
-            {loading ? 'Scanning...' : 'Search'}
+          <button type="submit" className="btn btn-primary px-6" disabled={loading} aria-busy={loading}>
+            {loading ? <><Loader2 size={16} className="animate-spin" /> Scanning...</> : 'Search'}
           </button>
         </form>
       </header>
