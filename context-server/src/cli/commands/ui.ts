@@ -53,7 +53,8 @@ const handler: CommandHandler = async ({ workspacePath }) => {
                 currentBranch
             });
         } catch (error) {
-            res.status(500).json({ error: String(error) });
+            console.error('Stats API Error:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
         }
     });
 
@@ -77,7 +78,8 @@ const handler: CommandHandler = async ({ workspacePath }) => {
 
             res.json({ memories, decisions });
         } catch (error) {
-            res.status(500).json({ error: String(error) });
+            console.error('Conflicts API Error:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
         }
     });
 
@@ -104,7 +106,8 @@ const handler: CommandHandler = async ({ workspacePath }) => {
             }
             res.json({ success: true });
         } catch (error) {
-            res.status(500).json({ error: String(error) });
+            console.error('Resolve API Error:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
         }
     });
 
@@ -118,7 +121,8 @@ const handler: CommandHandler = async ({ workspacePath }) => {
             const results = await semanticSearch({ query, topK: 20 });
             res.json(results);
         } catch (error) {
-            res.status(500).json({ error: String(error) });
+            console.error('Search API Error:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
         }
     });
 
@@ -128,7 +132,8 @@ const handler: CommandHandler = async ({ workspacePath }) => {
             const graph = await buildDependencyGraph(workspacePath);
             res.json(graph);
         } catch (error) {
-            res.status(500).json({ error: String(error) });
+            console.error('Graph API Error:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
         }
     });
 
@@ -158,7 +163,8 @@ const handler: CommandHandler = async ({ workspacePath }) => {
             
             res.json({ success: true, deleted: deletedMemories.count + emptyTasks.length });
         } catch (error) {
-            res.status(500).json({ error: String(error) });
+            console.error('GC API Error:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
         }
     });
 
