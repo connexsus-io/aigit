@@ -19,11 +19,37 @@ interface TaskVelocity {
 export async function buildProjectStats(limit: number = 10): Promise<string> {
     const lines: string[] = ['\n📊 aigit Project Statistics\n'];
 
-    const [memoryCount, decisionCount, taskCount, healingCount] = await Promise.all([
+    // ⚡ Bolt Performance Optimization:
+    // 1. Grouped all independent database queries into a single Promise.all call to
+    //    run them concurrently, minimizing I/O latency.
+    // 2. Replaced `findMany` queries for agent statistics with Prisma's `groupBy`.
+    //    This pushes the aggregation to the database level, transforming an O(N)
+    //    memory footprint operation in Node.js to O(1).
+    // Expected impact: Drastically reduced memory usage and faster query execution times.
+    const [
+        memoryCount,
+        decisionCount,
+        taskCount,
+        healingCount,
+        agentMemories,
+        agentDecisions,
+        branchMemories,
+        branchDecisions,
+        tasks
+    ] = await Promise.all([
         prisma.memory.count(),
         prisma.decision.count(),
         prisma.task.count(),
         prisma.healingEvent.count(),
+        prisma.memory.groupBy({ by: ['agentName'], _count: { id: true } }),
+        prisma.decision.groupBy({ by: ['agentName'], _count: { id: true } }),
+        prisma.memory.groupBy({ by: ['gitBranch'], _count: { id: true } }),
+        prisma.decision.groupBy({ by: ['gitBranch'], _count: { id: true } }),
+        prisma.task.findMany({
+            include: { decisions: { select: { id: true } } },
+            orderBy: { updatedAt: 'desc' },
+            take: limit,
+        })
     ]);
 
     lines.push('  ── Overview ──────────────────────────────────');
@@ -31,14 +57,6 @@ export async function buildProjectStats(limit: number = 10): Promise<string> {
     lines.push(`  🎯 Decisions:      ${decisionCount}`);
     lines.push(`  📋 Tasks:          ${taskCount}`);
     lines.push(`  🩹 Healing Events: ${healingCount}\n`);
-
-    // ⚡ Bolt Optimization: Use Promise.all to run independent aggregation queries concurrently
-    // to minimize latency. We use database-native groupBy instead of fetching all records
-    // via findMany to severely reduce Node.js memory overhead and network payload size.
-    const [agentMemories, agentDecisions] = await Promise.all([
-        prisma.memory.groupBy({ by: ['agentName'], _count: { id: true } }),
-        prisma.decision.groupBy({ by: ['agentName'], _count: { id: true } }),
-    ]);
 
     const agentMap = new Map<string, AgentStats>();
     const getAgent = (name: string): AgentStats => {
@@ -75,12 +93,6 @@ export async function buildProjectStats(limit: number = 10): Promise<string> {
         lines.push('');
     }
 
-    const tasks = await prisma.task.findMany({
-        include: { decisions: { select: { id: true } } },
-        orderBy: { updatedAt: 'desc' },
-        take: limit,
-    });
-
     if (tasks.length > 0) {
         const velocities: TaskVelocity[] = tasks.map(t => ({
             slug: t.slug,
@@ -102,9 +114,6 @@ export async function buildProjectStats(limit: number = 10): Promise<string> {
         }
         lines.push('');
     }
-
-    const branchMemories = await prisma.memory.groupBy({ by: ['gitBranch'], _count: { id: true } });
-    const branchDecisions = await prisma.decision.groupBy({ by: ['gitBranch'], _count: { id: true } });
 
     const branchMap = new Map<string, { memories: number; decisions: number }>();
     for (const b of branchMemories) {
