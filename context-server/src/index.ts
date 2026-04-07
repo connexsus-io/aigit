@@ -366,19 +366,47 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
                 const conflicts: Array<{ current: string; target: string; file?: string; symbol?: string }> = [];
 
-                for (const cd of currentDecisions) {
-                    for (const td of targetDecisions) {
-                        const sameFile = cd.filePath && td.filePath && cd.filePath === td.filePath;
-                        const sameSymbol = cd.symbolName && td.symbolName && cd.symbolName === td.symbolName;
+                // Pre-group target decisions by filePath and symbolName to avoid O(N*M) nested loop
+                const targetByFile = new Map<string, typeof targetDecisions>();
+                const targetBySymbol = new Map<string, typeof targetDecisions>();
 
-                        if (sameFile || sameSymbol) {
-                            conflicts.push({
-                                current: `${cd.context} → ${cd.chosen}`,
-                                target: `${td.context} → ${td.chosen}`,
-                                file: cd.filePath || td.filePath || undefined,
-                                symbol: cd.symbolName || td.symbolName || undefined,
-                            });
+                for (const td of targetDecisions) {
+                    if (td.filePath) {
+                        let group = targetByFile.get(td.filePath);
+                        if (!group) {
+                            group = [];
+                            targetByFile.set(td.filePath, group);
                         }
+                        group.push(td);
+                    }
+                    if (td.symbolName) {
+                        let group = targetBySymbol.get(td.symbolName);
+                        if (!group) {
+                            group = [];
+                            targetBySymbol.set(td.symbolName, group);
+                        }
+                        group.push(td);
+                    }
+                }
+
+                for (const cd of currentDecisions) {
+                    const matchedTargets = new Set<typeof targetDecisions[0]>();
+                    if (cd.filePath) {
+                        const fileMatches = targetByFile.get(cd.filePath) || [];
+                        for (const td of fileMatches) matchedTargets.add(td);
+                    }
+                    if (cd.symbolName) {
+                        const symbolMatches = targetBySymbol.get(cd.symbolName) || [];
+                        for (const td of symbolMatches) matchedTargets.add(td);
+                    }
+
+                    for (const td of matchedTargets) {
+                        conflicts.push({
+                            current: `${cd.context} → ${cd.chosen}`,
+                            target: `${td.context} → ${td.chosen}`,
+                            file: cd.filePath || td.filePath || undefined,
+                            symbol: cd.symbolName || td.symbolName || undefined,
+                        });
                     }
                 }
 
