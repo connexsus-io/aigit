@@ -5,8 +5,8 @@ import fs from 'fs';
 
 vi.mock('../db', () => ({
     prisma: {
-        memory: { findMany: vi.fn() },
-        decision: { findMany: vi.fn() }
+        memory: { groupBy: vi.fn() },
+        decision: { groupBy: vi.fn() }
     }
 }));
 
@@ -22,11 +22,11 @@ describe('Dependency Graph Builder', () => {
 
     it('generates a mermaid graph combining AST and semantics', async () => {
         // Mock DB records
-        vi.mocked(prisma.memory.findMany).mockResolvedValue([
-            { id: 'm1', filePath: 'src/a.ts', content: 'memory on a', type: 'architecture' }
+        vi.mocked(prisma.memory.groupBy).mockResolvedValue([
+            { filePath: 'src/a.ts', _count: { filePath: 1 } }
         ] as any);
-        vi.mocked(prisma.decision.findMany).mockResolvedValue([
-            { id: 'd1', filePath: 'src/b.ts', context: 'ctx', chosen: 'chosen', reasoning: 'rsn' }
+        vi.mocked(prisma.decision.groupBy).mockResolvedValue([
+            { filePath: 'src/b.ts', _count: { filePath: 1 } }
         ] as any);
 
         // Mock FS
