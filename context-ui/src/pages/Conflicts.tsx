@@ -127,10 +127,11 @@ export default function ConflictsPage() {
 
               {synthesizeTarget === item.id ? (
                 <div className="mt-6 p-4 rounded-lg border border-brand-primary bg-black/20">
-                    <h4 className="mb-2 text-sm text-brand-primary flex items-center gap-2">
+                    <h4 id={`synth-label-${item.id}`} className="mb-2 text-sm text-brand-primary flex items-center gap-2">
                         <Sparkles size={16}/> Edit & Synthesize Knowledge
                     </h4>
                     <textarea 
+                        aria-labelledby={`synth-label-${item.id}`}
                         className="w-full bg-transparent border border-white/10 rounded p-3 text-white focus:outline-none focus:border-brand-primary mb-3"
                         rows={4}
                         style={{ width: '100%' }}
@@ -141,8 +142,9 @@ export default function ConflictsPage() {
                          <button
                             className="btn btn-primary"
                             onClick={() => handleAction(item.id, (item as any)._renderType, 'synthesize', synthText)}
-                            disabled={processingId === item.id}
+                            disabled={processingId === item.id || !synthText.trim()}
                             aria-busy={processingId === item.id}
+                            title={!synthText.trim() ? "Synthesized text cannot be empty" : undefined}
                         >
                             {processingId === item.id ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />} Save & Assimilate
                         </button>
