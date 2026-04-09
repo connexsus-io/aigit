@@ -88,23 +88,36 @@ export async function buildDependencyGraph(workspacePath: string): Promise<DepGr
     const sourceFiles = collectSourceFiles(workspacePath);
     const relPath = (f: string) => path.relative(workspacePath, f);
 
-    // Get all memories and decisions with file paths
-    const [memories, decisions] = await Promise.all([
-        prisma.memory.findMany({ where: { filePath: { not: null } }, select: { filePath: true } }),
-        prisma.decision.findMany({ where: { filePath: { not: null } }, select: { filePath: true } }),
+    // ⚡ Bolt Performance Optimization:
+    // Replaced `findMany` queries for file statistics with Prisma's `groupBy`.
+    // This pushes the aggregation to the database level, transforming an O(N)
+    // memory footprint operation in Node.js to O(1) and reducing latency.
+    const [memoryGroups, decisionGroups] = await Promise.all([
+        prisma.memory.groupBy({
+            by: ['filePath'],
+            where: { filePath: { not: null } },
+            _count: { filePath: true }
+        }),
+        prisma.decision.groupBy({
+            by: ['filePath'],
+            where: { filePath: { not: null } },
+            _count: { filePath: true }
+        })
     ]);
 
     // Count context links per file
     const memoryCountByFile = new Map<string, number>();
     const decisionCountByFile = new Map<string, number>();
 
-    for (const m of memories) {
-        if (!m.filePath) continue;
-        memoryCountByFile.set(m.filePath, (memoryCountByFile.get(m.filePath) || 0) + 1);
+    for (const group of memoryGroups) {
+        if (group.filePath) {
+            memoryCountByFile.set(group.filePath, group._count.filePath);
+        }
     }
-    for (const d of decisions) {
-        if (!d.filePath) continue;
-        decisionCountByFile.set(d.filePath, (decisionCountByFile.get(d.filePath) || 0) + 1);
+    for (const group of decisionGroups) {
+        if (group.filePath) {
+            decisionCountByFile.set(group.filePath, group._count.filePath);
+        }
     }
 
     const nodes: DepNode[] = [];
