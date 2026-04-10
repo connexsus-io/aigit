@@ -94,42 +94,62 @@ export async function anchorFileToSymbols(filePath: string, workspacePath: strin
     let anchored = 0;
     const total = memories.length + decisions.length;
 
-    const updatePromises = [];
-
+    const memoriesBySymbol = new Map<CodeSymbol, string[]>();
     for (const m of memories) {
         if (!m.lineNumber) continue;
         const sym = findSymbolForLine(symbols, m.lineNumber);
         if (sym) {
-            updatePromises.push(
-                prisma.memory.update({
-                    where: { id: m.id },
-                    data: {
-                        symbolName: sym.qualifiedName,
-                        symbolType: sym.type,
-                        symbolRange: formatRange(sym.range),
-                    },
-                })
-            );
+            let group = memoriesBySymbol.get(sym);
+            if (!group) {
+                group = [];
+                memoriesBySymbol.set(sym, group);
+            }
+            group.push(m.id);
             anchored++;
         }
     }
 
+    const decisionsBySymbol = new Map<CodeSymbol, string[]>();
     for (const d of decisions) {
         if (!d.lineNumber) continue;
         const sym = findSymbolForLine(symbols, d.lineNumber);
         if (sym) {
-            updatePromises.push(
-                prisma.decision.update({
-                    where: { id: d.id },
-                    data: {
-                        symbolName: sym.qualifiedName,
-                        symbolType: sym.type,
-                        symbolRange: formatRange(sym.range),
-                    },
-                })
-            );
+            let group = decisionsBySymbol.get(sym);
+            if (!group) {
+                group = [];
+                decisionsBySymbol.set(sym, group);
+            }
+            group.push(d.id);
             anchored++;
         }
+    }
+
+    const updatePromises = [];
+
+    for (const [sym, ids] of memoriesBySymbol.entries()) {
+        updatePromises.push(
+            prisma.memory.updateMany({
+                where: { id: { in: ids } },
+                data: {
+                    symbolName: sym.qualifiedName,
+                    symbolType: sym.type,
+                    symbolRange: formatRange(sym.range),
+                },
+            })
+        );
+    }
+
+    for (const [sym, ids] of decisionsBySymbol.entries()) {
+        updatePromises.push(
+            prisma.decision.updateMany({
+                where: { id: { in: ids } },
+                data: {
+                    symbolName: sym.qualifiedName,
+                    symbolType: sym.type,
+                    symbolRange: formatRange(sym.range),
+                },
+            })
+        );
     }
 
     if (updatePromises.length > 0) {

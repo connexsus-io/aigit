@@ -21,3 +21,7 @@
 ## 2024-04-05 - File-Based Filtering O(N*M)
 **Learning:** During Markdown architecture generation, filtering a large array of `memories` and `decisions` by `filePath` inside a loop iterating over all unique files caused severe performance degradation ($O(N \times F)$ where F is the number of files). The same occurred inside the Mermaid graph generation.
 **Action:** Pre-group memories and decisions by `filePath` into a `Map` prior to iterating. This shifts complexity to $O(N)$ and yields major speedups (e.g. 640ms -> 240ms for Markdown generation; effectively instantaneous for Mermaid).
+
+## 2024-04-06 - Prisma UpdateMany vs Transactions
+**Learning:** Performing multiple individual `prisma.model.update` calls mapped from a list of objects inside a `$transaction` arrays resolves synchronously, triggering an N+1 query overhead in Prisma and the DB.
+**Action:** When updating multiple records with identical data (like updating `symbolName` for multiple memories/decisions mapping to the same AST symbol), group the IDs by their shared update data and use `prisma.model.updateMany({ where: { id: { in: ids } } })` inside `Promise.all` to batch the operations and minimize latency.
