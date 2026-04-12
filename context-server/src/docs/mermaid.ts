@@ -39,6 +39,11 @@ export function generateMermaidGraph(
 
     // Pre-group decisions by filePath for faster lookups
     const decisionsByFile = new Map<string, typeof decisions>();
+
+    // ⚡ Bolt Performance Optimization:
+    // Pre-group decisions by composite key (filePath + symbolName) to avoid O(N*M) filtering inside the loop
+    const decisionsByFileAndSymbol = new Map<string, typeof decisions>();
+
     for (const d of decisions) {
         if (!d.filePath) continue;
         let group = decisionsByFile.get(d.filePath);
@@ -47,6 +52,14 @@ export function generateMermaidGraph(
             decisionsByFile.set(d.filePath, group);
         }
         group.push(d);
+
+        const key = `${d.filePath}::${d.symbolName || ''}`;
+        let symGroup = decisionsByFileAndSymbol.get(key);
+        if (!symGroup) {
+            symGroup = [];
+            decisionsByFileAndSymbol.set(key, symGroup);
+        }
+        symGroup.push(d);
     }
 
     // Pre-group memories by filePath
@@ -65,8 +78,8 @@ export function generateMermaidGraph(
     // For a cleaner graph, let's link Memories to Decisions if they share the same filePath and symbolName
     memories.forEach(mem => {
         if (mem.filePath) {
-            const fileDecisions = decisionsByFile.get(mem.filePath) || [];
-            const relatedDecisions = fileDecisions.filter(d => d.symbolName === mem.symbolName);
+            const key = `${mem.filePath}::${mem.symbolName || ''}`;
+            const relatedDecisions = decisionsByFileAndSymbol.get(key) || [];
             relatedDecisions.forEach(d => {
                 m += `  Mem_${mem.id.replace(/-/g, '')} -.->|Influenced| Dec_${d.id.replace(/-/g, '')}\n`;
             });
