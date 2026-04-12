@@ -39,3 +39,7 @@
 **Vulnerability:** Error handlers in the `context-server/src/cli/commands/ui.ts` API endpoints were directly casting thrown `Error` objects to strings (via `String(error)`) and returning them to the client with an HTTP 500 status code. This can leak stack traces, file paths, or sensitive internal data to malicious actors.
 **Learning:** Returning unhandled or raw error objects in API responses directly exposes internal system state. Even if it is a local tool, failing securely by abstracting error messages from the user is a core defense-in-depth practice.
 **Prevention:** In Express APIs, always abstract internal errors. Log the detailed error string server-side using `console.error` for debugging, and return a sanitized, generic message like 'Internal Server Error' in the HTTP response.
+## 2024-11-06 - [HIGH] Overly permissive CORS Configuration
+**Vulnerability:** The API server locally exposed via Express in `context-server/src/cli/commands/ui.ts` returned an overly permissive `Access-Control-Allow-Origin: *` response header.
+**Learning:** Returning `*` for the `Access-Control-Allow-Origin` header means any malicious site a developer might visit could potentially make silent cross-origin requests to the local context server on port 3001 and access local file metadata or settings.
+**Prevention:** Always restrict `Access-Control-Allow-Origin` to explicit, trusted origins. In local CLI servers designed to host a companion web UI, restrict CORS solely to `http://localhost:*` or `http://127.0.0.1:*`.
