@@ -7,6 +7,7 @@ export default function SettingsPage() {
   const [result, setResult] = useState<{success: boolean, deleted?: number, message?: string} | null>(null);
 
   const runGC = async () => {
+    if (!window.confirm("Are you sure you want to run Garbage Collection? This will delete context items older than 30 days and cannot be undone.")) return;
     setRunning(true);
     setResult(null);
     try {
