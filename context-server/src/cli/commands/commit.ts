@@ -17,22 +17,16 @@ Commands:
   commit memory "<content>" [--type <type>] [--file <path>]
       Commit a memory (architecture, capability, pattern, etc.)
       Types: architecture, capability, pattern, convention (default: architecture)
-
+  
   commit decision "<context>" "<chosen>" [--reasoning "<text>"] [--file <path>]
       Record an architectural decision with context and chosen path.
-
+  
   commit task "<title>" [--slug <slug>]
       Create a new tracked task on the current branch.
-
+  
   commit update task <slug> <status>
       Update the status of an existing task.
       Statuses: PLANNING, IN_PROGRESS, REVIEW, DONE, BLOCKED, CANCELLED
-
-Examples:
-  aigit commit memory "Using Redis for session caching" --type architecture
-  aigit commit decision "API protocol" "REST" --reasoning "Team prefers REST for simplicity"
-  aigit commit task "Implement JWT authentication"
-  aigit commit update task "jwt-auth" IN_PROGRESS
 `;
 
 const handler: CommandHandler = async ({ args, workspacePath }) => {
@@ -195,7 +189,6 @@ const handler: CommandHandler = async ({ args, workspacePath }) => {
             console.log('Usage: aigit commit update task <slug> <status>');
             process.exit(1);
         }
-
     } else if (subCommand === 'staged') {
         try {
             // Check if an AI Agent already supplied semantic memory in the last 5 minutes
@@ -267,9 +260,10 @@ const handler: CommandHandler = async ({ args, workspacePath }) => {
             }
         } catch (error) {
             console.error('⚠️  Failed to generate automatic staged context.');
+            console.error(`   Error details: ${error.message}`);
+            console.error(`   This may occur if git is not properly initialized or there are no staged changes.`);
             process.exit(1);
         }
-
     } else if (subCommand === 'auto') {
         try {
             const commitInfo = execFileSync('git', ['log', '-1', '--pretty=format:%h - %s%n%b']).toString().trim();
@@ -301,8 +295,9 @@ const handler: CommandHandler = async ({ args, workspacePath }) => {
             console.log(`   Tokens: ~${Math.floor(semanticSummary.length / 4)}`);
             console.log();
         } catch (error) {
-            console.error('⚠️  Failed to generate automatic Git commit context. Are you in a Git repository with at least one commit?');
-            console.error(error);
+            console.error('⚠️  Failed to generate automatic Git commit context.');
+            console.error(`   Error details: ${error.message}`);
+            console.error(`   This may occur if you're not in a Git repository or have no commits yet.`);
             process.exit(1);
         }
     } else {

@@ -9,7 +9,7 @@
   },
   "homepage": "https://github.com/connexsus-io/aigit#readme",
   "bugs": {
-    "url": "https://github.com/connexsus-io/aigit/issues"
+    "url": "https://github.com/connexsus-io/aigit#issues"
   },
   "main": "dist/index.js",
   "scripts": {
