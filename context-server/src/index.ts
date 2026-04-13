@@ -27,6 +27,7 @@ import { buildDependencyGraph } from './diagnostics/depGraph';
 import { TOOL_SCHEMAS } from './tools/schemas';
 import { resolveSymbolContext } from './tools/symbolUtils';
 import { resolveProfile, filterByProfile } from './tools/profiles';
+import { v4 as uuidv4 } from 'uuid';
 import {
     parseArgs,
     GetProjectHistoryArgs,
@@ -482,28 +483,37 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                             group.push(d);
                         }
 
-                        // Create tasks individually to get their new IDs for associating decisions.
-                        // We still save N queries by not checking existence individually.
+                        // ⚡ Bolt Performance Optimization:
+                        // Instead of N+1 sequential `prisma.task.create` calls followed by N `prisma.decision.createMany` calls,
+                        // we pre-generate UUIDs for new tasks and insert them in a single batch, alongside their decisions.
+                        const tasksToInsert: any[] = [];
+                        const decisionsToInsert: any[] = [];
+
                         for (const t of newTasks) {
-                            const newTask = await prisma.task.create({
-                                data: {
-                                    projectId: t.projectId, gitBranch: tgt, slug: t.slug, title: t.title, status: t.status,
-                                }
+                            const newTaskId = uuidv4();
+                            tasksToInsert.push({
+                                id: newTaskId,
+                                projectId: t.projectId, gitBranch: tgt, slug: t.slug, title: t.title, status: t.status,
                             });
-                            ported++;
 
                             const taskDecisions = decisionsByTaskId.get(t.id);
                             if (taskDecisions && taskDecisions.length > 0) {
-                                await prisma.decision.createMany({
-                                    data: taskDecisions.map(d => ({
-                                        taskId: newTask.id, gitBranch: tgt, context: d.context, chosen: d.chosen,
-                                        rejected: d.rejected as string[], reasoning: d.reasoning,
-                                        filePath: d.filePath, lineNumber: d.lineNumber,
-                                        symbolName: d.symbolName, symbolType: d.symbolType, symbolRange: d.symbolRange,
-                                    }))
-                                });
-                                ported += taskDecisions.length;
+                                decisionsToInsert.push(...taskDecisions.map(d => ({
+                                    taskId: newTaskId, gitBranch: tgt, context: d.context, chosen: d.chosen,
+                                    rejected: d.rejected as string[], reasoning: d.reasoning,
+                                    filePath: d.filePath, lineNumber: d.lineNumber,
+                                    symbolName: d.symbolName, symbolType: d.symbolType, symbolRange: d.symbolRange,
+                                })));
                             }
+                        }
+
+                        if (tasksToInsert.length > 0) {
+                            await prisma.task.createMany({ data: tasksToInsert });
+                            ported += tasksToInsert.length;
+                        }
+                        if (decisionsToInsert.length > 0) {
+                            await prisma.decision.createMany({ data: decisionsToInsert });
+                            ported += decisionsToInsert.length;
                         }
                     }
                 }

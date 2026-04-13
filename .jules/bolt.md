@@ -25,3 +25,7 @@
 ## 2024-04-06 - Prisma UpdateMany vs Transactions
 **Learning:** Performing multiple individual `prisma.model.update` calls mapped from a list of objects inside a `$transaction` arrays resolves synchronously, triggering an N+1 query overhead in Prisma and the DB.
 **Action:** When updating multiple records with identical data (like updating `symbolName` for multiple memories/decisions mapping to the same AST symbol), group the IDs by their shared update data and use `prisma.model.updateMany({ where: { id: { in: ids } } })` inside `Promise.all` to batch the operations and minimize latency.
+
+## 2024-04-10 - Task Insertion N+1 Issue
+**Learning:** During cross-branch merge, inserting tasks sequentially in a `for` loop, then their decisions, caused massive N+1 delays. Since `uuid` is mapped in Prisma schema natively, we can pre-generate IDs and use `createMany` bulk operations instead of sequential `create`.
+**Action:** Always prefer bulk insertions using `createMany` over `create` inside loops, generating IDs proactively if the schema natively relies on them.
