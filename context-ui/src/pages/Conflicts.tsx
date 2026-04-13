@@ -178,7 +178,11 @@ export default function ConflictsPage() {
                     
                     <button 
                         className="btn btn-danger"
-                        onClick={() => handleAction(item.id, (item as any)._renderType, 'discard')}
+                        onClick={() => {
+                            if (window.confirm("Are you sure you want to discard this context? This action cannot be undone.")) {
+                                handleAction(item.id, (item as any)._renderType, 'discard');
+                            }
+                        }}
                         disabled={processingId === item.id}
                         aria-busy={processingId === item.id}
                     >

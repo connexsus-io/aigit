@@ -12,3 +12,6 @@
 ## 2026-04-09 - Accessible Dynamically Rendered Form Elements
 **Learning:** When creating dynamically rendered form elements like textareas in a mapped list, global labeling isn't sufficient. Without unique `id` and `aria-labelledby` linkages that incorporate the item's unique identifier (like \`synth-heading-\${item.id}\`), screen readers cannot determine which label belongs to which input, and empty/disabled states can trap users without feedback.
 **Action:** When mapping over items to render forms or inputs, always construct unique IDs by combining a descriptive prefix with the data object's ID, and explicitly link labels to inputs. Additionally, when a submit button relies on input state, provide a disabled `title` to explain why it is inactive.
+## 2024-04-13 - [Destructive Action Confirmations]
+**Learning:** Users can accidentally click destructive action buttons (like running Garbage Collection or Discarding context) and permanently lose data because there are no safeguards.
+**Action:** Always wrap destructive actions in a `window.confirm` dialog to double check intent and provide context on what data might be lost.

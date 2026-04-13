@@ -20,7 +20,8 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  useEffect(() => {
+  const fetchStats = (isRefresh = false) => {
+    if (isRefresh) setIsRefreshing(true);
     fetch(`${API_BASE_URL}/api/stats`)
       .then(res => res.json())
       .then(data => {
