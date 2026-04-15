@@ -43,3 +43,8 @@
 **Vulnerability:** The API server locally exposed via Express in `context-server/src/cli/commands/ui.ts` returned an overly permissive `Access-Control-Allow-Origin: *` response header.
 **Learning:** Returning `*` for the `Access-Control-Allow-Origin` header means any malicious site a developer might visit could potentially make silent cross-origin requests to the local context server on port 3001 and access local file metadata or settings.
 **Prevention:** Always restrict `Access-Control-Allow-Origin` to explicit, trusted origins. In local CLI servers designed to host a companion web UI, restrict CORS solely to `http://localhost:*` or `http://127.0.0.1:*`.
+
+## 2026-04-15 - [CRITICAL] Fix Hardcoded Secrets
+**Vulnerability:** Found hardcoded `POSTHOG_KEY` and `SENTRY_DSN` in `context-server/src/cli/index.ts`. Exposing these credentials can lead to abuse, data leaks, or exhaustion of third-party API limits by malicious actors.
+**Learning:** Storing secrets or API keys directly in source code is inherently unsafe, as it makes them accessible to anyone with access to the repository, including public users if the repository is open-sourced. Relying on default fallback values for security credentials can result in unintended sharing of accounts.
+**Prevention:** Always use environment variables (`process.env.*`) or secure configuration management for external service credentials. Ensure that initialization of services that require these keys is conditional upon the presence of the environment variables to avoid runtime errors when the keys are omitted.
