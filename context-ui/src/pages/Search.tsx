@@ -57,7 +57,13 @@ export default function SearchPage() {
               style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 3rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-dim)', borderRadius: '8px', color: '#fff', fontSize: '1rem' }}
             />
           </div>
-          <button type="submit" className="btn btn-primary px-6" disabled={loading} aria-busy={loading}>
+          <button
+            type="submit"
+            className="btn btn-primary px-6"
+            disabled={loading || !query.trim()}
+            aria-busy={loading}
+            title={!query.trim() ? "Please enter a search query" : undefined}
+          >
             {loading ? <><Loader2 size={16} className="animate-spin" /> Scanning...</> : 'Search'}
           </button>
         </form>
@@ -65,6 +71,16 @@ export default function SearchPage() {
 
       <div aria-live="polite" className="mt-8" style={{ marginTop: '2rem' }}>
         {loading && <div className="text-muted p-4 text-center">Interrogating hyperspace vector embeddings...</div>}
+
+        {!loading && !searched && (
+          <div className="glass-card flex flex-col items-center justify-center p-12 text-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '4rem', textAlign: 'center' }}>
+            <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(0,0%,100%,0.05)' }}>
+              <SearchIcon size={48} color="var(--brand-primary)" />
+            </div>
+            <h3 className="text-lg">Ready to Search</h3>
+            <p className="text-muted mt-2">Enter a query above to search architectural decisions and code memories.</p>
+          </div>
+        )}
 
         {!loading && searched && results.length === 0 && (
           <div className="glass-card flex flex-col items-center justify-center p-12 text-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '4rem', textAlign: 'center' }}>
