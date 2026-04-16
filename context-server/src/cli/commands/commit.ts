@@ -181,7 +181,7 @@ const handler: CommandHandler = async ({ args, workspacePath }) => {
                 }
                 await afterWrite(workspacePath);
             } catch (error: any) {
-                console.error('⚠️  Failed to update task:', error.message);
+                console.error('⚠️  Failed to update task:', error instanceof Error ? error.message : String(error));
                 process.exit(1);
             }
         } else {
@@ -260,7 +260,7 @@ const handler: CommandHandler = async ({ args, workspacePath }) => {
             }
         } catch (error) {
             console.error('⚠️  Failed to generate automatic staged context.');
-            console.error(`   Error details: ${error.message}`);
+            console.error(`   Error details: ${error instanceof Error ? error.message : String(error)}`);
             console.error(`   This may occur if git is not properly initialized or there are no staged changes.`);
             process.exit(1);
         }
@@ -296,7 +296,7 @@ const handler: CommandHandler = async ({ args, workspacePath }) => {
             console.log();
         } catch (error) {
             console.error('⚠️  Failed to generate automatic Git commit context.');
-            console.error(`   Error details: ${error.message}`);
+            console.error(`   Error details: ${error instanceof Error ? error.message : String(error)}`);
             console.error(`   This may occur if you're not in a Git repository or have no commits yet.`);
             process.exit(1);
         }
