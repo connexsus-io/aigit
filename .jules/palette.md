@@ -15,3 +15,7 @@
 ## 2024-04-13 - [Destructive Action Confirmations]
 **Learning:** Users can accidentally click destructive action buttons (like running Garbage Collection or Discarding context) and permanently lose data because there are no safeguards.
 **Action:** Always wrap destructive actions in a `window.confirm` dialog to double check intent and provide context on what data might be lost.
+
+## 2024-04-14 - Empty State Disabled Inputs
+**Learning:** Empty states in input fields (like the Search bar) should disable the primary submission button. However, simply disabling the button can leave screen-reader users and visual users confused about *why* the button is inaccessible without feedback.
+**Action:** Always add a descriptive `title` attribute to the button detailing the reason for its disabled state (e.g., `title="Please enter a search query"`) when it depends on an empty input.
