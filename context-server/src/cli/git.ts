@@ -31,20 +31,22 @@ export function getActiveBranch(workspacePath: string): string {
                     return branches[0];
                 }
             } catch (e3) {
-                // Final fallback: try to get any branch info
-                try {
-                    const branchOutput = execFileSync('git', ['branch', '--show-current'], { 
-                        cwd: workspacePath, 
-                        encoding: 'utf-8', 
-                        stdio: 'pipe' 
-                    }).trim();
-                    if (branchOutput) return branchOutput;
-                } catch (e4) {
-                    // If all else fails, return unknown
-                    return 'unknown';
-                }
+                // fallback to next block
+            }
+            // Final fallback: try to get any branch info
+            try {
+                const branchOutput = execFileSync('git', ['branch', '--show-current'], {
+                    cwd: workspacePath,
+                    encoding: 'utf-8',
+                    stdio: 'pipe'
+                }).trim();
+                if (branchOutput) return branchOutput;
+            } catch (e4) {
+                // If all else fails, return unknown
+                return 'unknown';
             }
         }
+        return 'unknown';
     }
 }
 
