@@ -48,6 +48,7 @@ export function getActiveBranch(workspacePath: string): string {
         }
         return 'unknown';
     }
+    return 'unknown';
 }
 
 export function getChangedFiles(workspacePath: string): string[] {
