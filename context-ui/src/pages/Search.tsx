@@ -57,7 +57,13 @@ export default function SearchPage() {
               style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 3rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-dim)', borderRadius: '8px', color: '#fff', fontSize: '1rem' }}
             />
           </div>
-          <button type="submit" className="btn btn-primary px-6" disabled={loading} aria-busy={loading}>
+          <button
+            type="submit"
+            className="btn btn-primary px-6"
+            disabled={loading || !query.trim()}
+            aria-busy={loading}
+            title={!query.trim() ? "Please enter a search query" : undefined}
+          >
             {loading ? <><Loader2 size={16} className="animate-spin" /> Scanning...</> : 'Search'}
           </button>
         </form>
