@@ -441,11 +441,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
                 // 1. Bulk process memories
                 if (memories.length > 0) {
-                    const existingMemories = await prisma.memory.findMany({
-                        where: { projectId, gitBranch: tgt },
-                        select: { content: true }
-                    });
-                    const existingContentSet = new Set(existingMemories.map(m => m.content));
+                    const existingContentSet = new Set(targetMemories.map(m => m.content));
 
                     const newMemoriesData = memories
                         .filter(m => !existingContentSet.has(m.content))
@@ -463,11 +459,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
                 // 2. Bulk process tasks
                 if (tasks.length > 0) {
-                    const existingTasks = await prisma.task.findMany({
-                        where: { projectId, gitBranch: tgt },
-                        select: { slug: true }
-                    });
-                    const existingSlugSet = new Set(existingTasks.map(t => t.slug));
+                    const existingSlugSet = new Set(targetTasks.map(t => t.slug));
 
                     const newTasks = tasks.filter(t => !existingSlugSet.has(t.slug));
 
