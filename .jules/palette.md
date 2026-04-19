@@ -19,3 +19,7 @@
 ## 2024-04-14 - Empty State Disabled Inputs
 **Learning:** Empty states in input fields (like the Search bar) should disable the primary submission button. However, simply disabling the button can leave screen-reader users and visual users confused about *why* the button is inaccessible without feedback.
 **Action:** Always add a descriptive `title` attribute to the button detailing the reason for its disabled state (e.g., `title="Please enter a search query"`) when it depends on an empty input.
+
+## 2024-04-19 - Focus Management in In-Place Forms
+**Learning:** Replacing an interactive element (like a button) with an inline form (like a textarea) causes the original element to unmount. If the newly mounted input does not have `autoFocus`, keyboard focus is lost and resets to the document body, forcing keyboard users to tab through the entire page again.
+**Action:** Always use the `autoFocus` attribute on the primary input when an inline edit form is toggled. Additionally, implement standard keyboard cancellation patterns (like `Escape` to cancel and `Cmd/Ctrl + Enter` to submit) to restore the previous state fluidly.

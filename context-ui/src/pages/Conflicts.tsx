@@ -137,6 +137,17 @@ export default function ConflictsPage() {
                         style={{ width: '100%' }}
                         value={synthText}
                         onChange={(e) => setSynthText(e.target.value)}
+                        autoFocus
+                        placeholder="Refine this memory before assimilation..."
+                        onKeyDown={(e) => {
+                          if (e.key === 'Escape') {
+                            setSynthesizeTarget(null);
+                          } else if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                            if (synthText.trim()) {
+                              handleAction(item.id, (item as any)._renderType, 'synthesize', synthText);
+                            }
+                          }
+                        }}
                     />
                     <div className="flex gap-2">
                          <button
@@ -144,7 +155,7 @@ export default function ConflictsPage() {
                             onClick={() => handleAction(item.id, (item as any)._renderType, 'synthesize', synthText)}
                             disabled={processingId === item.id || !synthText.trim()}
                             aria-busy={processingId === item.id}
-                            title={!synthText.trim() ? "Please enter text to synthesize" : undefined}
+                            title={!synthText.trim() ? "Please enter text to synthesize" : "Save & Assimilate (Cmd/Ctrl + Enter)"}
                         >
                             {processingId === item.id ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />} Save & Assimilate
                         </button>
