@@ -137,6 +137,16 @@ export default function ConflictsPage() {
                         style={{ width: '100%' }}
                         value={synthText}
                         onChange={(e) => setSynthText(e.target.value)}
+                        autoFocus
+                        onKeyDown={(e) => {
+                            if (e.key === 'Escape') {
+                                setSynthesizeTarget(null);
+                            } else if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                                if (synthText.trim() && processingId !== item.id) {
+                                    handleAction(item.id, (item as any)._renderType, 'synthesize', synthText);
+                                }
+                            }
+                        }}
                     />
                     <div className="flex gap-2">
                          <button
