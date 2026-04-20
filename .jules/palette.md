@@ -19,3 +19,6 @@
 ## 2024-04-14 - Empty State Disabled Inputs
 **Learning:** Empty states in input fields (like the Search bar) should disable the primary submission button. However, simply disabling the button can leave screen-reader users and visual users confused about *why* the button is inaccessible without feedback.
 **Action:** Always add a descriptive `title` attribute to the button detailing the reason for its disabled state (e.g., `title="Please enter a search query"`) when it depends on an empty input.
+## 2024-04-14 - Keyboard Accessibility for Inline Forms
+**Learning:** In React components (like in `context-ui`), when conditionally rendering an inline form to replace an interactive element (e.g., the synthesize area in Conflicts.tsx), keyboard focus is easily lost if the user has to click into the text area.
+**Action:** When conditionally rendering an inline form, always use the `autoFocus` attribute to immediately transfer focus. Additionally, implement `onKeyDown` handlers for `Escape` (to cancel) and `Cmd/Ctrl + Enter` (to submit) to ensure the inline form is fully keyboard accessible without forcing mouse interaction.
