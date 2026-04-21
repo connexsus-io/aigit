@@ -22,3 +22,7 @@
 ## 2024-04-14 - Keyboard Accessibility for Inline Forms
 **Learning:** In React components (like in `context-ui`), when conditionally rendering an inline form to replace an interactive element (e.g., the synthesize area in Conflicts.tsx), keyboard focus is easily lost if the user has to click into the text area.
 **Action:** When conditionally rendering an inline form, always use the `autoFocus` attribute to immediately transfer focus. Additionally, implement `onKeyDown` handlers for `Escape` (to cancel) and `Cmd/Ctrl + Enter` (to submit) to ensure the inline form is fully keyboard accessible without forcing mouse interaction.
+
+## 2024-04-21 - Keyboard Shortcut Visibility in Inline Forms
+**Learning:** While implementing keyboard shortcuts (like Escape to cancel or Cmd+Enter to submit) makes inline forms accessible to keyboard users, these shortcuts are functionally invisible. Without visual hints, users won't know these power-user features exist, leading to a suboptimal experience where users still rely on mouse clicks.
+**Action:** Whenever implementing keyboard shortcuts for inline forms or actions, always provide a subtle, low-opacity visual hint (like "Cmd/Ctrl ↵" or "Esc") alongside the relevant action button or input.
