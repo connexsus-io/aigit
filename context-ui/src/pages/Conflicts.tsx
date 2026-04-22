@@ -148,9 +148,10 @@ export default function ConflictsPage() {
                             }
                         }}
                     />
-                    <div className="flex gap-2">
-                         <button
-                            className="btn btn-primary"
+                    <div className="flex justify-between items-center w-full mt-3">
+                        <div className="flex gap-2">
+                             <button
+                                className="btn btn-primary"
                             onClick={() => handleAction(item.id, (item as any)._renderType, 'synthesize', synthText)}
                             disabled={processingId === item.id || !synthText.trim()}
                             aria-busy={processingId === item.id}
@@ -159,8 +160,13 @@ export default function ConflictsPage() {
                             {processingId === item.id ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />} Save & Assimilate
                         </button>
                         <button className="btn" onClick={() => setSynthesizeTarget(null)}>
-                            Cancel
-                        </button>
+                                Cancel
+                            </button>
+                        </div>
+                        <div className="text-xs text-muted flex gap-4">
+                            <span><kbd style={{ fontFamily: 'var(--font-mono)', background: 'rgba(255,255,255,0.1)', padding: '2px 4px', borderRadius: '4px', fontSize: '10px' }}>Cmd/Ctrl</kbd> + <kbd style={{ fontFamily: 'var(--font-mono)', background: 'rgba(255,255,255,0.1)', padding: '2px 4px', borderRadius: '4px', fontSize: '10px' }}>Enter</kbd> to save</span>
+                            <span><kbd style={{ fontFamily: 'var(--font-mono)', background: 'rgba(255,255,255,0.1)', padding: '2px 4px', borderRadius: '4px', fontSize: '10px' }}>Esc</kbd> to cancel</span>
+                        </div>
                     </div>
                 </div>
               ) : (
