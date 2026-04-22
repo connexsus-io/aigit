@@ -6,17 +6,19 @@ export async function showContextLog(workspacePath: string) {
         await initializeDatabase();
         const currentBranch = getActiveBranch(workspacePath);
 
-        const memories = await prisma.memory.findMany({
-            where: { gitBranch: { in: ['main', currentBranch] } },
-            orderBy: { createdAt: 'desc' },
-            take: 10
-        });
-
-        const decisions = await prisma.decision.findMany({
-            where: { gitBranch: { in: ['main', currentBranch] } },
-            orderBy: { createdAt: 'desc' },
-            take: 10
-        });
+        // ⚡ Bolt: Grouped independent database queries into a single Promise.all call to minimize overall database latency
+        const [memories, decisions] = await Promise.all([
+            prisma.memory.findMany({
+                where: { gitBranch: { in: ['main', currentBranch] } },
+                orderBy: { createdAt: 'desc' },
+                take: 10
+            }),
+            prisma.decision.findMany({
+                where: { gitBranch: { in: ['main', currentBranch] } },
+                orderBy: { createdAt: 'desc' },
+                take: 10
+            })
+        ]);
 
         console.log(`\n⏳ [aigit log] Recent Semantic Memory (Branch: ${currentBranch})\n`);
 
