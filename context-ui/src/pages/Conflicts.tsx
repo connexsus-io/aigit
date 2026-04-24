@@ -157,9 +157,11 @@ export default function ConflictsPage() {
                             title={!synthText.trim() ? "Please enter text to synthesize" : undefined}
                         >
                             {processingId === item.id ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />} Save & Assimilate
+                            <kbd aria-hidden="true" className="text-xs" style={{ marginLeft: '0.5rem', fontFamily: 'monospace', opacity: 0.7 }}>Cmd/Ctrl+Enter</kbd>
                         </button>
                         <button className="btn" onClick={() => setSynthesizeTarget(null)}>
                             Cancel
+                            <kbd aria-hidden="true" className="text-xs text-muted" style={{ marginLeft: '0.5rem', fontFamily: 'monospace' }}>Esc</kbd>
                         </button>
                     </div>
                 </div>
