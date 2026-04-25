@@ -141,6 +141,7 @@ export default function ConflictsPage() {
                         value={synthText}
                         onChange={(e) => setSynthText(e.target.value)}
                         autoFocus
+                        placeholder="Refine this memory before assimilation..."
                         onKeyDown={(e) => {
                             if (e.key === 'Escape') {
                                 setSynthesizeTarget(null);
@@ -157,7 +158,7 @@ export default function ConflictsPage() {
                             onClick={() => handleAction(item.id, (item as any)._renderType, 'synthesize', synthText)}
                             disabled={processingId === item.id || !synthText.trim()}
                             aria-busy={processingId === item.id}
-                            title={!synthText.trim() ? "Please enter text to synthesize" : undefined}
+                            title={!synthText.trim() ? "Please enter text to synthesize" : "Save & Assimilate (Cmd/Ctrl + Enter)"}
                         >
                             {processingId === item.id ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />} Save & Assimilate
                             <kbd aria-hidden="true" className="text-xs" style={{ marginLeft: '0.5rem', fontFamily: 'monospace', opacity: 0.7 }}>Cmd/Ctrl+Enter</kbd>
