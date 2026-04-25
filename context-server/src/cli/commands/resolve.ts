@@ -10,19 +10,21 @@ const handler: CommandHandler = async ({ workspacePath, command }) => {
     console.log(chalk.cyan(`\n🔍 Scanning for unassimilated context on branch '${currentBranch}'...\n`));
 
     // Find memories where originBranch != gitBranch (i.e. brought in via merge)
-    const memories = await prisma.memory.findMany({
-        where: {
-            gitBranch: currentBranch,
-            originBranch: { not: null, notIn: [currentBranch] }
-        }
-    });
-
-    const decisions = await prisma.decision.findMany({
-        where: {
-            gitBranch: currentBranch,
-            originBranch: { not: null, notIn: [currentBranch] }
-        }
-    });
+    // ⚡ Bolt: Grouped independent database queries into a single Promise.all call to minimize overall database latency
+    const [memories, decisions] = await Promise.all([
+        prisma.memory.findMany({
+            where: {
+                gitBranch: currentBranch,
+                originBranch: { not: null, notIn: [currentBranch] }
+            }
+        }),
+        prisma.decision.findMany({
+            where: {
+                gitBranch: currentBranch,
+                originBranch: { not: null, notIn: [currentBranch] }
+            }
+        })
+    ]);
 
     const total = memories.length + decisions.length;
     if (total === 0) {

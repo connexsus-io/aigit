@@ -180,8 +180,9 @@ const handler: CommandHandler = async ({ args, workspacePath }) => {
                     console.log(`\n✅ [aigit update task] Task '${slug}' marked as ${status} on branch [${branch}]`);
                 }
                 await afterWrite(workspacePath);
-            } catch (error: any) {
-                console.error('⚠️  Failed to update task:', error.message);
+            } catch (error: unknown) {
+                const errorMessage = error instanceof Error ? error.message : String(error);
+                console.error('⚠️  Failed to update task:', errorMessage);
                 process.exit(1);
             }
         } else {
@@ -258,9 +259,10 @@ const handler: CommandHandler = async ({ args, workspacePath }) => {
                 console.error(`======================================================\n`);
                 process.exit(1);
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
             console.error('⚠️  Failed to generate automatic staged context.');
-            console.error(`   Error details: ${error.message}`);
+            console.error(`   Error details: ${errorMessage}`);
             console.error(`   This may occur if git is not properly initialized or there are no staged changes.`);
             process.exit(1);
         }
@@ -294,9 +296,10 @@ const handler: CommandHandler = async ({ args, workspacePath }) => {
             console.log(`   ID: ${memory.id}`);
             console.log(`   Tokens: ~${Math.floor(semanticSummary.length / 4)}`);
             console.log();
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
             console.error('⚠️  Failed to generate automatic Git commit context.');
-            console.error(`   Error details: ${error.message}`);
+            console.error(`   Error details: ${errorMessage}`);
             console.error(`   This may occur if you're not in a Git repository or have no commits yet.`);
             process.exit(1);
         }

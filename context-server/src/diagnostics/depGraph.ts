@@ -17,6 +17,10 @@ export interface DepGraphResult {
     mermaid: string;
 }
 
+export function sanitizeMermaidLabel(label: string): string {
+    return label.replace(/[^a-zA-Z0-9._ -]/g, '_');
+}
+
 /**
  * Extract import statements from a TypeScript/JavaScript file.
  */
@@ -160,7 +164,7 @@ export async function buildDependencyGraph(workspacePath: string): Promise<DepGr
 
     for (const n of importantNodes) {
         const id = getId(n.file);
-        const label = path.basename(n.file);
+        const label = sanitizeMermaidLabel(path.basename(n.file));
         const badge = n.linkedMemories + n.linkedDecisions > 0
             ? ` (${n.linkedMemories}M/${n.linkedDecisions}D)`
             : '';
