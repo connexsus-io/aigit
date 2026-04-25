@@ -7,18 +7,30 @@ export async function dumpContextLedger(workspacePath: string) {
     try {
         await initializeDatabase();
 
-        const projects = await prisma.project.findMany();
-        const agents = await prisma.agent.findMany();
-        const sessions = await prisma.session.findMany();
-        const tasks = await prisma.task.findMany();
-        const decisions = await prisma.decision.findMany();
-        const healingEvents = await prisma.healingEvent.findMany();
-
-        // Fetch memories including their raw stringified vector embeddings
-        const memories = await prisma.$queryRaw<any[]>`
-            SELECT id, "projectId", "sessionId", "gitBranch", type, content, embedding::text, "createdAt"
-            FROM "Memory"
-        `;
+        // ⚡ Bolt Performance Optimization:
+        // Grouped sequential independent database queries into a single Promise.all call
+        // to minimize database latency and prevent unnecessary N+1 roundtrips.
+        const [
+            projects,
+            agents,
+            sessions,
+            tasks,
+            decisions,
+            healingEvents,
+            memories
+        ] = await Promise.all([
+            prisma.project.findMany(),
+            prisma.agent.findMany(),
+            prisma.session.findMany(),
+            prisma.task.findMany(),
+            prisma.decision.findMany(),
+            prisma.healingEvent.findMany(),
+            // Fetch memories including their raw stringified vector embeddings
+            prisma.$queryRaw<any[]>`
+                SELECT id, "projectId", "sessionId", "gitBranch", type, content, embedding::text, "createdAt"
+                FROM "Memory"
+            `
+        ]);
 
         const sanitizedDecisions = decisions.map(sanitizeDecision);
         const sanitizedMemories = memories.map(sanitizeMemory);
