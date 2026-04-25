@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
-import { Activity, Brain, Database, CheckCircle2 } from 'lucide-react';
+import { Activity, Brain, Database, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
 import { AIGIT_UI_TOKEN, API_BASE_URL } from '../config';
 
 interface StatsData {
@@ -45,7 +45,27 @@ export default function DashboardPage() {
     return <div className="text-muted">Loading pulse...</div>;
   }
 
-  if (!stats) return <div className="text-danger">Failed to load platform stats.</div>;
+  if (!stats) {
+    return (
+      <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center', marginTop: '2rem' }}>
+        <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(350, 80%, 55%, 0.1)' }}>
+          <AlertCircle size={48} color="var(--danger)" />
+        </div>
+        <h3 className="text-lg">Failed to load platform stats</h3>
+        <p className="text-muted mt-2 mb-4">There was an error communicating with the telemetry server.</p>
+        <button
+          className="btn btn-primary"
+          onClick={() => fetchStats(true)}
+          disabled={isRefreshing}
+          aria-busy={isRefreshing}
+          aria-label="Retry loading platform stats"
+        >
+          <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} />
+          {isRefreshing ? 'Retrying...' : 'Try Again'}
+        </button>
+      </div>
+    );
+  }
 
   const memChartData = stats.memoryAgents.filter(a => a.agentName).map(a => ({
     name: a.agentName,
