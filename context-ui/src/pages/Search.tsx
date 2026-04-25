@@ -89,6 +89,16 @@ export default function SearchPage() {
       <div aria-live="polite" className="mt-8" style={{ marginTop: '2rem' }}>
         {loading && <div className="text-muted p-4 text-center">Interrogating hyperspace vector embeddings...</div>}
 
+        {!loading && !searched && (
+          <div className="glass-card flex flex-col items-center justify-center p-12 text-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '4rem', textAlign: 'center' }}>
+            <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(0,0%,100%,0.05)' }}>
+              <SearchIcon size={48} color="var(--brand-primary)" />
+            </div>
+            <h3 className="text-lg">Ready to Search</h3>
+            <p className="text-muted mt-2">Enter a query above to search architectural decisions and code memories.</p>
+          </div>
+        )}
+
         {!loading && searched && results.length === 0 && (
           <div className="glass-card flex flex-col items-center justify-center p-12 text-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '4rem', textAlign: 'center' }}>
             <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(0,0%,100%,0.05)' }}>

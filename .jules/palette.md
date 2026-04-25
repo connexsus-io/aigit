@@ -14,6 +14,9 @@
 ## 2024-04-13 - [Destructive Action Confirmations]
 **Learning:** Users can accidentally click destructive action buttons (like running Garbage Collection or Discarding context) and permanently lose data because there are no safeguards.
 **Action:** Always wrap destructive actions in a `window.confirm` dialog to double check intent and provide context on what data might be lost.
+## 2026-04-16 - [Empty State Discoverability]
+**Learning:** Search interfaces often load blank or without contextual guidance, leaving users to guess what queries are effective. An initial "Ready to Search" empty state serves as an implicit tutorial, reducing cognitive load and preventing a broken-page feel before the first interaction.
+**Action:** When implementing or refining search interfaces, always provide an initial visual state (when query is empty and no search has been executed) that clearly instructs the user on the purpose of the search and how to begin.
 
 ## 2024-04-14 - Empty State Disabled Inputs
 **Learning:** Empty states in input fields (like the Search bar) should disable the primary submission button. However, simply disabling the button can leave screen-reader users and visual users confused about *why* the button is inaccessible without feedback.
