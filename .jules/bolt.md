@@ -1,3 +1,6 @@
+## 2024-04-24 - Cross-Branch Conflict Resolution O(N*M)
+**Learning:** During cross-branch context merge, matching target decisions against current branch decisions using `filePath` AND `symbolName` triggered an O(N*M) overlapping matches problem when relying on separate `Map` lookups (which found the Cartesian product of all files/symbols rather than exact composite matches).
+**Action:** Always pre-group cross-dimensional data (like files and symbols) using an exact composite key (`${filePath}::${symbolName}`) in a `Map`, while preserving single-attribute fallback Maps to gracefully handle partial matches.
 ## 2024-03-20 - Time Travel Enrichment Reverted
 **Learning:** In V8/Node, trying to manually map an array inside a loop (with type casting) instead of just using the spread operator and a subsequent `new Map(arr.map(...))` was demonstrably slower in benchmark runs (203ms vs 187ms baseline). The overhead of multiple `push` and `set` calls in a single loop exceeded the overhead of array copies for small data sets.
 **Action:** When mapping arrays into `Map` structures, prefer bulk Map constructors over manual loops unless the array is excessively large or there are secondary operations. Always trust the benchmark over theoretical O(n) vs O(2n) optimizations when constant factors dominate.
@@ -29,3 +32,7 @@
 ## 2024-04-10 - Task Insertion N+1 Issue
 **Learning:** During cross-branch merge, inserting tasks sequentially in a `for` loop, then their decisions, caused massive N+1 delays. Since `uuid` is mapped in Prisma schema natively, we can pre-generate IDs and use `createMany` bulk operations instead of sequential `create`.
 **Action:** Always prefer bulk insertions using `createMany` over `create` inside loops, generating IDs proactively if the schema natively relies on them.
+
+## 2024-04-19 - Redundant DB Queries During Data Merge
+**Learning:** In the `merge_context` handler, we were executing `Promise.all` to fetch `targetMemories` and `targetTasks` up-front, but then ignoring these values and sequentially awaiting `prisma.memory.findMany` and `prisma.task.findMany` again for the same target branch inside the processing loops. This caused unnecessary I/O bounds and blocked the event loop during merges.
+**Action:** When data is pre-fetched via `Promise.all` for a specific entity or branch, always utilize the pre-fetched objects (e.g. `new Set(targetMemories.map(m => m.content))`) rather than performing redundant queries.

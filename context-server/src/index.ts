@@ -367,38 +367,52 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
                 const conflicts: Array<{ current: string; target: string; file?: string; symbol?: string }> = [];
 
-                // Pre-group target decisions by filePath and symbolName to avoid O(N*M) nested loop
-                const targetByFile = new Map<string, typeof targetDecisions>();
-                const targetBySymbol = new Map<string, typeof targetDecisions>();
+                // ⚡ Bolt Performance Optimization:
+                // Pre-group target decisions by composite key (filePath + symbolName) to avoid O(N*M) overlapping matches.
+                // Maintain individual maps for fallback if only one attribute is present.
+                const targetByComposite = new Map<string, typeof targetDecisions>();
+                const targetByFileOpt = new Map<string, typeof targetDecisions>();
+                const targetBySymbolOpt = new Map<string, typeof targetDecisions>();
 
                 for (const td of targetDecisions) {
-                    if (td.filePath) {
-                        let group = targetByFile.get(td.filePath);
+                    if (td.filePath && td.symbolName) {
+                        const key = `${td.filePath}::${td.symbolName}`;
+                        let group = targetByComposite.get(key);
                         if (!group) {
                             group = [];
-                            targetByFile.set(td.filePath, group);
+                            targetByComposite.set(key, group);
                         }
                         group.push(td);
                     }
-                    if (td.symbolName) {
-                        let group = targetBySymbol.get(td.symbolName);
+
+                    if (td.filePath) {
+                        let group = targetByFileOpt.get(td.filePath);
                         if (!group) {
                             group = [];
-                            targetBySymbol.set(td.symbolName, group);
+                            targetByFileOpt.set(td.filePath, group);
+                        }
+                        group.push(td);
+                    }
+
+                    if (td.symbolName) {
+                        let group = targetBySymbolOpt.get(td.symbolName);
+                        if (!group) {
+                            group = [];
+                            targetBySymbolOpt.set(td.symbolName, group);
                         }
                         group.push(td);
                     }
                 }
 
                 for (const cd of currentDecisions) {
-                    const matchedTargets = new Set<typeof targetDecisions[0]>();
-                    if (cd.filePath) {
-                        const fileMatches = targetByFile.get(cd.filePath) || [];
-                        for (const td of fileMatches) matchedTargets.add(td);
-                    }
-                    if (cd.symbolName) {
-                        const symbolMatches = targetBySymbol.get(cd.symbolName) || [];
-                        for (const td of symbolMatches) matchedTargets.add(td);
+                    let matchedTargets: typeof targetDecisions = [];
+
+                    if (cd.filePath && cd.symbolName) {
+                        matchedTargets = targetByComposite.get(`${cd.filePath}::${cd.symbolName}`) || [];
+                    } else if (cd.filePath) {
+                        matchedTargets = targetByFileOpt.get(cd.filePath) || [];
+                    } else if (cd.symbolName) {
+                        matchedTargets = targetBySymbolOpt.get(cd.symbolName) || [];
                     }
 
                     for (const td of matchedTargets) {
@@ -441,11 +455,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
                 // 1. Bulk process memories
                 if (memories.length > 0) {
-                    const existingMemories = await prisma.memory.findMany({
-                        where: { projectId, gitBranch: tgt },
-                        select: { content: true }
-                    });
-                    const existingContentSet = new Set(existingMemories.map(m => m.content));
+                    const existingContentSet = new Set(targetMemories.map(m => m.content));
 
                     const newMemoriesData = memories
                         .filter(m => !existingContentSet.has(m.content))
@@ -463,11 +473,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
                 // 2. Bulk process tasks
                 if (tasks.length > 0) {
-                    const existingTasks = await prisma.task.findMany({
-                        where: { projectId, gitBranch: tgt },
-                        select: { slug: true }
-                    });
-                    const existingSlugSet = new Set(existingTasks.map(t => t.slug));
+                    const existingSlugSet = new Set(targetTasks.map(t => t.slug));
 
                     const newTasks = tasks.filter(t => !existingSlugSet.has(t.slug));
 
