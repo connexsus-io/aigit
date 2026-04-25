@@ -151,8 +151,26 @@ When user's prompt is NOT in English:
 
 - Do NOT rely on the raw git diff hook. 
 - You wrote the code, so you must summarize the architectural intent before committing.
-- **Action:** Run `aigit commit memory "<dense 2-sentence architectural summary of changes>"` right before running `git commit`.
+- **Action:** Run `aigit load` first, then `aigit commit memory "<dense 2-sentence architectural summary of changes>"` right before running `git commit`.
+- **Ledger Safety:** After `aigit commit memory`, run `npm run check:ledger` before staging `.aigit/ledger.json`. The ledger diff must be additive only: projects, tasks, and memories from `origin/main` must not disappear.
 - **⚠️ FATAL CONSEQUENCE:** The project has a strict `isTTY` Git hook installed. Because you run headless, if you attempt to run `git commit` without prior semantic memory, the hook will instantly detect you are an AI and **fatally abort your commit** with `process.exit(1)`. Do not skip this step or you will fail your task.
+
+### 🛡️ Protected State Files
+
+These files are shared state, not ordinary implementation files:
+
+- `.aigit/ledger.json`
+- Lockfiles, unless dependencies changed intentionally
+- Generated `dist/` files, unless the package explicitly tracks release artifacts
+- Local environment/config files
+
+Before staging `.aigit/ledger.json`, run:
+
+```bash
+npm run check:ledger
+```
+
+Never commit `.aigit/ledger.json` if the guard reports removed historical projects, tasks, or memories. If a ledger deletion is intentional, use `--allow-ledger-deletions`, document the reason in the PR, and show the exact deleted IDs.
 
 ### 🏁 Final Checklist Protocol
 
