@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GitMerge, Check, X, Sparkles, Loader2 } from 'lucide-react';
-import { API_BASE_URL } from '../config';
+import { AIGIT_UI_TOKEN, API_BASE_URL } from '../config';
 
 interface ConflictItem {
   id: string;
@@ -27,7 +27,7 @@ export default function ConflictsPage() {
 
   const fetchConflicts = () => {
     setLoading(true);
-    fetch(`${API_BASE_URL}/api/conflicts`)
+    fetch(`${API_BASE_URL}/api/conflicts`, { headers: { 'X-Aigit-Ui-Token': AIGIT_UI_TOKEN } })
       .then(res => res.json())
       .then(data => {
         const mems = (data.memories || []).map((m: any) => ({ ...m, _renderType: 'memory' }));
@@ -50,7 +50,10 @@ export default function ConflictsPage() {
     try {
       await fetch(`${API_BASE_URL}/api/resolve`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Aigit-Ui-Token': AIGIT_UI_TOKEN
+        },
         body: JSON.stringify({ id, type, action, content })
       });
       // Remove from UI without full refetch for snappy experience

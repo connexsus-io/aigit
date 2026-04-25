@@ -4,6 +4,7 @@
     "private": true,
     "description": "Root workspace to execute tests across sub-packages",
     "scripts": {
+        "check:ledger": "node context-server/scripts/check-ledger-regression.mjs",
         "test": "npm test --prefix context-server"
     }
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { DatabaseZap, ShieldAlert, Check, Loader2 } from 'lucide-react';
-import { API_BASE_URL } from '../config';
+import { AIGIT_UI_TOKEN, API_BASE_URL } from '../config';
 
 export default function SettingsPage() {
   const [running, setRunning] = useState(false);
@@ -11,7 +11,10 @@ export default function SettingsPage() {
     setRunning(true);
     setResult(null);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/gc`, { method: 'POST' });
+      const res = await fetch(`${API_BASE_URL}/api/gc`, {
+        method: 'POST',
+        headers: { 'X-Aigit-Ui-Token': AIGIT_UI_TOKEN }
+      });
       const data = await res.json();
       if (data.success) {
           setResult({ success: true, deleted: data.deleted });

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 import { Activity, Brain, Database, CheckCircle2 } from 'lucide-react';
-import { API_BASE_URL } from '../config';
+import { AIGIT_UI_TOKEN, API_BASE_URL } from '../config';
 
 interface StatsData {
   totalMemories: number;
@@ -22,7 +22,7 @@ export default function DashboardPage() {
 
   const fetchStats = (isRefresh = false) => {
     if (isRefresh) setIsRefreshing(true);
-    fetch(`${API_BASE_URL}/api/stats`)
+    fetch(`${API_BASE_URL}/api/stats`, { headers: { 'X-Aigit-Ui-Token': AIGIT_UI_TOKEN } })
       .then(res => res.json())
       .then(data => {
         setStats(data);
