@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Search as SearchIcon, SearchX, Cpu, Fingerprint, FileCode2, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { API_BASE_URL } from '../config';
+import { AIGIT_UI_TOKEN, API_BASE_URL } from '../config';
 
 interface SearchResult {
   id: string;
@@ -26,7 +26,9 @@ export default function SearchPage() {
     setLoading(true);
     setSearched(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/search?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`${API_BASE_URL}/api/search?q=${encodeURIComponent(query)}`, {
+        headers: { 'X-Aigit-Ui-Token': AIGIT_UI_TOKEN }
+      });
       const data = await res.json();
       setResults(data);
     } catch (err) {

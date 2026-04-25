@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { RefreshCw } from 'lucide-react';
 import mermaid from 'mermaid';
 import DOMPurify from 'dompurify';
-import { API_BASE_URL } from '../config';
+import { AIGIT_UI_TOKEN, API_BASE_URL } from '../config';
 
 export default function GraphPage() {
   const [graphData, setGraphData] = useState<{ mermaid: string, totalFiles: number, totalLinks: number } | null>(null);
@@ -10,7 +10,7 @@ export default function GraphPage() {
 
   const fetchGraph = () => {
     setLoading(true);
-    fetch(`${API_BASE_URL}/api/graph`)
+    fetch(`${API_BASE_URL}/api/graph`, { headers: { 'X-Aigit-Ui-Token': AIGIT_UI_TOKEN } })
       .then(res => res.json())
       .then(data => {
         setGraphData(data);
@@ -31,7 +31,7 @@ export default function GraphPage() {
       mermaid.initialize({ 
         startOnLoad: false, 
         theme: 'dark',
-        securityLevel: 'loose',
+        securityLevel: 'strict',
         fontFamily: 'Inter'
       });
       mermaid.contentLoaded();
