@@ -157,11 +157,9 @@ export default function ConflictsPage() {
                             title={!synthText.trim() ? "Please enter text to synthesize" : undefined}
                         >
                             {processingId === item.id ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />} Save & Assimilate
-                            <span className="text-muted text-xs" style={{ marginLeft: '0.5rem', opacity: 0.7 }}>Cmd/Ctrl ↵</span>
                         </button>
                         <button className="btn" onClick={() => setSynthesizeTarget(null)}>
                             Cancel
-                            <span className="text-muted text-xs" style={{ marginLeft: '0.5rem', opacity: 0.7 }}>Esc</span>
                         </button>
                     </div>
                 </div>
