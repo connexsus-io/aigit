@@ -47,13 +47,15 @@ const handler: CommandHandler = async ({ args, workspacePath }) => {
     let directDecisions: any[] = [];
     
     if (changedFiles.length > 0) {
-        directMemories = await prisma.memory.findMany({
-            where: { filePath: { in: changedFiles } }
-        });
-        
-        directDecisions = await prisma.decision.findMany({
-            where: { filePath: { in: changedFiles } }
-        });
+        // ⚡ Bolt: Grouped independent database queries into a single Promise.all call to minimize overall database latency
+        [directMemories, directDecisions] = await Promise.all([
+            prisma.memory.findMany({
+                where: { filePath: { in: changedFiles } }
+            }),
+            prisma.decision.findMany({
+                where: { filePath: { in: changedFiles } }
+            })
+        ]);
     }
 
     // 3. Drift detection
