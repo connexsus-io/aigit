@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Search as SearchIcon, SearchX, Cpu, Fingerprint, FileCode2, Loader2, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { API_BASE_URL } from '../config';
+import { AIGIT_UI_TOKEN, API_BASE_URL } from '../config';
 
 interface SearchResult {
   id: string;
@@ -26,7 +26,9 @@ export default function SearchPage() {
     setLoading(true);
     setSearched(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/search?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`${API_BASE_URL}/api/search?q=${encodeURIComponent(query)}`, {
+        headers: { 'X-Aigit-Ui-Token': AIGIT_UI_TOKEN }
+      });
       const data = await res.json();
       setResults(data);
     } catch (err) {
@@ -72,7 +74,13 @@ export default function SearchPage() {
               </button>
             )}
           </div>
-          <button type="submit" className="btn btn-primary px-6" disabled={loading || !query.trim()} aria-busy={loading} title={!query.trim() ? "Please enter a search query" : undefined}>
+          <button
+            type="submit"
+            className="btn btn-primary px-6"
+            disabled={loading || !query.trim()}
+            aria-busy={loading}
+            title={!query.trim() ? "Please enter a search query" : undefined}
+          >
             {loading ? <><Loader2 size={16} className="animate-spin" /> Scanning...</> : 'Search'}
           </button>
         </form>

@@ -1,15 +1,14 @@
 #!/usr/bin/env node
 
 import * as Sentry from '@sentry/node';
-import * as os from 'os';
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
-import * as crypto from 'crypto';
-import { PostHog } from 'posthog-node';
 import { performance } from 'perf_hooks';
 import { Command } from 'commander';
 import { initializeDatabase, findWorkspaceRoot } from '../db';
 import { showTip } from './output';
+import { createTelemetryState } from './telemetry';
 
 // ── Version ────────────────────────────────────────────────────
 let cliVersion = 'unknown';
@@ -19,31 +18,17 @@ try {
 } catch { /* ignore */ }
 
 // ── Telemetry ──────────────────────────────────────────────────
-const POSTHOG_KEY = process.env.AIGIT_POSTHOG_KEY || 'phc_vgRl0mE57cbfKhECqT55sep3xVwggbmUvM82YK9781Y';
-const phClient = new PostHog(POSTHOG_KEY, { host: 'https://eu.i.posthog.com' });
-const isTelemetryEnabled = process.env.DO_NOT_TRACK !== '1' && process.env.DO_NOT_TRACK !== 'true';
+const {
+    phClient,
+    telemetryId: TELEMETRY_ID,
+    isTelemetryEnabled,
+    telemetryOptedOut,
+} = createTelemetryState({
+    posthogKey: process.env.AIGIT_POSTHOG_KEY,
+    sentryDsn: process.env.AIGIT_SENTRY_DSN,
+});
 
-function getOrGenerateTelemetryId(): string {
-    const configDir = path.join(os.homedir(), '.aigit');
-    const configFile = path.join(configDir, 'telemetry.json');
-    try {
-        if (fs.existsSync(configFile)) {
-            const data = JSON.parse(fs.readFileSync(configFile, 'utf-8'));
-            if (data.distinctId) return data.distinctId;
-        } else {
-            if (!fs.existsSync(configDir)) fs.mkdirSync(configDir, { recursive: true });
-        }
-        const distinctId = crypto.randomUUID();
-        fs.writeFileSync(configFile, JSON.stringify({ distinctId }));
-        return distinctId;
-    } catch {
-        return 'anonymous_cli_user_fallback';
-    }
-}
-
-const TELEMETRY_ID = getOrGenerateTelemetryId();
-
-if (isTelemetryEnabled) {
+if (isTelemetryEnabled && phClient && TELEMETRY_ID) {
     phClient.identify({
         distinctId: TELEMETRY_ID,
         properties: { cli_version: cliVersion, node_version: process.version, os_platform: os.platform(), os_release: os.release() },
@@ -51,29 +36,31 @@ if (isTelemetryEnabled) {
 }
 
 // ── Sentry ─────────────────────────────────────────────────────
-Sentry.init({
-    dsn: process.env.AIGIT_SENTRY_DSN || 'https://b7b2bf74b578153299cf94bc66e89175@o4510993965907968.ingest.de.sentry.io/4510993978490960',
-    tracesSampleRate: 1.0,
-    beforeSend(event) {
-        const workspacePath = findWorkspaceRoot(process.cwd());
-        const scrubbedEvent = JSON.parse(JSON.stringify(event));
-        const scrubString = (str: string) => str.split(workspacePath).join('[SECURE_WORKSPACE]');
-        if (scrubbedEvent.exception?.values) {
-            scrubbedEvent.exception.values.forEach((val: any) => {
-                if (val.value) val.value = scrubString(val.value);
-                if (val.stacktrace?.frames) {
-                    val.stacktrace.frames.forEach((frame: any) => {
-                        if (frame.filename) frame.filename = scrubString(frame.filename);
-                        if (frame.abs_path) frame.abs_path = scrubString(frame.abs_path);
-                    });
-                }
-            });
-        }
-        return scrubbedEvent;
-    },
-});
+if (!telemetryOptedOut && process.env.AIGIT_SENTRY_DSN) {
+    Sentry.init({
+        dsn: process.env.AIGIT_SENTRY_DSN,
+        tracesSampleRate: 1.0,
+        beforeSend(event) {
+            const workspacePath = findWorkspaceRoot(process.cwd());
+            const scrubbedEvent = JSON.parse(JSON.stringify(event));
+            const scrubString = (str: string) => str.split(workspacePath).join('[SECURE_WORKSPACE]');
+            if (scrubbedEvent.exception?.values) {
+                scrubbedEvent.exception.values.forEach((val: any) => {
+                    if (val.value) val.value = scrubString(val.value);
+                    if (val.stacktrace?.frames) {
+                        val.stacktrace.frames.forEach((frame: any) => {
+                            if (frame.filename) frame.filename = scrubString(frame.filename);
+                            if (frame.abs_path) frame.abs_path = scrubString(frame.abs_path);
+                        });
+                    }
+                });
+            }
+            return scrubbedEvent;
+        },
+    });
 
-if (isTelemetryEnabled) Sentry.setUser({ id: TELEMETRY_ID });
+    if (TELEMETRY_ID) Sentry.setUser({ id: TELEMETRY_ID });
+}
 
 // ── Helpers ────────────────────────────────────────────────────
 const startTime = performance.now();
@@ -81,18 +68,20 @@ const startTime = performance.now();
 async function run(commandName: string, action: () => Promise<void>) {
     await initializeDatabase();
 
+    if (isTelemetryEnabled && phClient && TELEMETRY_ID) {
         try { phClient.capture({
-            distinctId: TELEMETRY_ID,
-            event: 'cli_command_executed',
-            properties: { command: commandName, cli_version: cliVersion, node_version: process.version, os_platform: os.platform() },
-        }); } catch { }
+                distinctId: TELEMETRY_ID,
+                event: 'cli_command_executed',
+                properties: { command: commandName, cli_version: cliVersion, node_version: process.version, os_platform: os.platform() },
+            }); } catch { }
+    }
 
     try {
         await action();
         showTip(commandName);
 
-        if (isTelemetryEnabled) {
-        try { phClient.capture({
+        if (isTelemetryEnabled && phClient && TELEMETRY_ID) {
+            try { phClient.capture({
                 distinctId: TELEMETRY_ID,
                 event: 'cli_command_completed',
                 properties: { command: commandName, duration_ms: Math.round(performance.now() - startTime) },
@@ -100,7 +89,7 @@ async function run(commandName: string, action: () => Promise<void>) {
             await phClient.shutdown();
         }
     } catch (err: any) {
-        if (isTelemetryEnabled) {
+        if (isTelemetryEnabled && phClient && TELEMETRY_ID) {
             try { phClient.capture({
                 distinctId: TELEMETRY_ID,
                 event: 'cli_command_failed',
