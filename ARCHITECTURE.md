@@ -25,7 +25,7 @@ flowchart TD
 
 ## Core Principles & Memories
 
-*No core memories recorded yet.*
+- Agents must treat `.aigit/ledger.json` as protected shared state. Before staging ledger changes, run `npm run check:ledger`; projects, tasks, and memories from the target branch must not disappear unless explicitly overridden and documented.
 
 ## Implementation Details (By File)
 
@@ -38,4 +38,3 @@ flowchart TD
 - **Branch**: main
 - **Created**: 2026-03-11
 - **Plan**: `.aigit/tasks/implement-user-dashboard.md`
-

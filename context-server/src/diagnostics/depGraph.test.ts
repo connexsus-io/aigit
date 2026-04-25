@@ -67,4 +67,30 @@ describe('Dependency Graph Builder', () => {
         expect(result.mermaid).toContain('F1["b.ts (0M/1D)"]');
         expect(result.mermaid).toContain('F0 --> F1');
     });
+
+    it('escapes unsafe filename characters in mermaid labels', async () => {
+        vi.mocked(prisma.memory.groupBy).mockResolvedValue([
+            { filePath: 'src/a"><script>.ts', _count: { filePath: 1 } }
+        ] as any);
+        vi.mocked(prisma.decision.groupBy).mockResolvedValue([]);
+
+        vi.mocked(fs.readdirSync).mockImplementation((d: any) => {
+            if (d === '/test') {
+                return [{ name: 'src', isDirectory: () => true }] as any;
+            }
+            if (d === '/test/src') {
+                return [{ name: 'a"><script>.ts', isDirectory: () => false }] as any;
+            }
+            return [];
+        });
+
+        vi.mocked(fs.existsSync).mockReturnValue(true);
+        vi.mocked(fs.readFileSync).mockReturnValue('export const safe = true;');
+
+        const result = await buildDependencyGraph('/test');
+
+        expect(result.mermaid).toContain('F0["a___script_.ts (1M/0D)"]');
+        expect(result.mermaid).not.toContain('<script>');
+        expect(result.mermaid).not.toContain('">');
+    });
 });

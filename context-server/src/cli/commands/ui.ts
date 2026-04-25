@@ -4,38 +4,89 @@ import type { CommandHandler } from './types';
 import chalk from 'chalk';
 import path from 'path';
 import { spawn } from 'child_process';
+import { randomBytes, timingSafeEqual } from 'crypto';
+import { z } from 'zod';
 import { getActiveBranch } from '../git';
 import { semanticSearch } from '../../rag/search';
 import { buildDependencyGraph } from '../../diagnostics/depGraph';
-const handler: CommandHandler = async ({ workspacePath }) => {
+
+const API_HOST = '127.0.0.1';
+const API_PORT = 3001;
+const UI_HOST = '127.0.0.1';
+const UI_PORT = 5173;
+const MAX_SYNTHESIS_LENGTH = 10_000;
+
+const MemoryResolveBody = z.object({
+    type: z.literal('memory'),
+    id: z.string().uuid(),
+    action: z.enum(['assimilate', 'discard', 'synthesize']),
+    content: z.string().trim().min(1).max(MAX_SYNTHESIS_LENGTH).optional(),
+}).superRefine((value, ctx) => {
+    if (value.action === 'synthesize' && !value.content) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['content'],
+            message: 'content is required when synthesizing memory context',
+        });
+    }
+    if (value.action !== 'synthesize' && value.content !== undefined) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['content'],
+            message: 'content is only supported for memory synthesis',
+        });
+    }
+});
+
+const DecisionResolveBody = z.object({
+    type: z.literal('decision'),
+    id: z.string().uuid(),
+    action: z.enum(['assimilate', 'discard']),
+}).strict();
+
+const ResolveBody = z.union([MemoryResolveBody, DecisionResolveBody]);
+
+export interface UiAppOptions {
+    workspacePath: string;
+    currentBranch: string;
+    uiOrigin: string;
+    uiToken: string;
+}
+
+function isMatchingToken(provided: string | undefined, expected: string): boolean {
+    if (!provided || provided.length !== expected.length) return false;
+    const providedBuffer = Buffer.from(provided);
+    const expectedBuffer = Buffer.from(expected);
+    if (providedBuffer.length !== expectedBuffer.length) return false;
+    return timingSafeEqual(providedBuffer, expectedBuffer);
+}
+
+export function createUiApp({ workspacePath, currentBranch, uiOrigin, uiToken }: UiAppOptions) {
     const app = express();
-    const port = 3001;
 
     app.use(express.json());
 
-    // CORS for local Vite dev server
+    // CORS is intentionally scoped to the one Vite instance spawned by `aigit ui`.
     app.use((req: Request, res: Response, next: NextFunction) => {
         const origin = req.headers.origin;
-        if (origin) {
-            try {
-                const url = new URL(origin);
-                if ((url.protocol === 'http:' || url.protocol === 'https:') &&
-                    (url.hostname === 'localhost' || url.hostname === '127.0.0.1')) {
-                    res.header('Access-Control-Allow-Origin', origin);
-                }
-            } catch (e) {
-                // Invalid URL, do nothing
-            }
+        if (origin === uiOrigin) {
+            res.header('Access-Control-Allow-Origin', uiOrigin);
+            res.header('Vary', 'Origin');
         }
-        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-        res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        res.header('Access-Control-Allow-Headers', 'Content-Type, X-Aigit-Ui-Token');
+        res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
         if (req.method === 'OPTIONS') {
-            return res.sendStatus(200);
+            return res.sendStatus(204);
         }
         next();
     });
 
-    const currentBranch = getActiveBranch(workspacePath);
+    app.use('/api', (req: Request, res: Response, next: NextFunction) => {
+        if (!isMatchingToken(req.header('X-Aigit-Ui-Token'), uiToken)) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+        next();
+    });
 
     // API: Get Project Stats
     app.get('/api/stats', async (req: Request, res: Response) => {
@@ -96,8 +147,13 @@ const handler: CommandHandler = async ({ workspacePath }) => {
 
     // API: Resolve Conflict
     app.post('/api/resolve', async (req: Request, res: Response) => {
+        const parsed = ResolveBody.safeParse(req.body);
+        if (!parsed.success) {
+            return res.status(400).json({ error: 'Invalid request body' });
+        }
+
         try {
-            const { type, id, action, content } = req.body;
+            const { type, id, action } = parsed.data;
             // action: 'assimilate' | 'discard' | 'synthesize'
 
             if (type === 'memory') {
@@ -105,8 +161,8 @@ const handler: CommandHandler = async ({ workspacePath }) => {
                     await prisma.memory.update({ where: { id }, data: { originBranch: currentBranch } });
                 } else if (action === 'discard') {
                     await prisma.memory.delete({ where: { id } });
-                } else if (action === 'synthesize' && content) {
-                    await prisma.memory.update({ where: { id }, data: { originBranch: currentBranch, content } });
+                } else if (action === 'synthesize') {
+                    await prisma.memory.update({ where: { id }, data: { originBranch: currentBranch, content: parsed.data.content } });
                 }
             } else if (type === 'decision') {
                 if (action === 'assimilate') {
@@ -166,11 +222,11 @@ const handler: CommandHandler = async ({ workspacePath }) => {
 
             if (emptyTasks.length > 0) {
                 await prisma.task.deleteMany({
-                    where: { id: { in: emptyTasks.map(t => t.id) } }
+                    where: { id: { in: emptyTasks.map((t: { id: string }) => t.id) } }
                 });
             }
 
-            try { await prisma.$executeRawUnsafe(`VACUUM ANALYZE;`); } catch(e) {}
+            try { await prisma.$executeRawUnsafe(`VACUUM ANALYZE;`); } catch { }
             
             res.json({ success: true, deleted: deletedMemories.count + emptyTasks.length });
         } catch (error) {
@@ -179,16 +235,31 @@ const handler: CommandHandler = async ({ workspacePath }) => {
         }
     });
 
-    app.listen(port, () => {
-        console.log(chalk.cyan(`\\n🚀 Aigit API Server running on http://localhost:${port}`));
+    return app;
+}
+
+const handler: CommandHandler = async ({ workspacePath }) => {
+    const currentBranch = getActiveBranch(workspacePath);
+    const uiToken = randomBytes(32).toString('hex');
+    const apiOrigin = `http://${API_HOST}:${API_PORT}`;
+    const uiOrigin = `http://${UI_HOST}:${UI_PORT}`;
+    const app = createUiApp({ workspacePath, currentBranch, uiOrigin, uiToken });
+
+    app.listen(API_PORT, API_HOST, () => {
+        console.log(chalk.cyan(`\\n🚀 Aigit API Server running on ${apiOrigin}`));
         
         // Start the Vite app
         const uiPath = path.resolve(__dirname, '../../../../context-ui');
         console.log(chalk.gray(`Starting UI from ${uiPath}...`));
         
         const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-        const vite = spawn(npmCmd, ['run', 'dev'], {
+        const vite = spawn(npmCmd, ['run', 'dev', '--', '--host', UI_HOST, '--port', String(UI_PORT)], {
             cwd: uiPath,
+            env: {
+                ...process.env,
+                VITE_API_URL: apiOrigin,
+                VITE_AIGIT_UI_TOKEN: uiToken,
+            },
             stdio: 'inherit',
             shell: false
         });
