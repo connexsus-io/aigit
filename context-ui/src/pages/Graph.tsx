@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, AlertCircle } from 'lucide-react';
 import mermaid from 'mermaid';
 import DOMPurify from 'dompurify';
 import { AIGIT_UI_TOKEN, API_BASE_URL } from '../config';
@@ -23,6 +23,7 @@ export default function GraphPage() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchGraph();
   }, []);
 
@@ -46,8 +47,9 @@ export default function GraphPage() {
                 const result: any = await mermaid.render('mermaid-svg', graphData.mermaid);
                 const rawHtml = typeof result === 'string' ? result : result.svg;
                 element.innerHTML = DOMPurify.sanitize(rawHtml);
-            } catch (e: any) {
-                const errorHtml = `<div class="text-danger p-4 border border-danger/30 rounded bg-danger/10">Mermaid Render Error: ${e.message}</div>`;
+            } catch (e: unknown) {
+                const errorMessage = e instanceof Error ? e.message : String(e);
+                const errorHtml = `<div class="text-danger p-4 border border-danger/30 rounded bg-danger/10">Mermaid Render Error: ${errorMessage}</div>`;
                 element.innerHTML = DOMPurify.sanitize(errorHtml);
             }
         }
@@ -91,7 +93,23 @@ export default function GraphPage() {
           </div>
         </div>
       ) : (
-          <div className="text-danger mt-8">Failed to fetch graph data.</div>
+        <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center', marginTop: '2rem' }}>
+          <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(350, 80%, 55%, 0.1)' }}>
+            <AlertCircle size={48} color="var(--danger)" />
+          </div>
+          <h3 className="text-lg">Failed to load architecture graph</h3>
+          <p className="text-muted mt-2 mb-4">There was an error communicating with the graph generation server.</p>
+          <button
+            className="btn btn-primary"
+            onClick={fetchGraph}
+            disabled={loading}
+            aria-busy={loading}
+            aria-label="Retry loading architecture graph"
+          >
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+            {loading ? 'Retrying...' : 'Try Again'}
+          </button>
+        </div>
       )}
     </div>
   );
