@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Loader2 } from 'lucide-react';
 import mermaid from 'mermaid';
 import DOMPurify from 'dompurify';
 import { AIGIT_UI_TOKEN, API_BASE_URL } from '../config';
@@ -70,8 +70,8 @@ export default function GraphPage() {
       </header>
 
       {loading ? (
-        <div className="flex-1 flex items-center justify-center text-muted" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          Mapping module references...
+        <div className="glass-card flex-1 flex items-center justify-center text-muted mt-6" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }} role="status" aria-live="polite">
+          <Loader2 className="animate-spin" size={24} style={{ marginRight: '0.5rem' }} /> Mapping module references...
         </div>
       ) : graphData ? (
         <div className="mt-6 flex-1 flex flex-col" style={{ marginTop: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>

@@ -78,7 +78,11 @@ export default function ConflictsPage() {
         </div>
       </header>
 
-      {loading && <div className="text-muted p-4">Scanning semantic intersections...</div>}
+      {loading && (
+        <div className="glass-card flex items-center justify-center mt-8 text-muted" style={{ padding: '2rem' }} role="status" aria-live="polite">
+          <Loader2 className="animate-spin" size={24} style={{ marginRight: '0.5rem' }} /> Scanning semantic intersections...
+        </div>
+      )}
 
       {!loading && items.length === 0 && (
         <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center' }}>

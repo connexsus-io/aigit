@@ -87,7 +87,11 @@ export default function SearchPage() {
       </header>
 
       <div aria-live="polite" className="mt-8" style={{ marginTop: '2rem' }}>
-        {loading && <div className="text-muted p-4 text-center">Interrogating hyperspace vector embeddings...</div>}
+        {loading && (
+          <div className="glass-card flex items-center justify-center text-muted" style={{ padding: '2rem' }} role="status" aria-live="polite">
+            <Loader2 className="animate-spin" size={24} style={{ marginRight: '0.5rem' }} /> Interrogating hyperspace vector embeddings...
+          </div>
+        )}
 
         {!loading && !searched && (
           <div className="glass-card flex flex-col items-center justify-center p-12 text-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '4rem', textAlign: 'center' }}>
