@@ -36,3 +36,7 @@
 ## 2024-04-19 - Redundant DB Queries During Data Merge
 **Learning:** In the `merge_context` handler, we were executing `Promise.all` to fetch `targetMemories` and `targetTasks` up-front, but then ignoring these values and sequentially awaiting `prisma.memory.findMany` and `prisma.task.findMany` again for the same target branch inside the processing loops. This caused unnecessary I/O bounds and blocked the event loop during merges.
 **Action:** When data is pre-fetched via `Promise.all` for a specific entity or branch, always utilize the pre-fetched objects (e.g. `new Set(targetMemories.map(m => m.content))`) rather than performing redundant queries.
+
+## 2024-04-30 - Drift Detection File Level Caching
+**Learning:** Iterating over all memories and decisions and then for each file running `fs.existsSync` and `extractAllSymbols` without caching leads to repetitive O(N) operations in `diagnostics/drift.ts` if multiple records map to the same file.
+**Action:** Utilize file-level caching via a `Map` where the file path is the key to only perform checking disk I/O and parsing the AST once per unique file.
