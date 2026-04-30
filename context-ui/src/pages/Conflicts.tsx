@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GitMerge, Check, X, Sparkles, Loader2 } from 'lucide-react';
+import { GitMerge, Check, X, Sparkles, Loader2, RefreshCw } from 'lucide-react';
 import { AIGIT_UI_TOKEN, API_BASE_URL } from '../config';
 
 interface ConflictItem {
@@ -86,7 +86,13 @@ export default function ConflictsPage() {
             <GitMerge size={48} color="var(--success)" />
           </div>
           <h3>Ledger is clean</h3>
-          <p className="text-muted mt-2">All semantic memories and decisions have been assimilated into the current branch.</p>
+          <p className="text-muted mt-2 mb-4">All semantic memories and decisions have been assimilated into the current branch.</p>
+          <button
+            className="btn"
+            onClick={fetchConflicts}
+          >
+            <RefreshCw size={16} /> Check Again
+          </button>
         </div>
       )}
 

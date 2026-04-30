@@ -105,7 +105,17 @@ export default function SearchPage() {
               <SearchX size={48} color="var(--text-muted)" />
             </div>
             <h3 className="text-lg">No semantic matches found</h3>
-            <p className="text-muted mt-2">Try rephrasing your search query to capture different architectural intent.</p>
+            <p className="text-muted mt-2 mb-4">Try rephrasing your search query to capture different architectural intent.</p>
+            <button
+              className="btn"
+              onClick={() => {
+                setQuery('');
+                setResults([]);
+                setSearched(false);
+              }}
+            >
+              <X size={16} /> Clear Search
+            </button>
           </div>
         )}
 
