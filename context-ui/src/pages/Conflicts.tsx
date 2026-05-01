@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GitMerge, Check, X, Sparkles, Loader2 } from 'lucide-react';
+import { GitMerge, Check, X, Sparkles, Loader2, RefreshCw } from 'lucide-react';
 import { AIGIT_UI_TOKEN, API_BASE_URL } from '../config';
 
 interface ConflictItem {
@@ -71,22 +71,37 @@ export default function ConflictsPage() {
 
   return (
     <div className="animate-fade-in">
-      <header className="glass-header">
+      <header className="glass-header flex justify-between items-center" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h2>Unassimilated Context Inbox</h2>
           <p className="text-muted">Review logic from merged feature branches before enforcing it into the mainline history.</p>
         </div>
+        <button
+          className="btn btn-primary"
+          onClick={fetchConflicts}
+          disabled={loading || processingId !== null}
+          aria-busy={loading}
+        >
+          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> {loading ? 'Scanning...' : 'Refresh Inbox'}
+        </button>
       </header>
 
       {loading && <div className="text-muted p-4">Scanning semantic intersections...</div>}
 
       {!loading && items.length === 0 && (
-        <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center' }}>
+        <div className="glass-card mt-8" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center' }}>
           <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(150, 70%, 45%, 0.1)' }}>
             <GitMerge size={48} color="var(--success)" />
           </div>
           <h3>Ledger is clean</h3>
-          <p className="text-muted mt-2">All semantic memories and decisions have been assimilated into the current branch.</p>
+          <p className="text-muted mt-2 mb-4">All semantic memories and decisions have been assimilated into the current branch.</p>
+          <button
+            className="btn btn-primary"
+            onClick={fetchConflicts}
+            aria-label="Re-scan for semantic intersections"
+          >
+            <RefreshCw size={16} /> Re-scan Ledger
+          </button>
         </div>
       )}
 
