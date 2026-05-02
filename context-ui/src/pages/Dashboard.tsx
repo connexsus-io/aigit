@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
-import { Activity, Brain, Database, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import { Activity, Brain, Database, CheckCircle2, AlertCircle, RefreshCw, Loader2 } from 'lucide-react';
 import { AIGIT_UI_TOKEN, API_BASE_URL } from '../config';
 
 interface StatsData {
@@ -42,7 +42,11 @@ export default function DashboardPage() {
   }, []);
 
   if (loading) {
-    return <div className="text-muted">Loading pulse...</div>;
+    return (
+      <div className="glass-card flex items-center justify-center mt-8 text-muted" style={{ padding: '2rem' }} role="status" aria-live="polite">
+        <Loader2 className="animate-spin" size={24} style={{ marginRight: '0.5rem' }} /> Loading pulse...
+      </div>
+    );
   }
 
   if (!stats) {

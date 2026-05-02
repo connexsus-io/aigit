@@ -32,3 +32,7 @@
 ## 2024-04-24 - Visual Keyboard Shortcut Hints
 **Learning:** Keyboard accessibility features (like supporting `Escape` to cancel or `Cmd/Ctrl + Enter` to submit) are highly effective, but often go unused because they are undiscoverable visually, trapping users who may prefer keyboard interactions but don't know they exist.
 **Action:** When implementing keyboard shortcuts for inline forms or interactive elements, always explicitly render a visual hint (e.g. using a `<kbd>` element with `aria-hidden="true"`) near the corresponding action button.
+
+## 2026-04-29 - [Accessible Initial Page Loading States]
+**Learning:** Throughout the application, initial page load states were simple text divs without ARIA roles or loading indicators. This creates layout jumping when content loads and fails to notify screen readers of the initial loading state.
+**Action:** Always wrap initial page loading states in a visual container (like a glass-card), include a spinning loader icon, and attach role="status" and aria-live="polite".
