@@ -143,8 +143,15 @@ export default function DashboardPage() {
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-                <div className="text-muted" style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-                    No agent memories tracked yet.
+                <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', height: '100%', alignItems: 'center', justifyContent: 'center', padding: '2rem', textAlign: 'center' }}>
+                    <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(0,0%,100%,0.05)' }}>
+                      <Database size={32} color="var(--brand-primary)" />
+                    </div>
+                    <h4 className="text-lg mb-2">No agent memories tracked yet.</h4>
+                    <p className="text-muted mb-4" style={{ fontSize: '0.875rem' }}>Memories will appear here once agents begin adding context.</p>
+                    <button className="btn btn-primary btn-sm" onClick={() => fetchStats(true)} disabled={isRefreshing} aria-busy={isRefreshing}>
+                      <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} /> {isRefreshing ? 'Refreshing...' : 'Refresh Data'}
+                    </button>
                 </div>
             )}
           </div>
@@ -171,8 +178,15 @@ export default function DashboardPage() {
                 </BarChart>
               </ResponsiveContainer>
              ) : (
-              <div className="text-muted" style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-                   No agent decisions tracked yet.
+              <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', height: '100%', alignItems: 'center', justifyContent: 'center', padding: '2rem', textAlign: 'center' }}>
+                   <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(0,0%,100%,0.05)' }}>
+                     <Brain size={32} color="var(--brand-secondary)" />
+                   </div>
+                   <h4 className="text-lg mb-2">No agent decisions tracked yet.</h4>
+                   <p className="text-muted mb-4" style={{ fontSize: '0.875rem' }}>Architectural decisions will appear here once recorded.</p>
+                   <button className="btn btn-primary btn-sm" onClick={() => fetchStats(true)} disabled={isRefreshing} aria-busy={isRefreshing}>
+                     <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} /> {isRefreshing ? 'Refreshing...' : 'Refresh Data'}
+                   </button>
                </div>
              )}
           </div>
