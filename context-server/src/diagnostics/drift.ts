@@ -47,25 +47,6 @@ export async function detectContextDrift(workspacePath: string): Promise<DriftRe
         prisma.decision.findMany()
     ]);
 
-    const fileExistsCache = new Map<string, boolean>();
-    const fileSymbolsCache = new Map<string, ReturnType<typeof extractAllSymbols>>();
-
-    // Helper to get file existence with caching
-    const checkFileExists = (fullPath: string) => {
-        if (fileExistsCache.has(fullPath)) return fileExistsCache.get(fullPath)!;
-        const exists = fs.existsSync(fullPath);
-        fileExistsCache.set(fullPath, exists);
-        return exists;
-    };
-
-    // Helper to get symbols with caching
-    const getSymbols = (fullPath: string) => {
-        if (fileSymbolsCache.has(fullPath)) return fileSymbolsCache.get(fullPath)!;
-        const symbols = extractAllSymbols(fullPath);
-        fileSymbolsCache.set(fullPath, symbols);
-        return symbols;
-    };
-
     // Check memories
     for (const m of memories) {
         let isStale = false;
@@ -74,13 +55,13 @@ export async function detectContextDrift(workspacePath: string): Promise<DriftRe
         // Check file existence
         if (m.filePath) {
             const fullPath = path.join(workspacePath, m.filePath);
-            if (!checkFileExists(fullPath)) {
+            if (!fs.existsSync(fullPath)) {
                 isStale = true;
                 reason = `Anchored file deleted: ${m.filePath}`;
             } else if (m.symbolName) {
                 // File exists, check if symbol still exists
                 try {
-                    const symbols = getSymbols(fullPath);
+                    const symbols = extractAllSymbols(fullPath);
                     const found = symbols.some(s => s.qualifiedName === m.symbolName);
                     if (!found) {
                         isStale = true;
@@ -121,20 +102,18 @@ export async function detectContextDrift(workspacePath: string): Promise<DriftRe
 
         if (d.filePath) {
             const fullPath = path.join(workspacePath, d.filePath);
-            if (!checkFileExists(fullPath)) {
+            if (!fs.existsSync(fullPath)) {
                 isStale = true;
                 reason = `Anchored file deleted: ${d.filePath}`;
             } else if (d.symbolName) {
                 try {
-                    const symbols = getSymbols(fullPath);
+                    const symbols = extractAllSymbols(fullPath);
                     const found = symbols.some(s => s.qualifiedName === d.symbolName);
                     if (!found) {
                         isStale = true;
                         reason = `Anchored AST symbol deleted: ${d.symbolName} in ${d.filePath}`;
                     }
-                } catch {
-                    // AST parse error, skip symbol check
-                }
+                } catch { }
             }
         }
 
