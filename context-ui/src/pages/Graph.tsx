@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Loader2, AlertCircle } from 'lucide-react';
 import mermaid from 'mermaid';
 import DOMPurify from 'dompurify';
 import { AIGIT_UI_TOKEN, API_BASE_URL } from '../config';
@@ -70,8 +70,8 @@ export default function GraphPage() {
       </header>
 
       {loading ? (
-        <div className="flex-1 flex items-center justify-center text-muted" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          Mapping module references...
+        <div className="glass-card flex-1 flex items-center justify-center text-muted mt-6" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }} role="status" aria-live="polite">
+          <Loader2 className="animate-spin" size={24} style={{ marginRight: '0.5rem' }} /> Mapping module references...
         </div>
       ) : graphData ? (
         <div className="mt-6 flex-1 flex flex-col" style={{ marginTop: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -93,19 +93,23 @@ export default function GraphPage() {
           </div>
         </div>
       ) : (
-          <div className="glass-card mt-8" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center' }}>
-            <h3 className="text-lg text-danger">Failed to Load Graph Data</h3>
-            <p className="text-muted mt-2 mb-4">We were unable to retrieve the architecture graph data from the server.</p>
-            <button
-              className="btn btn-primary"
-              onClick={fetchGraph}
-              disabled={loading}
-              aria-busy={loading}
-              aria-label="Retry loading architecture graph"
-            >
-              <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> {loading ? 'Retrying...' : 'Try Again'}
-            </button>
+        <div className="glass-card mt-8" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center' }}>
+          <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(350, 80%, 55%, 0.1)' }}>
+            <AlertCircle size={48} color="var(--danger)" />
           </div>
+          <h3 className="text-lg text-danger">Failed to Load Graph Data</h3>
+          <p className="text-muted mt-2 mb-4">We were unable to retrieve the architecture graph data from the server.</p>
+          <button
+            className="btn btn-primary"
+            onClick={fetchGraph}
+            disabled={loading}
+            aria-busy={loading}
+            aria-label="Retry loading architecture graph"
+          >
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+            {loading ? 'Retrying...' : 'Try Again'}
+          </button>
+        </div>
       )}
     </div>
   );
