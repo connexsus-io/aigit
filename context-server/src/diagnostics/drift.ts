@@ -47,6 +47,37 @@ export async function detectContextDrift(workspacePath: string): Promise<DriftRe
         prisma.decision.findMany()
     ]);
 
+    // ⚡ Bolt Performance Optimization:
+    // Caches to prevent O(N) redundant disk I/O and processing during AST parsing and existence checks
+    const fileExistsCache = new Map<string, boolean>();
+    const fileSymbolsCache = new Map<string, { symbols?: any[], error?: any }>();
+
+    function checkFileExists(fullPath: string): boolean {
+        let exists = fileExistsCache.get(fullPath);
+        if (exists === undefined) {
+            exists = fs.existsSync(fullPath);
+            fileExistsCache.set(fullPath, exists);
+        }
+        return exists;
+    }
+
+    function getFileSymbols(fullPath: string) {
+        let cached = fileSymbolsCache.get(fullPath);
+        if (!cached) {
+            try {
+                const symbols = extractAllSymbols(fullPath);
+                cached = { symbols };
+            } catch (error) {
+                cached = { error };
+            }
+            fileSymbolsCache.set(fullPath, cached);
+        }
+        if (cached.error) {
+            throw cached.error;
+        }
+        return cached.symbols!;
+    }
+
     // Check memories
     for (const m of memories) {
         let isStale = false;
@@ -55,13 +86,13 @@ export async function detectContextDrift(workspacePath: string): Promise<DriftRe
         // Check file existence
         if (m.filePath) {
             const fullPath = path.join(workspacePath, m.filePath);
-            if (!fs.existsSync(fullPath)) {
+            if (!checkFileExists(fullPath)) {
                 isStale = true;
                 reason = `Anchored file deleted: ${m.filePath}`;
             } else if (m.symbolName) {
                 // File exists, check if symbol still exists
                 try {
-                    const symbols = extractAllSymbols(fullPath);
+                    const symbols = getFileSymbols(fullPath);
                     const found = symbols.some(s => s.qualifiedName === m.symbolName);
                     if (!found) {
                         isStale = true;
@@ -102,12 +133,12 @@ export async function detectContextDrift(workspacePath: string): Promise<DriftRe
 
         if (d.filePath) {
             const fullPath = path.join(workspacePath, d.filePath);
-            if (!fs.existsSync(fullPath)) {
+            if (!checkFileExists(fullPath)) {
                 isStale = true;
                 reason = `Anchored file deleted: ${d.filePath}`;
             } else if (d.symbolName) {
                 try {
-                    const symbols = extractAllSymbols(fullPath);
+                    const symbols = getFileSymbols(fullPath);
                     const found = symbols.some(s => s.qualifiedName === d.symbolName);
                     if (!found) {
                         isStale = true;
