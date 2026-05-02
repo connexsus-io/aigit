@@ -21,8 +21,9 @@ export default function SettingsPage() {
       } else {
           setResult({ success: false, message: data.error });
       }
-    } catch (err: any) {
-      setResult({ success: false, message: err.message });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setResult({ success: false, message });
     } finally {
       setRunning(false);
     }

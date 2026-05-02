@@ -36,3 +36,6 @@
 ## 2024-04-19 - Redundant DB Queries During Data Merge
 **Learning:** In the `merge_context` handler, we were executing `Promise.all` to fetch `targetMemories` and `targetTasks` up-front, but then ignoring these values and sequentially awaiting `prisma.memory.findMany` and `prisma.task.findMany` again for the same target branch inside the processing loops. This caused unnecessary I/O bounds and blocked the event loop during merges.
 **Action:** When data is pre-fetched via `Promise.all` for a specific entity or branch, always utilize the pre-fetched objects (e.g. `new Set(targetMemories.map(m => m.content))`) rather than performing redundant queries.
+## 2024-05-02 - Redundant AST Parsing and Disk I/O
+**Learning:** During context drift detection, calling `fs.existsSync` and `extractAllSymbols` inside a loop iterating over every single memory and decision record triggers redundant, expensive disk I/O and AST parsing for records anchored to the same file (O(N)).
+**Action:** Use a file-level cache (like `Map<string, boolean>` for existence and `Map<string, { symbols?: any[], error?: any }>` for parsed symbols) outside the loop to ensure operations occur at most once per file, significantly reducing the bottleneck. Always explicitly cache failures using an error object or flag rather than `null` to preserve existing error handling behaviors exactly.

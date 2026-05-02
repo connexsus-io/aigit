@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GitMerge, Check, X, Sparkles, Loader2 } from 'lucide-react';
+import { GitMerge, Check, X, Sparkles, Loader2, RefreshCw } from 'lucide-react';
 import { AIGIT_UI_TOKEN, API_BASE_URL } from '../config';
 
 interface ConflictItem {
@@ -30,7 +30,9 @@ export default function ConflictsPage() {
     fetch(`${API_BASE_URL}/api/conflicts`, { headers: { 'X-Aigit-Ui-Token': AIGIT_UI_TOKEN } })
       .then(res => res.json())
       .then(data => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const mems = (data.memories || []).map((m: any) => ({ ...m, _renderType: 'memory' }));
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const decs = (data.decisions || []).map((d: any) => ({ ...d, _renderType: 'decision' }));
         setItems([...mems, ...decs]);
         setLoading(false);
@@ -42,6 +44,7 @@ export default function ConflictsPage() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchConflicts();
   }, []);
 
@@ -68,22 +71,37 @@ export default function ConflictsPage() {
 
   return (
     <div className="animate-fade-in">
-      <header className="glass-header">
+      <header className="glass-header flex justify-between items-center" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h2>Unassimilated Context Inbox</h2>
           <p className="text-muted">Review logic from merged feature branches before enforcing it into the mainline history.</p>
         </div>
+        <button
+          className="btn btn-primary"
+          onClick={fetchConflicts}
+          disabled={loading || processingId !== null}
+          aria-busy={loading}
+        >
+          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> {loading ? 'Scanning...' : 'Refresh Inbox'}
+        </button>
       </header>
 
       {loading && <div className="text-muted p-4">Scanning semantic intersections...</div>}
 
       {!loading && items.length === 0 && (
-        <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center' }}>
+        <div className="glass-card mt-8" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center' }}>
           <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(150, 70%, 45%, 0.1)' }}>
             <GitMerge size={48} color="var(--success)" />
           </div>
           <h3>Ledger is clean</h3>
-          <p className="text-muted mt-2">All semantic memories and decisions have been assimilated into the current branch.</p>
+          <p className="text-muted mt-2 mb-4">All semantic memories and decisions have been assimilated into the current branch.</p>
+          <button
+            className="btn btn-primary"
+            onClick={fetchConflicts}
+            aria-label="Re-scan for semantic intersections"
+          >
+            <RefreshCw size={16} /> Re-scan Ledger
+          </button>
         </div>
       )}
 
@@ -92,7 +110,7 @@ export default function ConflictsPage() {
           {items.map((item, i) => (
             <motion.div 
               key={item.id} 
-              className={`conflict-item ${(item as any)._renderType} shadow-md`}
+              className={`conflict-item ${(item as ConflictItem & { _renderType?: string })._renderType} shadow-md`}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
@@ -101,8 +119,8 @@ export default function ConflictsPage() {
               <div className="flex justify-between items-start">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs font-bold uppercase tracking-wider" style={{ color: (item as any)._renderType === 'memory' ? 'var(--brand-primary)' : 'var(--brand-secondary)'}}>
-                      {(item as any)._renderType}
+                    <span className="text-xs font-bold uppercase tracking-wider" style={{ color: (item as ConflictItem & { _renderType?: string })._renderType === 'memory' ? 'var(--brand-primary)' : 'var(--brand-secondary)'}}>
+                      {(item as ConflictItem & { _renderType?: string })._renderType}
                     </span>
                     <span className="text-muted text-sm px-2 py-0.5 rounded-full" style={{ background: 'hsla(0,0%,100%,0.05)' }}>
                        Origin: {item.originBranch}
@@ -116,7 +134,7 @@ export default function ConflictsPage() {
                   
                   {item.filePath && <code className="text-sm text-muted mb-4 block">File: {item.filePath}</code>}
 
-                  {(item as any)._renderType === 'memory' ? (
+                  {(item as ConflictItem & { _renderType?: string })._renderType === 'memory' ? (
                     <p className="text-lg mt-2 font-medium" style={{ whiteSpace: 'pre-wrap' }}>{item.content}</p>
                   ) : (
                     <div className="mt-2">
@@ -147,7 +165,7 @@ export default function ConflictsPage() {
                                 setSynthesizeTarget(null);
                             } else if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
                                 if (synthText.trim() && processingId !== item.id) {
-                                    handleAction(item.id, (item as any)._renderType, 'synthesize', synthText);
+                                    handleAction(item.id, (item as ConflictItem & { _renderType?: string })._renderType || '', 'synthesize', synthText);
                                 }
                             }
                         }}
@@ -155,7 +173,7 @@ export default function ConflictsPage() {
                     <div className="flex gap-2">
                          <button
                             className="btn btn-primary"
-                            onClick={() => handleAction(item.id, (item as any)._renderType, 'synthesize', synthText)}
+                            onClick={() => handleAction(item.id, (item as ConflictItem & { _renderType?: string })._renderType || '', 'synthesize', synthText)}
                             disabled={processingId === item.id || !synthText.trim()}
                             aria-busy={processingId === item.id}
                             title={!synthText.trim() ? "Please enter text to synthesize" : "Save & Assimilate (Cmd/Ctrl + Enter)"}
@@ -173,14 +191,14 @@ export default function ConflictsPage() {
                 <div className="conflict-actions">
                     <button 
                         className="btn btn-primary" 
-                        onClick={() => handleAction(item.id, (item as any)._renderType, 'assimilate')}
+                        onClick={() => handleAction(item.id, (item as ConflictItem & { _renderType?: string })._renderType || '', 'assimilate')}
                         disabled={processingId === item.id}
                         aria-busy={processingId === item.id}
                     >
                         {processingId === item.id ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />} Keep & Assimilate
                     </button>
                     
-                    {(item as any)._renderType === 'memory' && (
+                    {(item as ConflictItem & { _renderType?: string })._renderType === 'memory' && (
                         <button 
                             className="btn" 
                             onClick={() => {
@@ -196,7 +214,7 @@ export default function ConflictsPage() {
                         className="btn btn-danger"
                         onClick={() => {
                             if (window.confirm("Are you sure you want to discard this context? This action cannot be undone.")) {
-                                handleAction(item.id, (item as any)._renderType, 'discard');
+                                handleAction(item.id, (item as ConflictItem & { _renderType?: string })._renderType || '', 'discard');
                             }
                         }}
                         disabled={processingId === item.id}
