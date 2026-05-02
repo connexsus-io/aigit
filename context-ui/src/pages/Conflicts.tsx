@@ -71,27 +71,40 @@ export default function ConflictsPage() {
 
   return (
     <div className="animate-fade-in">
-      <header className="glass-header">
+      <header className="glass-header flex justify-between items-center" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h2>Unassimilated Context Inbox</h2>
           <p className="text-muted">Review logic from merged feature branches before enforcing it into the mainline history.</p>
         </div>
+        <button
+          className="btn btn-primary"
+          onClick={fetchConflicts}
+          disabled={loading || processingId !== null}
+          aria-busy={loading}
+        >
+          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> {loading ? 'Scanning...' : 'Refresh Inbox'}
+        </button>
       </header>
 
-      {loading && <div className="text-muted p-4">Scanning semantic intersections...</div>}
+      {loading && (
+        <div className="glass-card flex items-center justify-center mt-8 text-muted" style={{ padding: '2rem' }} role="status" aria-live="polite">
+          <Loader2 className="animate-spin" size={24} style={{ marginRight: '0.5rem' }} /> Scanning semantic intersections...
+        </div>
+      )}
 
       {!loading && items.length === 0 && (
-        <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center' }}>
+        <div className="glass-card mt-8" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center' }}>
           <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(150, 70%, 45%, 0.1)' }}>
             <GitMerge size={48} color="var(--success)" />
           </div>
           <h3>Ledger is clean</h3>
           <p className="text-muted mt-2 mb-4">All semantic memories and decisions have been assimilated into the current branch.</p>
           <button
-            className="btn"
+            className="btn btn-primary"
             onClick={fetchConflicts}
+            aria-label="Re-scan for semantic intersections"
           >
-            <RefreshCw size={16} /> Check Again
+            <RefreshCw size={16} /> Re-scan Ledger
           </button>
         </div>
       )}
