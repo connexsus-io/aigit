@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 import { Activity, Brain, Database, CheckCircle2, AlertCircle, RefreshCw, Loader2 } from 'lucide-react';
@@ -14,6 +14,56 @@ interface StatsData {
 }
 
 const COLORS = ['var(--brand-primary)', 'var(--brand-secondary)', 'var(--success)', 'var(--warning)'];
+
+function ChartEmptyState({
+  icon,
+  title,
+  description,
+  isRefreshing,
+  onRefresh
+}: {
+  icon: ReactNode;
+  title: string;
+  description: string;
+  isRefreshing: boolean;
+  onRefresh: () => void;
+}) {
+  return (
+    <div
+      className="text-muted"
+      role="status"
+      aria-live="polite"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '1.5rem',
+        textAlign: 'center',
+        borderRadius: '8px',
+        background: 'hsla(0, 0%, 100%, 0.02)'
+      }}
+    >
+      <div className="p-3 rounded-full mb-4" style={{ background: 'hsla(0, 0%, 100%, 0.05)' }} aria-hidden="true">
+        {icon}
+      </div>
+      <h4 className="text-lg mb-2">{title}</h4>
+      <p className="text-muted mb-4 text-sm">{description}</p>
+      <button
+        className="btn btn-primary"
+        onClick={onRefresh}
+        disabled={isRefreshing}
+        aria-busy={isRefreshing}
+        aria-label="Refresh dashboard data"
+        style={{ padding: '0.45rem 0.8rem' }}
+      >
+        <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
+        {isRefreshing ? 'Refreshing...' : 'Refresh Data'}
+      </button>
+    </div>
+  );
+}
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<StatsData | null>(null);
@@ -147,9 +197,13 @@ export default function DashboardPage() {
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-                <div className="text-muted" style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-                    No agent memories tracked yet.
-                </div>
+              <ChartEmptyState
+                icon={<Database size={28} color="var(--brand-primary)" />}
+                title="No agent memories tracked yet."
+                description="Memories will appear here once agents begin adding context."
+                isRefreshing={isRefreshing}
+                onRefresh={() => fetchStats(true)}
+              />
             )}
           </div>
         </div>
@@ -175,9 +229,13 @@ export default function DashboardPage() {
                 </BarChart>
               </ResponsiveContainer>
              ) : (
-              <div className="text-muted" style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-                   No agent decisions tracked yet.
-               </div>
+              <ChartEmptyState
+                icon={<Brain size={28} color="var(--brand-secondary)" />}
+                title="No agent decisions tracked yet."
+                description="Architectural decisions will appear here once recorded."
+                isRefreshing={isRefreshing}
+                onRefresh={() => fetchStats(true)}
+              />
              )}
           </div>
         </div>
