@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Search as SearchIcon, SearchX, Cpu, Fingerprint, FileCode2, Loader2, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AIGIT_UI_TOKEN, API_BASE_URL } from '../config';
@@ -18,6 +18,20 @@ export default function SearchPage() {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Focus search input when '/' is pressed, but don't type the '/'
+      if (e.key === '/' && document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +64,7 @@ export default function SearchPage() {
           <div className="relative" style={{ flex: 1, position: 'relative' }}>
             <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={20} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input 
+              ref={inputRef}
               aria-label="Search query"
               type="text" 
               value={query}
@@ -58,6 +73,23 @@ export default function SearchPage() {
               className="w-full bg-black/20 border border-white/10 rounded-lg py-3 pl-12 pr-10 text-white focus:outline-none focus:border-brand-primary"
               style={{ width: '100%', padding: '0.75rem 2.5rem 0.75rem 3rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-dim)', borderRadius: '8px', color: '#fff', fontSize: '1rem' }}
             />
+            {query.length === 0 && (
+              <div
+                className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center text-muted"
+                style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
+                aria-hidden="true"
+              >
+                <kbd style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: '0.75rem',
+                  padding: '0.125rem 0.375rem',
+                  borderRadius: '4px',
+                  background: 'hsla(0,0%,100%,0.1)',
+                  border: '1px solid var(--border-dim)',
+                  color: 'var(--text-muted)'
+                }}>/</kbd>
+              </div>
+            )}
             {query.length > 0 && (
               <button
                 type="button"
