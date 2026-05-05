@@ -1,6 +1,6 @@
 import path from 'path';
 import { prisma } from '../db';
-import { resolveSymbolAtLine, extractAllSymbols } from '../ast/resolver';
+import { resolveSymbolAtLine, extractAllSymbols, findSymbolForLine } from '../ast/resolver';
 import { semanticSearch } from '../rag/search';
 
 /** Parsed test failure extracted from test runner output */
@@ -121,6 +121,11 @@ export function extractFailedSymbols(
     const symbols: { name: string; type: string; file: string }[] = [];
     const seen = new Set<string>();
 
+    // ⚡ Bolt Performance Optimization:
+    // Cache parsed symbols per file to avoid O(N) redundant AST parsing.
+    // Explicitly cache errors to preserve failure parity exactly.
+    const fileSymbolsCache = new Map<string, { symbols?: any[], error?: any }>();
+
     for (const failure of failures) {
         if (!failure.filePath || !failure.lineNumber) continue;
 
@@ -128,18 +133,30 @@ export function extractFailedSymbols(
             ? failure.filePath
             : path.join(workspacePath, failure.filePath);
 
-        try {
-            const resolved = resolveSymbolAtLine(fullPath, failure.lineNumber);
-            if (resolved && !seen.has(resolved.qualifiedName)) {
-                seen.add(resolved.qualifiedName);
-                symbols.push({
-                    name: resolved.qualifiedName,
-                    type: resolved.type,
-                    file: failure.filePath,
-                });
+        let cached = fileSymbolsCache.get(fullPath);
+        if (!cached) {
+            try {
+                const parsed = extractAllSymbols(fullPath);
+                cached = { symbols: parsed };
+                fileSymbolsCache.set(fullPath, cached);
+            } catch (error: any) {
+                cached = { error };
+                fileSymbolsCache.set(fullPath, cached);
             }
-        } catch {
-            // File might not be parseable, skip
+        }
+
+        if (cached.error || !cached.symbols) {
+            continue; // File might not be parseable, skip
+        }
+
+        const resolved = findSymbolForLine(cached.symbols as any, failure.lineNumber);
+        if (resolved && !seen.has(resolved.qualifiedName)) {
+            seen.add(resolved.qualifiedName);
+            symbols.push({
+                name: resolved.qualifiedName,
+                type: resolved.type,
+                file: failure.filePath,
+            });
         }
     }
 

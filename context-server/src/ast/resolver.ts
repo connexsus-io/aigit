@@ -159,7 +159,7 @@ export async function anchorFileToSymbols(filePath: string, workspacePath: strin
     return { anchored, total };
 }
 
-function findSymbolForLine(symbols: CodeSymbol[], line: number): CodeSymbol | null {
+export function findSymbolForLine(symbols: CodeSymbol[], line: number): CodeSymbol | null {
     let best: CodeSymbol | null = null;
     let bestSpan = Infinity;
 
