@@ -5,6 +5,19 @@
 
 ---
 
+<!-- AIGIT:START -->
+## Aigit Memory Workflow
+
+1. At session start, run `aigit load` then `aigit hydrate`.
+2. For complex work, create or use `.aigit/tasks/<slug>.md`.
+3. Save durable reasoning with `aigit commit memory "..."`.
+4. Before commit, run `aigit repair ledger` and `npm run check:ledger` when available.
+5. Use `aigit hydrate --full-rules` only for setup/debugging.
+6. Do not manually edit or delete `.aigit/ledger.json`.
+<!-- AIGIT:END -->
+
+---
+
 ## CRITICAL: AGENT & SKILL PROTOCOL (START HERE)
 
 > **MANDATORY:** You MUST read the appropriate agent file and its skills BEFORE performing any implementation. This is the highest priority rule.

@@ -13,25 +13,24 @@ export function SEO({
     description,
     canonicalUrl = 'https://aigit.io',
     type = 'website',
-    image = 'https://aigit.io/favicon.svg' // Using favicon as fallback since no explicit OG image provided
+    image = 'https://aigit.io/favicon.svg'
 }: SEOProps) {
-    const fullTitle = `${title} | aigit - The AI Context Engine`;
+    const fullTitle = title === 'Home'
+        ? 'aigit - Git-native memory for AI coding agents'
+        : `${title} | aigit`;
 
     return (
         <Helmet>
-            {/* Standard Metadata */}
             <title>{fullTitle}</title>
             <meta name="description" content={description} />
             <link rel="canonical" href={canonicalUrl} />
 
-            {/* Open Graph / Facebook */}
             <meta property="og:type" content={type} />
             <meta property="og:url" content={canonicalUrl} />
             <meta property="og:title" content={fullTitle} />
             <meta property="og:description" content={description} />
             <meta property="og:image" content={image} />
 
-            {/* Twitter */}
             <meta name="twitter:card" content="summary_large_image" />
             <meta name="twitter:url" content={canonicalUrl} />
             <meta name="twitter:title" content={fullTitle} />

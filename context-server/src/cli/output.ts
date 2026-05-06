@@ -80,29 +80,28 @@ export function spinner(text: string): Ora {
 // ── Random command tips ────────────────────────────────────────
 
 const TIPS_BY_COMMAND: Record<string, string[]> = {
-    'commit memory':   ['Try `aigit query` to search what you just saved.', 'Run `aigit docs` to regenerate ARCHITECTURE.md.'],
-    'commit decision': ['Use `aigit query` to find this decision later.', 'Run `aigit docs` to see it in your architecture graph.'],
+    'commit memory':   ['Try `aigit query` to search what you just saved.', 'Run `aigit repair ledger` before handing off work.'],
+    'commit decision': ['Use `aigit query` to find this decision later.', 'Run `aigit repair ledger` before handing off work.'],
     'commit task':     ['Fill in .aigit/tasks/{slug}.md with your sub-tasks.', 'Run `aigit handoff <slug>` to pass context to Agent B.'],
-    'commit auto':     ['Run `aigit sync` to push your memory to ARCHITECTURE.md.'],
-    'update task':     ['Run `aigit handoff <slug>` to hand off to the next agent.', 'Run `aigit docs` to see task status in ARCHITECTURE.md.'],
+    'commit auto':     ['Use `aigit commit memory "..."` for durable reasoning when possible.'],
+    'update task':     ['Run `aigit handoff <slug>` to hand off to the next agent.', 'Run `aigit repair ledger` before committing task updates.'],
     'handoff':         ['Agent B should call `get_active_task_state` via MCP first.', 'Paste the block above into Agent B\'s first message.'],
-    'init':            ['Next: add the MCP config to Claude Desktop or Cursor.', 'Try `aigit commit task "My First Feature"` to start tracking work.'],
-    'query':           ['Use `aigit docs` to see the full memory graph.', 'Try `aigit commit memory` to add more context.'],
-    'sync':            ['Run `aigit docs` to regenerate ARCHITECTURE.md after syncing.'],
-    'heal':            ['Run `aigit sync` after healing to propagate fixes.'],
-    'docs':            ['Open ARCHITECTURE.md to review your semantic graph.', 'Share with team via git — everyone gets up-to-date architecture docs.'],
+    'init':            ['Next: add the core MCP config to your agent tool.', 'Try `aigit commit task "My First Feature"` to start tracking work.'],
+    'doctor':          ['Run `aigit doctor --fix` to apply safe adoption fixes.', 'Use `aigit repair ledger --prune-noise` only when you explicitly want cleanup.'],
+    'query':           ['Use `aigit commit memory` to add more searchable context.', 'Run `aigit hydrate` at session start to reuse saved memory.'],
+    'sync':            ['Use `aigit advanced` to review secondary tool-sync commands.'],
+    'docs':            ['Generated docs are secondary; keep durable reasoning in `aigit commit memory` first.'],
     'status':          ['Use `aigit handoff <slug>` to generate a context block for any active task.'],
-    'conflicts':       ['Run `aigit sync` to resolve and propagate after fixing conflicts.'],
+    'conflicts':       ['Run `aigit advanced` to review secondary rule-sync commands.'],
 };
 
 const GLOBAL_TIPS: string[] = [
-    'Run `aigit --help` to see all available commands.',
+    'Run `aigit --help` to see the default memory workflow commands.',
     'Use `aigit query "<question>"` to search your semantic memory.',
     'Use `aigit handoff <slug>` to generate an agent context block for any task.',
-    'Run `aigit docs` to regenerate ARCHITECTURE.md from all memories.',
     'Use `aigit commit memory "..."` to save any architectural insight.',
     'Try `aigit status` to see all active tasks on this branch.',
-    'Use `aigit mcp --profile core` to expose only core tools to your agent.',
+    'Use `aigit mcp --profile all` only when you need advanced tools.',
     'Run `aigit init` in a new project to set up semantic memory in seconds.',
 ];
 
@@ -115,4 +114,3 @@ export function showTip(commandName?: string): void {
     const tip = pool[Math.floor(Math.random() * pool.length)];
     console.log(`\n${c.muted('💡 Tip:')} ${c.muted(tip)}`);
 }
-

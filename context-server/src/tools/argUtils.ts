@@ -53,6 +53,7 @@ export const CommitTaskArgs = z.object({
 export const GetHydratedContextArgs = z.object({
     workspacePath,
     activeFile: optionalPath,
+    fullRules: z.boolean().optional(),
 });
 
 export const TakeNoteArgs = z.object({
@@ -109,6 +110,7 @@ export const ListSymbolsArgs = z.object({
 
 export const RevertContextArgs = z.object({
     id: nonEmpty,
+    workspacePath: workspacePath.optional(),
 });
 
 export const CheckConflictsArgs = z.object({
@@ -121,6 +123,7 @@ export const MergeContextArgs = z.object({
     projectId: uuid,
     sourceBranch: nonEmpty,
     targetBranch: nonEmpty,
+    workspacePath: workspacePath.optional(),
 });
 
 export const ScanAgentsArgs = z.object({

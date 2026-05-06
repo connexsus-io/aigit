@@ -1,46 +1,122 @@
-import { useState } from 'react'
-import './App.css'
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
+import { useState } from 'react';
+import './App.css';
+import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import {
-    BrainCircuit,
-    GitMerge,
-    RefreshCcw,
-    Database,
-    Network,
-    Code,
-    Stethoscope,
-    ShieldAlert,
-    Search,
-    FileText
-} from 'lucide-react'
-import { Navbar } from './Navbar'
-import { TerminalSimulator } from './TerminalSimulator'
-import { InteractiveDemo } from './InteractiveDemo'
-import { HowToUse } from './HowToUse'
-import { DocsPage } from './DocsPage'
-import { SEO } from './SEO'
+    ArrowRight,
+    Clipboard,
+    ClipboardCheck,
+    FileText,
+    GitBranch,
+    Network
+} from 'lucide-react';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
+import { Navbar } from './Navbar';
+import { InteractiveDemo } from './InteractiveDemo';
+import { DocsPage } from './DocsPage';
+import { FeedbackPage } from './FeedbackPage';
+import NotFoundPage from './NotFoundPage';
+import { SEO } from './SEO';
+
+const workflow = [
+    {
+        step: '01',
+        label: 'Hydrate',
+        command: 'aigit hydrate',
+        detail: 'The agent starts with branch-aware memory instead of an empty chat.'
+    },
+    {
+        step: '02',
+        label: 'Commit memory',
+        command: 'aigit commit memory "Auth uses signed cookies because API sessions must survive deploys."',
+        detail: 'The reason becomes a durable ledger record while it is still fresh.'
+    },
+    {
+        step: '03',
+        label: 'Query later',
+        command: 'aigit query "Why signed cookies?"',
+        detail: 'The next agent retrieves the decision before changing the code.'
+    }
+];
+
+const capabilities = [
+    {
+        icon: FileText,
+        title: 'Reasoning survives the chat',
+        text: 'Aigit records why the code is shaped this way, not just which files changed.'
+    },
+    {
+        icon: GitBranch,
+        title: 'Branch memory stays reviewable',
+        text: '.aigit/ledger.json travels with Git, so durable context has a visible diff.'
+    },
+    {
+        icon: Network,
+        title: 'Agents can use it directly',
+        text: 'The core MCP profile exposes hydrate, query, task, and memory tools.'
+    }
+];
 
 function CopyableCommand({ command }: { command: string }) {
     const [copied, setCopied] = useState(false);
 
-    const handleCopy = () => {
-        navigator.clipboard.writeText(command);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+    const handleCopy = async () => {
+        try {
+            await navigator.clipboard.writeText(command);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch {
+            setCopied(false);
+        }
     };
 
     return (
-        <div className="hero-install-box" onClick={handleCopy} title="Copy to clipboard">
-            <code className="hero-install-cmd">{command}</code>
-            <button className={`copy-btn ${copied ? 'copied' : ''}`} aria-label="Copy to clipboard">
-                {copied ? (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                ) : (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                )}
-            </button>
+        <button className="copy-command" onClick={handleCopy} type="button">
+            <code>{command}</code>
+            {copied ? <ClipboardCheck size={18} /> : <Clipboard size={18} />}
+            <span className="sr-only" aria-live="polite">{copied ? 'Copied install command' : 'Copy install command'}</span>
+        </button>
+    );
+}
+
+function LedgerSpineScene() {
+    return (
+        <div className="ledger-spine-scene" aria-hidden="true">
+            <div className="recorder-halo" />
+            <div className="recorder-shell">
+                <div className="recorder-topbar">
+                    <span>AIGIT FLIGHT RECORDER</span>
+                    <code>.aigit/ledger.json</code>
+                </div>
+                <div className="recorder-screen">
+                    <div className="recorder-scanline" />
+                    <div className="recorder-track">
+                        <span className="track-node active" />
+                        <span className="track-node" />
+                        <span className="track-node" />
+                    </div>
+                    <div className="recorder-row incoming">
+                        <span>agent asks</span>
+                        <strong>Why is auth built this way?</strong>
+                        <p>The question usually dies with the chat window.</p>
+                    </div>
+                    <div className="recorder-row memory">
+                        <span>memory locked</span>
+                        <strong>Signed cookies survive deploys.</strong>
+                        <p>Saved as branch context in Git.</p>
+                    </div>
+                    <div className="recorder-row query">
+                        <span>$ aigit query "why auth?"</span>
+                        <strong>1 memory found</strong>
+                    </div>
+                </div>
+                <div className="recorder-footer">
+                    <span>branch: feature/auth-refresh</span>
+                    <span>status: durable</span>
+                </div>
+            </div>
         </div>
-    )
+    );
 }
 
 function LandingPage() {
@@ -48,135 +124,99 @@ function LandingPage() {
         <main>
             <SEO
                 title="Home"
-                description="aigit effortless aligns your local codebase with AI models, enabling automated context synchronization, intelligent multi-agent orchestration, and native LLM workflows directly from the terminal."
+                description="Aigit stores project reasoning in a Git-tracked memory ledger so AI coding agents can pick up the thread."
             />
-            <header className="hero-section">
+
+            <section className="hero-section">
                 <div className="hero-content">
-                    <h1 className="hero-title">aigit</h1>
-                    <div className="hero-split">
-                        <div className="hero-text-column">
-                            <div className="hero-subtitle-box">
-                                <p className="hero-subtitle">
-                                    The AI Context Engine for Version-Controlled Semantic Memory. <br />
-                                    Stop typing the same prompts. Hook your <span className="hero-primary-accent">AI brain</span> directly into your Git workflow.
-                                </p>
-                            </div>
-                            <CopyableCommand command="npm install -g aigit-core" />
-                        </div>
-                        <div className="hero-visual-column">
-                            <TerminalSimulator />
-                        </div>
+                    <p className="eyebrow">Git-native memory for AI coding agents</p>
+                    <h1>aigit</h1>
+                    <p className="hero-pain">Your AI agent forgets why the code works.</p>
+                    <p className="hero-subtitle">
+                        Aigit stores the reason in Git so the next agent can pick up the thread.
+                    </p>
+                    <div className="hero-actions">
+                        <CopyableCommand command="npm install -g aigit-core" />
+                        <a href="#workflow" className="secondary-link">
+                            See the workflow
+                            <ArrowRight size={18} />
+                        </a>
                     </div>
                 </div>
-            </header>
+                <LedgerSpineScene />
+            </section>
+
+            <section className="workflow-section" id="workflow" aria-labelledby="workflow-heading">
+                <div className="section-heading-row">
+                    <div>
+                        <p className="section-kicker">Three-command loop</p>
+                        <h2 id="workflow-heading">Hydrate. Remember. Query.</h2>
+                    </div>
+                    <p>
+                        Aigit is deliberately narrow: one small loop that keeps durable
+                        reasoning inside the repo.
+                    </p>
+                </div>
+                <div className="workflow-rail">
+                    {workflow.map((item) => (
+                        <article className="workflow-item" key={item.step}>
+                            <span>{item.step}</span>
+                            <div>
+                                <h3>{item.label}</h3>
+                                <code>{item.command}</code>
+                                <p>{item.detail}</p>
+                            </div>
+                        </article>
+                    ))}
+                </div>
+            </section>
 
             <InteractiveDemo />
 
-            <HowToUse />
-
-            <section className="features-section">
-                <div className="section-header">
-                    <h2>SYS.CAPABILITIES</h2>
-                    <div className="section-divider"></div>
+            <section className="features-section" aria-labelledby="features-heading">
+                <div className="section-heading-row">
+                    <div>
+                        <p className="section-kicker">Proof points</p>
+                        <h2 id="features-heading">A small memory layer with hard edges.</h2>
+                    </div>
+                    <p>
+                        Aigit keeps durable reasoning in files your repo can review,
+                        branch, and hand to MCP-connected agents.
+                    </p>
                 </div>
+                <div className="proof-strips">
+                    {capabilities.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                            <article className="proof-strip" key={item.title}>
+                                <Icon size={22} />
+                                <h3>{item.title}</h3>
+                                <p>{item.text}</p>
+                            </article>
+                        );
+                    })}
+                </div>
+            </section>
 
-                <div className="features-grid">
-                    <div className="feature-card">
-                        <div className="feature-icon"><BrainCircuit size={40} strokeWidth={1.5} /></div>
-                        <h3>Branch-Aware Memory</h3>
-                        <p>
-                            Your agent's brain shifts automatically when you switch branches.
-                            No more polluting the trunk context with exploratory feature-work.
-                        </p>
-                    </div>
-                    <div className="feature-card">
-                        <div className="feature-icon"><GitMerge size={40} strokeWidth={1.5} /></div>
-                        <h3>Semantic Conflict Checking</h3>
-                        <p>
-                            Merging code? <code>aigit</code> detects conflicting architectural decisions
-                            between branches before you merge, keeping your AI aligned.
-                        </p>
-                    </div>
-                    <div className="feature-card">
-                        <div className="feature-icon"><RefreshCcw size={40} strokeWidth={1.5} /></div>
-                        <h3>Universal Agent Sync</h3>
-                        <p>
-                            Switch between Gemini, Claude, Cursor, Windsurf freely.
-                            <code>aigit sync</code> keeps rules, memory, and skills in sync across all tools.
-                        </p>
-                    </div>
-                    <div className="feature-card">
-                        <div className="feature-icon"><Database size={40} strokeWidth={1.5} /></div>
-                        <h3>Zero-Config Embedded Engine</h3>
-                        <p>
-                            Powered by an embedded, WASM-compiled Vector Database (PGlite).
-                            No Docker, no external services. Everything stays local in your repo.
-                        </p>
-                    </div>
-                    <div className="feature-card">
-                        <div className="feature-icon"><Network size={40} strokeWidth={1.5} /></div>
-                        <h3>Multi-Agent Swarm</h3>
-                        <p>
-                            Orchestrate multiple AI agents in a single task. <code>aigit swarm</code> creates
-                            a shared session where agents communicate, take turns, and resolve conflicts automatically.
-                        </p>
-                    </div>
-                    <div className="feature-card">
-                        <div className="feature-icon"><Code size={40} strokeWidth={1.5} /></div>
-                        <h3>AST-Anchored RAG</h3>
-                        <p>
-                            Decisions are physically linked to code symbols via AST parsing.
-                            <code>aigit query</code> finds relevant context instantly — even across time.
-                        </p>
-                    </div>
-                    <div className="feature-card">
-                        <div className="feature-icon"><Stethoscope size={40} strokeWidth={1.5} /></div>
-                        <h3>Self-Healing Codebases</h3>
-                        <p>
-                            Shift from assist to maintain. <code>aigit heal</code> intercepts failing tests,
-                            diagnoses the root cause, and auto-commits fixes to keep your codebase green.
-                        </p>
-                    </div>
-                    <div className="feature-card">
-                        <div className="feature-icon"><ShieldAlert size={40} strokeWidth={1.5} /></div>
-                        <h3>Autonomous Dependency Updates</h3>
-                        <p>
-                            Secure your supply chain automatically. <code>aigit deps</code> audits vulnerabilities,
-                            understands semantic memory, and automatically branches + fixes issues.
-                        </p>
-                    </div>
-                    <div className="feature-card">
-                        <div className="feature-icon"><Search size={40} strokeWidth={1.5} /></div>
-                        <h3>Semantic Security Auditing</h3>
-                        <p>
-                            Actively audit memory for vulnerabilities. <code>security-auditor</code> automatically flags
-                            prompt injections and redacts PII before it hits the context ledger.
-                        </p>
-                    </div>
-                    <div className="feature-card">
-                        <div className="feature-icon"><FileText size={40} strokeWidth={1.5} /></div>
-                        <h3>Auto-Generating Documentation</h3>
-                        <p>
-                            Nobody should write <code>ARCHITECTURE.md</code> manually again. <code>aigit docs</code> generates a holistic overview and Semantic DAG from context memory.
-                        </p>
-                    </div>
+            <section className="final-cta" aria-labelledby="final-cta-heading">
+                <p className="section-kicker">Start with one memory</p>
+                <h2 id="final-cta-heading">Install it before the next session forgets.</h2>
+                <div className="final-cta-actions">
+                    <CopyableCommand command="npm install -g aigit-core" />
+                    <Link to="/docs" className="secondary-link">
+                        Read the field manual
+                        <ArrowRight size={18} />
+                    </Link>
                 </div>
             </section>
 
             <footer className="footer-section">
-                <div className="footer-content">
-                    <p>aigit // The Context OS</p>
-                    <Link to="/feedback" className="footer-link">Send Feedback</Link>
-                </div>
+                <p>aigit - Git-native memory for AI coding agents.</p>
+                <Link to="/feedback">Send feedback</Link>
             </footer>
         </main>
-    )
+    );
 }
-
-import { FeedbackPage } from './FeedbackPage'
-import NotFoundPage from './NotFoundPage'
-import { Analytics } from '@vercel/analytics/react'
-import { SpeedInsights } from '@vercel/speed-insights/react'
 
 function App() {
     return (
@@ -193,7 +233,7 @@ function App() {
                 <SpeedInsights />
             </div>
         </BrowserRouter>
-    )
+    );
 }
 
-export default App
+export default App;

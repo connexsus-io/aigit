@@ -8,10 +8,12 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { compileHydratedContext } from './cli/hydration';
 import { getActiveBranch } from './cli/git';
-import { prisma, initializeDatabase } from './db';
+import { prisma, initializeDatabase, getDatabaseWorkspaceRoot } from './db';
+import { createTaskPlanFile } from './cli/taskFiles';
 import { resolveSymbolAtLine, extractAllSymbols, findLinkedContext, anchorFileToSymbols } from './ast/resolver';
 import { semanticSearch } from './rag/search';
 import { embedText } from './rag/embeddings';
+import { persistWorkspaceLedger } from './tools/persistence';
 import { queryHistoricalContext } from './rag/timeTravel';
 import { createSwarm, registerAgent, unregisterAgent, publishMessage, pollMessages, updateAgentStatus, getSwarmStatus } from './swarm/swarm';
 import { reportConflict, resolveConflict } from './swarm/conflict';
@@ -75,7 +77,7 @@ const ACTIVE_TOOLS = filterByProfile(TOOL_SCHEMAS, ACTIVE_PROFILE);
 
 const server = new Server(
     {
-        name: 'ai-context-protocol-engine',
+        name: 'aigit-memory-server',
         version: '1.0.0',
     },
     {
@@ -94,6 +96,10 @@ function validationError(toolName: string, error: string) {
         content: [{ type: 'text', text: `❌ [${toolName}] Invalid arguments: ${error}` }],
         isError: true,
     };
+}
+
+function resolveWriteWorkspace(workspacePath?: string): string {
+    return workspacePath ?? getDatabaseWorkspaceRoot();
 }
 
 // ── Tool routing ──────────────────────────────────────────────────────────────
@@ -153,6 +159,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 const emb = await embedText(embText);
                 const vectorStr = `[${emb.join(',')}]`;
                 await prisma.$executeRaw`UPDATE "Decision" SET embedding = ${vectorStr}::vector WHERE id = ${decision.id}`;
+                await persistWorkspaceLedger(resolveWriteWorkspace(workspacePath));
 
                 const anchor = symName ? ` [⚓ @${symName}]` : (filePath ? ` [📎 ${filePath}]` : '');
                 return { content: [{ type: 'text', text: `Decision recorded correctly.${anchor} ID: ${decision.id}` }] };
@@ -167,6 +174,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 const task = await prisma.task.create({
                     data: { projectId, slug, title, gitBranch: branch, status: 'PLANNING' }
                 });
+                const writeWorkspace = resolveWriteWorkspace(workspacePath);
+                createTaskPlanFile(writeWorkspace, {
+                    id: task.id,
+                    title,
+                    slug,
+                    gitBranch: branch,
+                    status: 'PLANNING',
+                });
+                await persistWorkspaceLedger(writeWorkspace);
                 return { content: [{ type: 'text', text: `Task Context successfully created on branch [${branch}]. ID: ${task.id} (Slug: ${task.slug}.md)` }] };
             }
 
@@ -175,8 +191,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 if (!v.ok) return validationError(tool, v.error);
                 const { projectId, workspacePath, message, scope, isDecision, issueRef, agentName } = v.data;
                 const branch = getActiveBranch(workspacePath);
-                const { dumpContextLedger } = await import('./cli/sync');
-
                 const memory = await prisma.memory.create({
                     data: {
                         projectId, gitBranch: branch, originBranch: branch,
@@ -192,7 +206,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 const vectorStr = `[${emb.join(',')}]`;
                 await prisma.$executeRaw`UPDATE "Memory" SET embedding = ${vectorStr}::vector WHERE id = ${memory.id}`;
 
-                await dumpContextLedger(workspacePath);
+                await persistWorkspaceLedger(workspacePath);
 
                 const issueTag = memory.issueRef ? ` 🔗 ${memory.issueRef}` : '';
                 return { content: [{ type: 'text', text: `✅ [aigit note] Context captured on branch [${branch}].${issueTag} ID: ${memory.id}` }] };
@@ -218,6 +232,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 const emb = await embedText(content);
                 const vectorStr = `[${emb.join(',')}]`;
                 await prisma.$executeRaw`UPDATE "Memory" SET embedding = ${vectorStr}::vector WHERE id = ${memory.id}`;
+                await persistWorkspaceLedger(workspacePath);
 
                 const anchor = symName ? ` [⚓ @${symName}]` : (filePath ? ` [📎 ${filePath}]` : '');
                 return { content: [{ type: 'text', text: `✅ Context committed to branch [${branch}].${anchor} ID: ${memory.id}` }] };
@@ -226,7 +241,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             case 'get_hydrated_context': {
                 const v = parseArgs(GetHydratedContextArgs, raw);
                 if (!v.ok) return validationError(tool, v.error);
-                const contextPayload = await compileHydratedContext(v.data.workspacePath, v.data.activeFile);
+                const contextPayload = await compileHydratedContext(v.data.workspacePath, v.data.activeFile, {
+                    fullRules: v.data.fullRules,
+                });
                 return { content: [{ type: 'text', text: contextPayload }] };
             }
 
@@ -335,12 +352,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 const memory = await prisma.memory.findUnique({ where: { id: targetId } });
                 if (memory) {
                     await prisma.memory.delete({ where: { id: targetId } });
+                    await persistWorkspaceLedger(resolveWriteWorkspace(v.data.workspacePath));
                     return { content: [{ type: 'text', text: `✅ Memory deleted. ID: ${targetId}` }] };
                 }
 
                 const decision = await prisma.decision.findUnique({ where: { id: targetId } });
                 if (decision) {
                     await prisma.decision.delete({ where: { id: targetId } });
+                    await persistWorkspaceLedger(resolveWriteWorkspace(v.data.workspacePath));
                     return { content: [{ type: 'text', text: `✅ Decision reverted. ID: ${targetId}` }] };
                 }
 
@@ -348,6 +367,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 if (task) {
                     await prisma.decision.deleteMany({ where: { taskId: targetId } });
                     await prisma.task.delete({ where: { id: targetId } });
+                    await persistWorkspaceLedger(resolveWriteWorkspace(v.data.workspacePath));
                     return { content: [{ type: 'text', text: `✅ Task and its decisions deleted. ID: ${targetId}` }] };
                 }
 
@@ -441,7 +461,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             case 'merge_context': {
                 const v = parseArgs(MergeContextArgs, raw);
                 if (!v.ok) return validationError(tool, v.error);
-                const { projectId, sourceBranch: src, targetBranch: tgt } = v.data;
+                const { projectId, sourceBranch: src, targetBranch: tgt, workspacePath } = v.data;
 
                 const [memories, decisions, tasks, targetMemories, targetTasks] = await Promise.all([
                     prisma.memory.findMany({ where: { projectId, gitBranch: src } }),
@@ -525,6 +545,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 }
 
 
+
+                await persistWorkspaceLedger(resolveWriteWorkspace(workspacePath));
 
                 return {
                     content: [{ type: 'text', text: `🔀 Merged ${ported} context entries from ${src} → ${tgt}.` }]
@@ -901,7 +923,7 @@ async function main() {
     const profileLabel = ACTIVE_PROFILE === 'all'
         ? `all ${ACTIVE_TOOLS.length} tools`
         : `${ACTIVE_PROFILE} profile (${ACTIVE_TOOLS.length} tools)`;
-    console.error(`[AI Context Protocol Engine] MCP Server running — ${profileLabel}.`);
+    console.error(`[aigit] MCP memory server running — ${profileLabel}.`);
 }
 
 main().catch(console.error);

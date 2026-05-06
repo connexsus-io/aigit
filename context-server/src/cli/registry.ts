@@ -19,6 +19,7 @@ import docsHandler from './commands/docs';
 import replayHandler from './commands/replay';
 import telemetryHandler from './commands/telemetry';
 import branchHandler from './commands/branch';
+import { formatAdvancedHelp } from './advancedHelp';
 
 export const COMMAND_REGISTRY: Record<string, CommandHandler> = {
     // Bootstrap
@@ -63,6 +64,9 @@ export const COMMAND_REGISTRY: Record<string, CommandHandler> = {
     deps: depsHandler,
 
     // Other
+    advanced: async () => {
+        console.log(formatAdvancedHelp());
+    },
     telemetry: telemetryHandler,
     mcp: async () => {
         // MCP server start is handled before registry dispatch in main cli/index.ts
@@ -70,52 +74,31 @@ export const COMMAND_REGISTRY: Record<string, CommandHandler> = {
 };
 
 export const GLOBAL_HELP = `
-aigit — The AI Context Engine for Git
+aigit — Git-native memory for AI coding agents
 
 Commands:
-  init                          Initialize aigit in current repo (hooks + .aigit/)
-  hydrate [file]                Compile branch-aware context prompt
+  init                          Initialize aigit in current repo
+  doctor                        Check adoption health and memory quality
+  hydrate [file]                Compile focused branch-aware context
   dump                          Serialize memory DB → .aigit/ledger.json
   load                          Reconstruct memory DB ← .aigit/ledger.json
   log                           Show semantic memory timeline
   status                        Show pending AI tasks
   revert <id>                   Remove a specific context entry
   check-conflicts [branch]      Check for semantic conflicts vs branch
-  merge <source> [target]       Port AI context between branches
   init-hook                     Install Git hooks only
-  anchor <file>                 Re-anchor existing memories to AST symbols
   query "<question>"            Semantic search across memory
-  query "<question>" --commit <hash>  Time-travel: search memory at a past commit
-  replay <path>                 Replay the chronological evolution of a file/module
-  docs [--out <path>]           Auto-generate ARCHITECTURE.md from memory ledger
+  handoff <slug>                Generate a task handoff block
+  repair ledger                 Repair and report ledger quality
+  mcp [directory]               Start the core MCP memory server
 
 Context:
   note "<message>"              Instantly capture a manual context note
   commit memory "<text>"        Commit a memory entry to current branch
   commit decision "<ctx>" "<chosen>"  Record an architectural decision
   commit task "<title>"         Create a tracked task
+  update task <slug> <status>   Update tracked task status
 
-Agent Sync:
-  scan                          Detect active AI tools in the workspace
-  sync [--dry-run] [--skills]   Bidirectional sync across all detected tools
-  sync --from <tool> --to <tool>  One-directional targeted sync
-  conflicts                     Show unresolved sync conflicts
-
-Swarm Orchestration:
-  swarm "<goal>"                Create a multi-agent swarm session
-  swarm status                  View swarm state (agents, turns, messages)
-  swarm halt <id>               Halt an active swarm
-  swarm resume <id>             Resume a halted swarm
-  swarm conflicts               List unresolved swarm conflicts
-  swarm resolve <id> <text>     Resolve a conflict
-  
-Self-Healing Codebases:
-  heal                          Run tests, diagnose failures, map AST context, propose fixes
-  heal --auto                   Auto-commit fixes derived from memory
-  heal status                   List test-failure healing history
-  deps                          Audit npm dependencies & correlate with past context
-  deps --auto                   Auto-branch and fix vulnerabilities
-  
 Other:
-  telemetry off                 Show instructions to disable anonymous usage tracking
+  advanced                      Show secondary advanced/experimental commands
 `;

@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { resolveProfile, filterByProfile, ProfileName } from './profiles';
+import { resolveMcpWorkspaceArg } from '../db';
 
 describe('profiles', () => {
     describe('resolveProfile', () => {
@@ -15,9 +16,9 @@ describe('profiles', () => {
             process.argv = originalArgv;
         });
 
-        it('should return "all" by default if --profile is not specified', () => {
+        it('should return "core" by default if --profile is not specified', () => {
             process.argv = ['node', 'script.js'];
-            expect(resolveProfile()).toBe('all');
+            expect(resolveProfile()).toBe('core');
         });
 
         it('should return the specified profile if it is valid (core)', () => {
@@ -35,13 +36,18 @@ describe('profiles', () => {
             expect(resolveProfile()).toBe('ops');
         });
 
-        it('should return "all" if --profile value is unrecognized', () => {
+        it('should return "core" if --profile value is unrecognized', () => {
             process.argv = ['node', 'script.js', '--profile', 'invalid_profile'];
-            expect(resolveProfile()).toBe('all');
+            expect(resolveProfile()).toBe('core');
         });
 
-        it('should return "all" if --profile is the last argument (no value provided)', () => {
+        it('should return "core" if --profile is the last argument (no value provided)', () => {
             process.argv = ['node', 'script.js', '--profile'];
+            expect(resolveProfile()).toBe('core');
+        });
+
+        it('should return all when explicitly requested', () => {
+            process.argv = ['node', 'script.js', '--profile', 'all'];
             expect(resolveProfile()).toBe('all');
         });
 
@@ -89,6 +95,17 @@ describe('profiles', () => {
             const onlyUnknown = [{ name: 'unknown_tool' }];
             const result = filterByProfile(onlyUnknown, 'core');
             expect(result).toHaveLength(0);
+        });
+    });
+
+    describe('resolveMcpWorkspaceArg', () => {
+        it('resolves the repo path before or after --profile flags', () => {
+            expect(resolveMcpWorkspaceArg(['mcp', '/repo', '--profile', 'all'], '/cwd')).toBe('/repo');
+            expect(resolveMcpWorkspaceArg(['mcp', '--profile', 'all', '/repo'], '/cwd')).toBe('/repo');
+        });
+
+        it('ignores option values when no repo path is provided', () => {
+            expect(resolveMcpWorkspaceArg(['mcp', '--profile', 'all'], '/cwd')).toBeNull();
         });
     });
 });

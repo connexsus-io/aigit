@@ -4,8 +4,9 @@ import type { CommandHandler } from './types';
 
 const handler: CommandHandler = async ({ args }) => {
     const workspacePath = findWorkspaceRoot(process.cwd());
-    const activeFile = args[0];
-    const context = await compileHydratedContext(workspacePath, activeFile);
+    const fullRules = args.includes('--full-rules');
+    const activeFile = args.find(arg => arg !== '--full-rules');
+    const context = await compileHydratedContext(workspacePath, activeFile, { fullRules });
     console.log(context);
 };
 

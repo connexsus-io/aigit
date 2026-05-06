@@ -19,7 +19,7 @@ const handler: CommandHandler = async ({ args, workspacePath }) => {
         const result = executeDepAutoHeal(workspacePath, plan.branchName);
         console.log(result.message);
     } else if (audit.fixableCount > 0) {
-        console.log('👉 Run `aigit deps --auto` to automatically branch and fix these vulnerabilities.');
+        console.log('Run `aigit advanced` to review secondary dependency maintenance commands.');
     }
 };
 
