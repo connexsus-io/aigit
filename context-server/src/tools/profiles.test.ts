@@ -15,9 +15,9 @@ describe('profiles', () => {
             process.argv = originalArgv;
         });
 
-        it('should return "all" by default if --profile is not specified', () => {
+        it('should return "core" by default if --profile is not specified', () => {
             process.argv = ['node', 'script.js'];
-            expect(resolveProfile()).toBe('all');
+            expect(resolveProfile()).toBe('core');
         });
 
         it('should return the specified profile if it is valid (core)', () => {
@@ -35,13 +35,18 @@ describe('profiles', () => {
             expect(resolveProfile()).toBe('ops');
         });
 
-        it('should return "all" if --profile value is unrecognized', () => {
+        it('should return "core" if --profile value is unrecognized', () => {
             process.argv = ['node', 'script.js', '--profile', 'invalid_profile'];
-            expect(resolveProfile()).toBe('all');
+            expect(resolveProfile()).toBe('core');
         });
 
-        it('should return "all" if --profile is the last argument (no value provided)', () => {
+        it('should return "core" if --profile is the last argument (no value provided)', () => {
             process.argv = ['node', 'script.js', '--profile'];
+            expect(resolveProfile()).toBe('core');
+        });
+
+        it('should return all when explicitly requested', () => {
+            process.argv = ['node', 'script.js', '--profile', 'all'];
             expect(resolveProfile()).toBe('all');
         });
 

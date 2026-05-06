@@ -1,11 +1,10 @@
 import { execFileSync } from 'child_process';
-import fs from 'fs';
-import path from 'path';
 import { getActiveBranch } from '../git';
 import { prisma } from '../../db';
 import { getOrCreateDefaultProject, afterWrite } from './utils';
 import { embedText } from '../../rag/embeddings';
 import type { CommandHandler } from './types';
+import { createTaskPlanFile, updateTaskFileStatus } from '../taskFiles';
 
 const COMMIT_HELP = `
 🧠 aigit commit — Commit context to your semantic memory
@@ -119,29 +118,13 @@ const handler: CommandHandler = async ({ args, workspacePath }) => {
             data: { projectId: project.id, slug, title, gitBranch: branch, status: 'PLANNING' },
         });
 
-        // Create the task plan file in .aigit/tasks/{slug}.md
-        const tasksDir = path.join(workspacePath, '.aigit', 'tasks');
-        if (!fs.existsSync(tasksDir)) fs.mkdirSync(tasksDir, { recursive: true });
-
-        const taskFilePath = path.join(tasksDir, `${slug}.md`);
-        const taskFileTemplate = `# ${title}
-
-> **Status**: PLANNING | **Branch**: ${branch} | **ID**: ${task.id}
-
-## Objective
-
-<!-- What does this task accomplish? What is the success criterion? -->
-
-## Sub-tasks
-
-- [ ] Sub-task 1
-- [ ] Sub-task 2
-
-## Notes
-
-<!-- Agent handoff notes go here -->
-`;
-        fs.writeFileSync(taskFilePath, taskFileTemplate, 'utf8');
+        createTaskPlanFile(workspacePath, {
+            id: task.id,
+            title,
+            slug,
+            gitBranch: branch,
+            status: 'PLANNING',
+        });
 
         await afterWrite(workspacePath);
 
@@ -177,7 +160,13 @@ const handler: CommandHandler = async ({ args, workspacePath }) => {
                 if (updateResult.count === 0) {
                     console.log(`⚠️  Warning: No task found with slug '${slug}' on branch [${branch}].`);
                 } else {
+                    const taskFileUpdate = updateTaskFileStatus(workspacePath, slug, status);
                     console.log(`\n✅ [aigit update task] Task '${slug}' marked as ${status} on branch [${branch}]`);
+                    if (taskFileUpdate.status === 'missing') {
+                        console.log(`   Task file missing: .aigit/tasks/${slug}.md`);
+                    } else if (taskFileUpdate.status === 'unparseable') {
+                        console.log(`   Task file status could not be parsed: .aigit/tasks/${slug}.md`);
+                    }
                 }
                 await afterWrite(workspacePath);
             } catch (error: unknown) {

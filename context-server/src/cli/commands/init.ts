@@ -1,11 +1,11 @@
 /**
  * aigit init
  *
- * Interactive setup wizard for new aigit projects.
+ * Setup wizard for repo-local AI agent memory.
  * - Detects project name from package.json or directory name
  * - Creates .aigit/ directory and initializes the database
- * - Creates the default project record in semantic memory DB
- * - Installs git hooks (pre-commit semantic enforcement)
+ * - Creates the default project record in the semantic memory DB
+ * - Installs git hooks for memory fidelity
  * - Prints MCP config snippets for Claude / Cursor / Windsurf / Cline
  * - Shows a "What's next" summary
  */
@@ -16,6 +16,8 @@ import { prisma, initializeDatabase } from '../../db';
 import { installGitHook } from '../hooks';
 import { spinner, ok, warn, info, c } from '../output';
 import type { CommandHandler } from './types';
+import { installManagedAgentsBlock } from '../../agents/rules';
+import { ensureDefaultAigitSkills } from '../../agents/defaultSkills';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -139,6 +141,17 @@ const handler: CommandHandler = async ({ workspacePath }) => {
         s6.warn(`.gitignore: add ${c.warn('.aigit/memory.db')} to avoid committing your memory database`);
     }
 
+    // ── Step 7: Agent adoption assets ────────────────────────────────────────
+    const s7 = spinner('Installing lightweight Aigit agent workflow…');
+    await new Promise(r => setTimeout(r, 150));
+    const agentsBlock = installManagedAgentsBlock(workspacePath);
+    const skills = ensureDefaultAigitSkills(workspacePath);
+    const workflowParts = [
+        agentsBlock.action === 'current' ? 'AGENTS block current' : `AGENTS block ${agentsBlock.action}`,
+        skills.created.length > 0 ? `${skills.created.length} skill(s) created` : 'skills current',
+    ];
+    s7.succeed(workflowParts.join(', '));
+
     // ── What's Next ───────────────────────────────────────────────────────────
     const binary = detectAigitBinary();
     const claudeConfigPath = process.platform === 'darwin'
@@ -159,6 +172,7 @@ ${c.muted(mcpConfigJson(workspacePath, binary).split('\n').map(l => '   ' + l).j
    ${c.info('Cursor / Windsurf / Cline')}:
    ${c.muted('command:')} ${c.muted(binary)}
    ${c.muted('args: ["mcp", "' + workspacePath + '"]')}
+   ${c.muted('Default MCP profile: core memory tools. Use --profile all only for advanced tools.')}
 
 ${c.bold('2. Give your agent context on day 1')}
 
@@ -171,16 +185,22 @@ ${c.bold('3. Track your first task')}
    ${c.muted('$ aigit update task my-first-feature IN_PROGRESS')}
    ${c.muted('$ aigit handoff my-first-feature    # hand off to next agent')}
 
-${c.bold('4. Build your knowledge graph')}
+${c.bold('4. Save durable project reasoning')}
 
    ${c.muted('$ aigit commit memory "Key architectural choice..."')}
-   ${c.muted('$ aigit docs                        # → ARCHITECTURE.md')}
+   ${c.muted('$ aigit query "Why did we choose this?"')}
+   ${c.muted('$ aigit repair ledger               # conservative report/repair')}
+
+${c.bold('5. Check adoption health')}
+
+   ${c.muted('$ aigit doctor')}
+   ${c.muted('$ aigit doctor --fix                 # safe fixes only')}
 
 ${c.bold('Your Project ID')} (save this — you\'ll use it in MCP tool calls):
    ${c.highlight(project.id)}
 `);
 
-    info('Run `aigit --help` to see all available commands.');
+    info('Run `aigit --help` for the default memory workflow, or `aigit advanced` for secondary commands.');
     console.log();
 };
 

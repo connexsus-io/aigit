@@ -1,53 +1,40 @@
 import { execFileSync, execSync } from 'child_process';
 
-export function getActiveBranch(workspacePath: string): string {
+function runGit(workspacePath: string, args: string[]): string | null {
     try {
-        // First try the standard approach
-        return execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { 
-            cwd: workspacePath, 
-            encoding: 'utf-8', 
-            stdio: 'pipe' 
+        return execFileSync('git', args, {
+            cwd: workspacePath,
+            encoding: 'utf-8',
+            stdio: 'pipe',
         }).trim();
-    } catch (e) {
-        // If that fails, try alternative approaches
-        try {
-            // Try getting branch from symbolic-ref
-            const branch = execFileSync('git', ['symbolic-ref', '--short', 'HEAD'], { 
-                cwd: workspacePath, 
-                encoding: 'utf-8', 
-                stdio: 'pipe' 
-            }).trim();
-            if (branch) return branch;
-        } catch (e2) {
-            // Try getting branch from refs
-            try {
-                const branchOutput = execFileSync('git', ['for-each-ref', '--format=%(refname:short)', '--contains', 'HEAD'], { 
-                    cwd: workspacePath, 
-                    encoding: 'utf-8', 
-                    stdio: 'pipe' 
-                }).trim();
-                const branches = branchOutput.split('\n').filter(b => b.trim() !== '');
-                if (branches.length === 1) {
-                    return branches[0];
-                }
-            } catch (e3) {
-                // fallback to next block
-            }
-            // Final fallback: try to get any branch info
-            try {
-                const branchOutput = execFileSync('git', ['branch', '--show-current'], {
-                    cwd: workspacePath,
-                    encoding: 'utf-8',
-                    stdio: 'pipe'
-                }).trim();
-                if (branchOutput) return branchOutput;
-            } catch (e4) {
-                // If all else fails, return unknown
-                return 'unknown';
-            }
-        }
-        return 'unknown';
+    } catch {
+        return null;
     }
+}
+
+function parsePointingBranches(output: string | null): string[] {
+    if (!output) return [];
+    return output
+        .split('\n')
+        .map(branch => branch.trim())
+        .filter(branch => branch.length > 0 && branch !== 'HEAD');
+}
+
+export function getActiveBranch(workspacePath: string): string {
+    const branch = runGit(workspacePath, ['rev-parse', '--abbrev-ref', 'HEAD']);
+    if (branch && branch !== 'HEAD') return branch;
+
+    const symbolicBranch = runGit(workspacePath, ['symbolic-ref', '--short', 'HEAD']);
+    if (symbolicBranch && symbolicBranch !== 'HEAD') return symbolicBranch;
+
+    const exactBranches = parsePointingBranches(
+        runGit(workspacePath, ['branch', '--format=%(refname:short)', '--points-at', 'HEAD'])
+    );
+    if (exactBranches.length === 1) return exactBranches[0];
+
+    const shortSha = runGit(workspacePath, ['rev-parse', '--short', 'HEAD']);
+    if (shortSha) return `detached:${shortSha}`;
+
     return 'unknown';
 }
 

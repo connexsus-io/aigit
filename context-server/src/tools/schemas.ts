@@ -77,7 +77,8 @@ export const TOOL_SCHEMAS = [
             additionalProperties: false,
             properties: {
                 workspacePath: { type: 'string', description: 'The root directory of the workspace.' },
-                activeFile: { type: 'string', description: 'Optional path to the file currently being edited.' }
+                activeFile: { type: 'string', description: 'Optional path to the file currently being edited.' },
+                fullRules: { type: 'boolean', description: 'Include full detected AI tool rule file contents. Defaults to false for selective hydration.' }
             },
             required: ['workspacePath']
         }
@@ -203,7 +204,8 @@ export const TOOL_SCHEMAS = [
             type: 'object',
             additionalProperties: false,
             properties: {
-                id: { type: 'string', description: 'The UUID of the memory, decision, or task to delete.' }
+                id: { type: 'string', description: 'The UUID of the memory, decision, or task to delete.' },
+                workspacePath: { type: 'string', description: 'Optional. The root directory used to persist the ledger after deletion.' }
             },
             required: ['id']
         }
@@ -233,7 +235,8 @@ export const TOOL_SCHEMAS = [
             properties: {
                 projectId: { type: 'string', description: 'The UUID of the project.' },
                 sourceBranch: { type: 'string', description: 'The branch to copy context from.' },
-                targetBranch: { type: 'string', description: 'The branch to copy context to.' }
+                targetBranch: { type: 'string', description: 'The branch to copy context to.' },
+                workspacePath: { type: 'string', description: 'Optional. The root directory used to persist the ledger after merge.' }
             },
             required: ['projectId', 'sourceBranch', 'targetBranch']
         }

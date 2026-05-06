@@ -1,17 +1,20 @@
 /**
  * MCP Server tool profiles.
  *
- * Splitting 30 tools into focused subsets improves LLM routing accuracy.
- * Default (no --profile flag) exposes all tools — backward compatible.
+ * Splitting tools into focused subsets improves LLM routing accuracy.
+ * Default (no --profile flag) exposes the core memory workflow.
+ * Use --profile all to preserve old full-tool exposure.
  *
  * Usage (claude_desktop_config.json):
- *   "args": ["mcp", "--profile", "core"]
+ *   "args": ["mcp"]
+ *   "args": ["mcp", "--profile", "all"]
  *   "args": ["mcp", "--profile", "swarm"]
  *   "args": ["mcp", "--profile", "ops"]
- *   "args": ["mcp"]                        // all 30 tools (default)
  */
 
 export type ProfileName = 'core' | 'swarm' | 'ops' | 'all';
+
+const DEFAULT_PROFILE: ProfileName = 'core';
 
 /**
  * Core — Semantic memory, context hydration, AST anchoring.
@@ -73,16 +76,18 @@ const PROFILE_MAP: Record<Exclude<ProfileName, 'all'>, ReadonlyArray<string>> = 
     ops: OPS_TOOLS,
 };
 
+const VALID_PROFILES = new Set<ProfileName>(['core', 'swarm', 'ops', 'all']);
+
 /**
  * Resolve --profile from process.argv.
- * Falls back to 'all' if not specified or unrecognized.
+ * Falls back to the memory-first core profile if not specified or unrecognized.
  */
 export function resolveProfile(): ProfileName {
     const idx = process.argv.indexOf('--profile');
-    if (idx === -1) return 'all';
+    if (idx === -1) return DEFAULT_PROFILE;
     const value = process.argv[idx + 1];
-    if (value && value in PROFILE_MAP) return value as ProfileName;
-    return 'all';
+    if (value && VALID_PROFILES.has(value as ProfileName)) return value as ProfileName;
+    return DEFAULT_PROFILE;
 }
 
 /**

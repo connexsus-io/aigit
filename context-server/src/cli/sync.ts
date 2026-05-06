@@ -3,7 +3,46 @@ import path from 'path';
 import { prisma, initializeDatabase } from '../db';
 import { sanitizeMemory, sanitizeDecision } from '../security/scrubber';
 
-export async function dumpContextLedger(workspacePath: string) {
+interface DumpContextLedgerOptions {
+    disconnect?: boolean;
+}
+
+async function attachVectorEmbeddings(
+    tableName: 'Memory' | 'Decision',
+    entries: Array<{ id: string; embedding?: string | null }>
+) {
+    const entriesWithEmbeddings = entries.filter(entry => entry.embedding);
+    if (entriesWithEmbeddings.length === 0) return;
+
+    // PostgreSQL limits parameters to ~65535. With 2 params per row, chunk at 10000 to stay well below it.
+    const CHUNK_SIZE = 10000;
+
+    for (let i = 0; i < entriesWithEmbeddings.length; i += CHUNK_SIZE) {
+        const chunk = entriesWithEmbeddings.slice(i, i + CHUNK_SIZE);
+        const placeholders: string[] = [];
+        const values: string[] = [];
+
+        chunk.forEach((entry, index) => {
+            const idParam = `$${index * 2 + 1}`;
+            const embedParam = `$${index * 2 + 2}`;
+            placeholders.push(`(${idParam}, ${embedParam}::text)`);
+            values.push(entry.id, entry.embedding as string);
+        });
+
+        const query = `
+            UPDATE "${tableName}" AS target
+            SET embedding = v.embedding::vector
+            FROM (VALUES ${placeholders.join(', ')}) AS v(id, embedding)
+            WHERE target.id = v.id;
+        `;
+
+        await prisma.$executeRawUnsafe(query, ...values);
+    }
+}
+
+export async function dumpContextLedger(workspacePath: string, options: DumpContextLedgerOptions = {}) {
+    const shouldDisconnect = options.disconnect ?? true;
+
     try {
         await initializeDatabase();
 
@@ -13,11 +52,18 @@ export async function dumpContextLedger(workspacePath: string) {
             prisma.agent.findMany(),
             prisma.session.findMany(),
             prisma.task.findMany(),
-            prisma.decision.findMany(),
+            prisma.$queryRaw<any[]>`
+                SELECT id, "taskId", "gitBranch", "originBranch", context, chosen, rejected, reasoning,
+                       "filePath", "lineNumber", "symbolName", "symbolType", "symbolRange", "issueRef",
+                       "agentName", embedding::text, "createdAt"
+                FROM "Decision"
+            `,
             prisma.healingEvent.findMany(),
             // Fetch memories including their raw stringified vector embeddings
             prisma.$queryRaw<any[]>`
-                SELECT id, "projectId", "sessionId", "gitBranch", type, content, embedding::text, "createdAt"
+                SELECT id, "projectId", "sessionId", "gitBranch", "originBranch", type, content,
+                       "filePath", "lineNumber", "symbolName", "symbolType", "symbolRange", "issueRef",
+                       "agentName", embedding::text, "createdAt"
                 FROM "Memory"
             `
         ]);
@@ -45,7 +91,9 @@ export async function dumpContextLedger(workspacePath: string) {
     } catch (e) {
         console.error('❌ [aigit] Failed to dump context ledger:', e);
     } finally {
-        await prisma.$disconnect();
+        if (shouldDisconnect) {
+            await prisma.$disconnect();
+        }
     }
 }
 
@@ -104,7 +152,18 @@ export async function loadContextLedger(workspacePath: string) {
         if (ledger.agents?.length > 0) await prisma.agent.createMany({ data: reviveDates(ledger.agents) });
         if (ledger.sessions?.length > 0) await prisma.session.createMany({ data: reviveDates(ledger.sessions) });
         if (ledger.tasks?.length > 0) await prisma.task.createMany({ data: reviveDates(ledger.tasks) });
-        if (ledger.decisions?.length > 0) await prisma.decision.createMany({ data: reviveDates(ledger.decisions) });
+        if (ledger.decisions?.length > 0) {
+            const safeDecisions = ledger.decisions.map((d: any) => {
+                const { embedding, ...rest } = d;
+                return {
+                    ...rest,
+                    rejected: Array.isArray(rest.rejected) ? rest.rejected : [],
+                    reasoning: rest.reasoning ?? '',
+                };
+            });
+            await prisma.decision.createMany({ data: reviveDates(safeDecisions) });
+            await attachVectorEmbeddings('Decision', ledger.decisions);
+        }
         if (ledger.healingEvents?.length > 0) await prisma.healingEvent.createMany({ data: reviveDates(ledger.healingEvents) });
 
         // Load Memories bypassing 'embedding' initially since it's an Unsupported type
@@ -114,37 +173,7 @@ export async function loadContextLedger(workspacePath: string) {
                 return rest;
             });
             await prisma.memory.createMany({ data: reviveDates(safeMemories) });
-
-            // Attach embeddings explicitly via raw SQL bulk update to avoid N+1 queries
-            const memoriesWithEmbeddings = ledger.memories.filter((m: any) => m.embedding);
-
-            if (memoriesWithEmbeddings.length > 0) {
-                // Using parameterized queries with VALUES requires exact unrolling of placeholders
-                // PostgreSQL limits parameters to ~65535. With 2 params per memory, chunk at 10000 to be safe.
-                const CHUNK_SIZE = 10000;
-
-                for (let i = 0; i < memoriesWithEmbeddings.length; i += CHUNK_SIZE) {
-                    const chunk = memoriesWithEmbeddings.slice(i, i + CHUNK_SIZE);
-                    const placeholders: string[] = [];
-                    const values: any[] = [];
-
-                    chunk.forEach((memory: any, index: number) => {
-                        const idParam = `$${index * 2 + 1}`;
-                        const embedParam = `$${index * 2 + 2}`;
-                        placeholders.push(`(${idParam}, ${embedParam}::text)`);
-                        values.push(memory.id, memory.embedding);
-                    });
-
-                    const query = `
-                        UPDATE "Memory" AS m
-                        SET embedding = v.embedding::vector
-                        FROM (VALUES ${placeholders.join(', ')}) AS v(id, embedding)
-                        WHERE m.id = v.id;
-                    `;
-
-                    await prisma.$executeRawUnsafe(query, ...values);
-                }
-            }
+            await attachVectorEmbeddings('Memory', ledger.memories);
         }
 
         console.log(`✅ [aigit] Semantic context perfectly reconstructed from ledger.json!\n`);

@@ -36,7 +36,7 @@ const handler: CommandHandler = async ({ args, workspacePath }) => {
     console.log(result.report);
 
     if (!result.success && !auto) {
-        info('Run `aigit heal --auto` to automatically commit fixes to semantic memory.');
+        info('Run `aigit advanced` to review secondary maintenance commands.');
         process.exit(1);
     }
 };

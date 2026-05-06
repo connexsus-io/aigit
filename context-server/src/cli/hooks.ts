@@ -13,10 +13,10 @@ export function installGitHook(workspacePath: string) {
     const postCheckoutPath = path.join(hooksDir, 'post-checkout');
     const postCheckoutContent = `#!/bin/sh
 # aigit post-checkout hook
-# Restores the AI Context Engine memory from the Git-tracked ledger when switching branches.
+# Restores local agent memory from the Git-tracked ledger when switching branches.
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
-echo "[aigit] Context Engine shifted to branch: $BRANCH"
+echo "[aigit] Memory shifted to branch: $BRANCH"
 
 npx --no-install aigit load || npx --no-install aigit load || true
 `;
@@ -25,9 +25,9 @@ npx --no-install aigit load || npx --no-install aigit load || true
     const postMergePath = path.join(hooksDir, 'post-merge');
     const postMergeContent = `#!/bin/sh
 # aigit post-merge hook
-# Restores the AI Context Engine memory after pulling updates from remote.
+# Restores local agent memory after pulling updates from remote.
 
-echo "[aigit] Syncing AI contextual memory with newly merged remote ledger..."
+echo "[aigit] Loading Git-tracked memory ledger..."
 
 npx --no-install aigit load || npx --no-install aigit load || true
 `;
@@ -36,9 +36,9 @@ npx --no-install aigit load || npx --no-install aigit load || true
     const preCommitPath = path.join(hooksDir, 'pre-commit');
     const preCommitContent = `#!/bin/sh
 # aigit pre-commit hook
-# Evaluates staged files to auto-generate context memory, then serializes memory into the Git-tracked ledger before committing.
+# Verifies semantic memory requirements, then serializes memory into the Git-tracked ledger before committing.
 
-echo "[aigit] Generating AI-readable context for staged files..."
+echo "[aigit] Checking semantic memory for staged files..."
 if ! npx --no-install aigit commit staged; then
     exit 1
 fi
@@ -52,34 +52,28 @@ if [ -f .aigit/ledger.json ]; then
 fi
 `;
 
-    // 4. pre-push hook (Runs before git push)
-    const prePushPath = path.join(hooksDir, 'pre-push');
-    const prePushContent = `#!/bin/sh
-# aigit pre-push hook
-# Runs the self-healing test engine to ensure code is healthy before pushing.
-
-echo "[aigit] Running self-healing diagnostics..."
-
-npx --no-install aigit heal || npx --no-install aigit heal || true
-
-# If tests failed, print a warning but usually don't block the push aggressively unless configured to
-echo "[aigit] Diagnostics complete. Proceeding with push..."
-`;
-
     const postCommitPath = path.join(hooksDir, 'post-commit');
+    const prePushPath = path.join(hooksDir, 'pre-push');
 
     try {
         fs.writeFileSync(postCheckoutPath, postCheckoutContent, { mode: 0o755 });
         fs.writeFileSync(postMergePath, postMergeContent, { mode: 0o755 });
         fs.writeFileSync(preCommitPath, preCommitContent, { mode: 0o755 });
-        fs.writeFileSync(prePushPath, prePushContent, { mode: 0o755 });
 
         // Remove legacy post-commit hook if it exists to fix the infinite dirtiness loop
         if (fs.existsSync(postCommitPath)) {
             fs.unlinkSync(postCommitPath);
         }
 
-        console.log(`✅ [aigit] Git hooks successfully installed at .git/hooks (post-checkout, post-merge, pre-commit, pre-push)`);
+        // Remove legacy aigit pre-push hooks that ran broad automation by default.
+        if (fs.existsSync(prePushPath)) {
+            const prePushContent = fs.readFileSync(prePushPath, 'utf8');
+            if (prePushContent.includes('aigit pre-push hook') || prePushContent.includes('aigit heal')) {
+                fs.unlinkSync(prePushPath);
+            }
+        }
+
+        console.log(`✅ [aigit] Git hooks successfully installed at .git/hooks (post-checkout, post-merge, pre-commit)`);
 
         // Ensure .aigit is ignored properly, but track ledger.json
         const gitignorePath = path.join(workspacePath, '.gitignore');

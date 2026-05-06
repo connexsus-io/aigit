@@ -9,6 +9,7 @@ import { Command } from 'commander';
 import { initializeDatabase, findWorkspaceRoot } from '../db';
 import { showTip } from './output';
 import { createTelemetryState } from './telemetry';
+import { formatAdvancedHelp } from './advancedHelp';
 
 // ── Version ────────────────────────────────────────────────────
 let cliVersion = 'unknown';
@@ -65,7 +66,7 @@ if (!telemetryOptedOut && process.env.AIGIT_SENTRY_DSN) {
 // ── Helpers ────────────────────────────────────────────────────
 const startTime = performance.now();
 
-async function run(commandName: string, action: () => Promise<void>) {
+async function run(commandName: string, action: () => Promise<void>, options: { showTip?: boolean } = {}) {
     await initializeDatabase();
 
     if (isTelemetryEnabled && phClient && TELEMETRY_ID) {
@@ -78,7 +79,9 @@ async function run(commandName: string, action: () => Promise<void>) {
 
     try {
         await action();
-        showTip(commandName);
+        if (options.showTip ?? true) {
+            showTip(commandName);
+        }
 
         if (isTelemetryEnabled && phClient && TELEMETRY_ID) {
             try { phClient.capture({
@@ -113,7 +116,7 @@ const program = new Command();
 
 program
     .name('aigit')
-    .description('The AI Context Engine for Git')
+    .description('Git-native memory for AI coding agents')
     .version(cliVersion, '-v, --version', 'Output the current version');
 
 // ── init ─────────────────────────────────────────────────────
@@ -138,14 +141,43 @@ program
         });
     });
 
+program
+    .command('advanced')
+    .description('Show advanced and experimental commands')
+    .action(() => {
+        console.log(formatAdvancedHelp());
+    });
+
+// ── doctor ────────────────────────────────────────────────────
+program
+    .command('doctor')
+    .description('Check Aigit adoption health and report safe fixes')
+    .option('--json', 'Output a machine-readable JSON report')
+    .option('--fix', 'Apply safe adoption fixes')
+    .action(async (opts: { json?: boolean; fix?: boolean }) => {
+        await run('doctor', async () => {
+            const args = [
+                ...(opts.json ? ['--json'] : []),
+                ...(opts.fix ? ['--fix'] : []),
+            ];
+            const { default: handler } = await import('./commands/doctor');
+            await handler({ args, workspacePath: ws(), command: 'doctor' });
+        }, { showTip: !opts.json });
+    });
+
 // ── hydrate ───────────────────────────────────────────────────
 program
     .command('hydrate [file]')
     .description('Compile a branch-aware context prompt')
-    .action(async (file?: string) => {
+    .option('--full-rules', 'Include full detected AI tool rule file contents')
+    .action(async (file: string | undefined, opts: { fullRules?: boolean }) => {
         await run('hydrate', async () => {
             const { default: handler } = await import('./commands/hydrate');
-            await handler({ args: file ? [file] : [], workspacePath: ws(), command: 'hydrate' });
+            const args = [
+                ...(file ? [file] : []),
+                ...(opts.fullRules ? ['--full-rules'] : []),
+            ];
+            await handler({ args, workspacePath: ws(), command: 'hydrate' });
         });
     });
 
@@ -256,7 +288,7 @@ commitUpdate
     });
 
 commit
-    .command('auto')
+    .command('auto', { hidden: true })
     .description('Auto-generate rich semantic context from the latest git commit')
     .action(async () => {
         await run('commit auto', async () => {
@@ -266,7 +298,7 @@ commit
     });
 
 commit
-    .command('staged')
+    .command('staged', { hidden: true })
     .description('Git pre-commit hook integration — enforces semantic summaries')
     .action(async () => {
         await run('commit staged', async () => {
@@ -313,7 +345,7 @@ program
     });
 
 program
-    .command('sync')
+    .command('sync', { hidden: true })
     .description('Bidirectional sync across all detected AI tools')
     .option('--dry-run', 'Preview changes without writing')
     .option('--skills', 'Include skills in sync')
@@ -332,7 +364,7 @@ program
     });
 
 program
-    .command('conflicts')
+    .command('conflicts', { hidden: true })
     .description('Show unresolved sync conflicts')
     .action(async () => {
         await run('conflicts', async () => {
@@ -353,7 +385,7 @@ program
     });
 
 program
-    .command('merge <source> [target]')
+    .command('merge <source> [target]', { hidden: true })
     .description('Port AI context from source branch to target branch')
     .action(async (source: string, target?: string) => {
         await run('merge', async () => {
@@ -364,7 +396,7 @@ program
 
 // ── code analysis ─────────────────────────────────────────────
 program
-    .command('anchor <file>')
+    .command('anchor <file>', { hidden: true })
     .description('Re-anchor existing memories to AST symbols after refactoring')
     .action(async (file: string) => {
         await run('anchor', async () => {
@@ -374,7 +406,7 @@ program
     });
 
 program
-    .command('scan')
+    .command('scan', { hidden: true })
     .description('Detect active AI tools in the workspace')
     .action(async () => {
         await run('scan', async () => {
@@ -384,7 +416,7 @@ program
     });
 
 program
-    .command('replay <path>')
+    .command('replay <path>', { hidden: true })
     .description('Replay the chronological evolution of a file or module')
     .action(async (filePath: string) => {
         await run('replay', async () => {
@@ -395,7 +427,7 @@ program
 
 // ── docs ──────────────────────────────────────────────────────
 program
-    .command('docs')
+    .command('docs', { hidden: true })
     .description('Auto-generate ARCHITECTURE.md from the memory ledger')
     .option('--out <path>', 'Output file path')
     .action(async (opts: { out?: string }) => {
@@ -408,7 +440,7 @@ program
     });
 
 program
-    .command('export-docs')
+    .command('export-docs', { hidden: true })
     .description('Export ARCHITECTURE.md (alias for docs)')
     .action(async () => {
         await run('export-docs', async () => {
@@ -419,7 +451,7 @@ program
 
 // ── swarm ─────────────────────────────────────────────────────
 program
-    .command('swarm [goal]')
+    .command('swarm [goal]', { hidden: true })
     .description('Create or manage a multi-agent swarm session')
     .action(async (goal?: string) => {
         const sub = goal ?? '';
@@ -429,11 +461,11 @@ program
         });
     });
 
-// ── self-healing ──────────────────────────────────────────────
+// ── advanced maintenance ──────────────────────────────────────
 program
-    .command('heal')
+    .command('heal', { hidden: true })
     .description('Run tests, diagnose failures, and propose fixes')
-    .option('--auto', 'Auto-commit fixes derived from memory')
+    .option('--auto', 'Apply fixes in the advanced healing workflow')
     .action(async (opts: { auto?: boolean }) => {
         await run('heal', async () => {
             const args = opts.auto ? ['--auto'] : [];
@@ -443,9 +475,9 @@ program
     });
 
 program
-    .command('deps')
+    .command('deps', { hidden: true })
     .description('Audit npm dependencies & correlate with past context')
-    .option('--auto', 'Auto-branch and fix vulnerabilities')
+    .option('--auto', 'Apply dependency fixes in the advanced workflow')
     .action(async (opts: { auto?: boolean }) => {
         await run('deps', async () => {
             const args = opts.auto ? ['--auto'] : [];
@@ -481,7 +513,7 @@ update
 
 // ── diagnostics & stats ───────────────────────────────────────
 program
-    .command('bisect <query>')
+    .command('bisect <query>', { hidden: true })
     .description('Time-travel binary search for when a context entry appeared')
     .option('--from <hash>', 'Oldest commit to search from')
     .option('--to <hash>', 'Newest commit to search to (default: HEAD)')
@@ -496,7 +528,7 @@ program
     });
 
 program
-    .command('stats')
+    .command('stats', { hidden: true })
     .description('Show AI ROI, agent contributions, and project stats')
     .option('--top <n>', 'Number of agents/tasks to show', '10')
     .action(async (opts: { top: string }) => {
@@ -508,7 +540,7 @@ program
     });
 
 program
-    .command('deps-graph')
+    .command('deps-graph', { hidden: true })
     .description('Generate semantic dependency graph of the project')
     .action(async () => {
         await run('deps-graph', async () => {
@@ -518,7 +550,7 @@ program
     });
 
 program
-    .command('ci-report')
+    .command('ci-report', { hidden: true })
     .description('Generate CI/CD context reports')
     .option('--pr-title <title>', 'PR Title to search within context', '')
     .option('--changed-files <files>', 'Comma-separated changed files', '')
@@ -535,7 +567,7 @@ program
     });
 
 program
-    .command('resolve')
+    .command('resolve', { hidden: true })
     .description('Interactive wizard to assimilate or resolve context merged from other branches')
     .action(async () => {
         await run('resolve', async () => {
@@ -545,7 +577,24 @@ program
     });
 
 program
-    .command('gc')
+    .command('repair <target>')
+    .description('Repair context artifacts (currently: ledger)')
+    .option('--prune-noise', 'Prune noisy automatic Git diff memories from the ledger')
+    .option('--fix-task-files', 'Sync task markdown status from the ledger')
+    .action(async (target: string, opts: { pruneNoise?: boolean; fixTaskFiles?: boolean }) => {
+        await run('repair', async () => {
+            const args = [
+                target,
+                ...(opts.pruneNoise ? ['--prune-noise'] : []),
+                ...(opts.fixTaskFiles ? ['--fix-task-files'] : []),
+            ];
+            const { default: handler } = await import('./commands/repair');
+            await handler({ args, workspacePath: ws(), command: 'repair' });
+        });
+    });
+
+program
+    .command('gc', { hidden: true })
     .description('Garbage collect old context entries')
     .action(async () => {
         await run('gc', async () => {
@@ -555,7 +604,7 @@ program
     });
 
 program
-    .command('ui')
+    .command('ui', { hidden: true })
     .description('Launch the local Aigit Web Dashboard')
     .action(async () => {
         await run('ui', async () => {
@@ -569,7 +618,7 @@ program
 program
     .command('mcp [directory]')
     .description('Start the MCP server via STDIO transport')
-    .option('--profile <profile>', 'Tool subset to expose: core | swarm | ops | all', 'all')
+    .option('--profile <profile>', 'Tool subset to expose: core | swarm | ops | all', 'core')
     .action(async () => {
         await initializeDatabase();
         require('../index');
@@ -577,7 +626,7 @@ program
 
 // ── telemetry ─────────────────────────────────────────────────
 program
-    .command('telemetry <command>')
+    .command('telemetry <command>', { hidden: true })
     .description('Manage anonymous usage telemetry')
     .action(async (cmd: string) => {
         await run('telemetry', async () => {
