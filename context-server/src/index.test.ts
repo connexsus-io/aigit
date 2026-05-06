@@ -62,7 +62,8 @@ vi.mock('@modelcontextprotocol/sdk/types.js', () => ({
 vi.mock('./db', () => ({
     prisma: mockPrisma,
     initializeDatabase: vi.fn(),
-    findWorkspaceRoot: vi.fn(() => '/repo'),
+    findWorkspaceRoot: vi.fn(() => '/launcher-cwd'),
+    getDatabaseWorkspaceRoot: vi.fn(() => '/repo'),
 }));
 
 vi.mock('./cli/git', () => ({
@@ -167,6 +168,23 @@ describe('MCP context write durability', () => {
             workspacePath: '/repo',
         });
 
+        expect(mockPersistWorkspaceLedger).toHaveBeenCalledWith('/repo');
+    });
+
+    it('uses the MCP server target workspace for writes when tool calls omit workspacePath', async () => {
+        await callTool('commit_task', {
+            projectId: '123e4567-e89b-42d3-a456-426614174000',
+            slug: 'memory-fidelity',
+            title: 'Memory Fidelity',
+        });
+
+        expect(mockCreateTaskPlanFile).toHaveBeenCalledWith('/repo', {
+            id: 'task-1',
+            title: 'Memory Fidelity',
+            slug: 'memory-fidelity',
+            gitBranch: 'main',
+            status: 'PLANNING',
+        });
         expect(mockPersistWorkspaceLedger).toHaveBeenCalledWith('/repo');
     });
 });

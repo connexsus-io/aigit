@@ -63,7 +63,7 @@ npm run check:ledger`
 const advancedCommands = [
     ['aigit advanced', 'List secondary commands without making them part of the default workflow.'],
     ['aigit hydrate --full-rules', 'Include full detected rule files for setup and debugging.'],
-    ['aigit mcp --profile all <repo>', 'Expose every MCP tool when you explicitly need advanced behavior.'],
+    ['aigit mcp <repo> --profile all', 'Expose every MCP tool when you explicitly need advanced behavior.'],
     ['aigit check-conflicts main', 'Check semantic memory conflicts before a merge.'],
     ['aigit handoff <task-slug>', 'Generate a short handoff block for another agent.']
 ];

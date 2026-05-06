@@ -8,6 +8,9 @@ interface HydrationOptions {
     fullRules?: boolean;
 }
 
+const RECENT_SEMANTIC_MEMORY_LIMIT = 8;
+const RECENT_MEMORY_SCAN_LIMIT = 32;
+
 function branchScope(branch: string): string[] {
     if (branch === 'main') return ['main'];
     return ['main', branch];
@@ -113,7 +116,7 @@ export async function compileHydratedContext(
                 prisma.memory.findMany({
                     where: { gitBranch: { in: scopedBranches } },
                     orderBy: { createdAt: 'desc' },
-                    take: 8,
+                    take: RECENT_MEMORY_SCAN_LIMIT,
                 }),
                 prisma.decision.findMany({
                     where: { gitBranch: { in: scopedBranches } },
@@ -122,7 +125,9 @@ export async function compileHydratedContext(
                 }),
             ]);
 
-            const semanticMemories = recentMemories.filter(memory => !isNoisyMemory(memory.content));
+            const semanticMemories = recentMemories
+                .filter(memory => !isNoisyMemory(memory.content))
+                .slice(0, RECENT_SEMANTIC_MEMORY_LIMIT);
             if (semanticMemories.length > 0 || recentDecisions.length > 0) {
                 payload += `## BRANCH CONTEXT\n`;
                 for (const memory of semanticMemories) {

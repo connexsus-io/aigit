@@ -23,6 +23,7 @@ export const ADVANCED_COMMANDS: AdvancedCommandInfo[] = [
     { name: 'resolve', usage: 'aigit resolve', description: 'Resolve context imported from other branches.' },
     { name: 'gc', usage: 'aigit gc', description: 'Garbage collect old context entries.' },
     { name: 'ui', usage: 'aigit ui', description: 'Launch the local dashboard.' },
+    { name: 'mcp-all', usage: 'aigit mcp <repo> --profile all', description: 'Expose every MCP tool for advanced integrations.' },
     { name: 'telemetry', usage: 'aigit telemetry <command>', description: 'Manage anonymous usage telemetry.' },
 ];
 

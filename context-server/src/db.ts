@@ -19,20 +19,34 @@ export function findWorkspaceRoot(startDir: string): string {
     return startDir;
 }
 
+export function resolveMcpWorkspaceArg(args: string[], cwd: string): string | null {
+    if (args[0] !== 'mcp') return null;
+
+    for (let i = 1; i < args.length; i += 1) {
+        const candidate = args[i];
+        if (!candidate) continue;
+        if (candidate === '--profile') {
+            i += 1;
+            continue;
+        }
+        if (candidate.startsWith('-')) continue;
+
+        return path.isAbsolute(candidate)
+            ? candidate
+            : path.resolve(cwd, candidate);
+    }
+
+    return null;
+}
+
 /**
  * Resolve the target directory for the database.
  * When the CLI is invoked as `aigit mcp /path/to/project`, we use that explicit path.
  * Otherwise we walk up from cwd to find the workspace root.
  */
 function resolveTargetDir(): string {
-    const args = process.argv.slice(2);
-    if (args[0] === 'mcp' && args[1]) {
-        const candidate = args[1];
-        return path.isAbsolute(candidate)
-            ? candidate
-            : path.resolve(process.cwd(), candidate);
-    }
-    return findWorkspaceRoot(process.cwd());
+    const mcpWorkspace = resolveMcpWorkspaceArg(process.argv.slice(2), process.cwd());
+    return mcpWorkspace ?? findWorkspaceRoot(process.cwd());
 }
 
 // ── DB path setup ─────────────────────────────────────────────────────────────
@@ -40,6 +54,10 @@ function resolveTargetDir(): string {
 const targetDir = resolveTargetDir();
 const AIGIT_DIR = path.join(targetDir, '.aigit');
 const AIGIT_DB_PATH = path.join(AIGIT_DIR, 'memory.db');
+
+export function getDatabaseWorkspaceRoot(): string {
+    return targetDir;
+}
 
 if (!fs.existsSync(AIGIT_DIR)) {
     fs.mkdirSync(AIGIT_DIR, { recursive: true });

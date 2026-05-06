@@ -21,4 +21,10 @@ describe('advanced help', () => {
             'docs',
         ]));
     });
+
+    it('documents --profile after the repo path for MCP commands', () => {
+        const mcpCommand = ADVANCED_COMMANDS.find((command) => command.name === 'mcp-all');
+
+        expect(mcpCommand?.usage).toBe('aigit mcp <repo> --profile all');
+    });
 });

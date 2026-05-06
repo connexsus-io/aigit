@@ -159,7 +159,7 @@ aigit check-conflicts main
 | `aigit repair ledger --prune-noise --fix-task-files` | Explicitly clean noisy memories and sync task files. |
 | `aigit check-conflicts main` | Check branch memory conflicts before merge. |
 | `aigit mcp <repo>` | Start the core MCP memory server for agent tools. |
-| `aigit mcp --profile all <repo>` | Explicitly expose advanced MCP tools. |
+| `aigit mcp <repo> --profile all` | Explicitly expose advanced MCP tools. |
 | `aigit advanced` | Show secondary advanced/experimental commands. |
 
 ## MCP Setup

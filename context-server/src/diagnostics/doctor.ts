@@ -60,7 +60,13 @@ export interface DoctorOptions {
     fix?: boolean;
 }
 
-const REQUIRED_HOOKS = ['pre-commit', 'post-checkout', 'post-merge'];
+const REQUIRED_HOOKS = ['pre-commit', 'post-checkout', 'post-merge'] as const;
+
+const HOOK_EXPECTATIONS: Record<typeof REQUIRED_HOOKS[number], string[]> = {
+    'pre-commit': ['aigit commit staged', 'aigit dump'],
+    'post-checkout': ['aigit load'],
+    'post-merge': ['aigit load'],
+};
 
 function hookDirectory(workspacePath: string): string | null {
     const gitPath = path.join(workspacePath, '.git');
@@ -79,14 +85,24 @@ function hookDirectory(workspacePath: string): string | null {
     return null;
 }
 
+function isExpectedExecutableHook(hookPath: string, snippets: string[]): boolean {
+    if (!fs.existsSync(hookPath)) return false;
+
+    const stats = fs.statSync(hookPath);
+    if ((stats.mode & 0o111) === 0) return false;
+
+    const content = fs.readFileSync(hookPath, 'utf8');
+    return snippets.every(snippet => content.includes(snippet));
+}
+
 function checkHooks(workspacePath: string): { installed: string[]; missing: string[] } {
     const hooksDir = hookDirectory(workspacePath);
-    if (!hooksDir) return { installed: [], missing: REQUIRED_HOOKS };
+    if (!hooksDir) return { installed: [], missing: [...REQUIRED_HOOKS] };
 
     const installed: string[] = [];
     const missing: string[] = [];
     for (const hook of REQUIRED_HOOKS) {
-        if (fs.existsSync(path.join(hooksDir, hook))) {
+        if (isExpectedExecutableHook(path.join(hooksDir, hook), HOOK_EXPECTATIONS[hook])) {
             installed.push(hook);
         } else {
             missing.push(hook);

@@ -7,9 +7,9 @@
  *
  * Usage (claude_desktop_config.json):
  *   "args": ["mcp"]
- *   "args": ["mcp", "--profile", "all"]
- *   "args": ["mcp", "--profile", "swarm"]
- *   "args": ["mcp", "--profile", "ops"]
+ *   "args": ["mcp", "/path/to/repo", "--profile", "all"]
+ *   "args": ["mcp", "/path/to/repo", "--profile", "swarm"]
+ *   "args": ["mcp", "/path/to/repo", "--profile", "ops"]
  */
 
 export type ProfileName = 'core' | 'swarm' | 'ops' | 'all';

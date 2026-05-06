@@ -63,4 +63,33 @@ describe('compileHydratedContext', () => {
 
         expect(context).toContain('FULL RULE CONTENT SHOULD NOT LEAK');
     });
+
+    it('over-fetches recent memories so noisy rows do not hide durable branch context', async () => {
+        const memories = [
+            ...Array.from({ length: 8 }, (_, index) => ({
+                id: `noise-${index}`,
+                type: 'context',
+                content: `Automatic Git Commit Context\nFiles Changed:\nM file-${index}.ts`,
+                filePath: null,
+                lineNumber: null,
+                symbolName: null,
+            })),
+            {
+                id: 'memory-durable',
+                type: 'architecture',
+                content: 'Durable memory behind noisy commit summaries.',
+                filePath: null,
+                lineNumber: null,
+                symbolName: null,
+            },
+        ];
+
+        vi.mocked(prisma.memory.findMany).mockImplementation(((query?: { take?: number }) => (
+            Promise.resolve(memories.slice(0, query?.take ?? memories.length))
+        )) as never);
+
+        const context = await compileHydratedContext('/repo');
+
+        expect(context).toContain('Durable memory behind noisy commit summaries.');
+    });
 });

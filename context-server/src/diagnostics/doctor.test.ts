@@ -87,11 +87,30 @@ describe('buildDoctorReport', () => {
         const gitDir = path.join(workspacePath, 'actual-git-dir');
         fs.mkdirSync(path.join(gitDir, 'hooks'), { recursive: true });
         fs.writeFileSync(path.join(workspacePath, '.git'), `gitdir: ${gitDir}\n`, 'utf8');
-        fs.writeFileSync(path.join(gitDir, 'hooks', 'pre-commit'), '#!/bin/sh\n', 'utf8');
+        const preCommitPath = path.join(gitDir, 'hooks', 'pre-commit');
+        fs.writeFileSync(preCommitPath, '#!/bin/sh\nnpx --no-install aigit commit staged\nnpx --no-install aigit dump\n', 'utf8');
+        fs.chmodSync(preCommitPath, 0o755);
 
         const report = await buildDoctorReport(workspacePath, { fix: false });
 
         expect(report.checks.hooks.installed).toContain('pre-commit');
         expect(report.checks.hooks.missing).toContain('post-checkout');
+    });
+
+    it('treats non-executable or unrelated hook files as missing', async () => {
+        const hooksDir = path.join(workspacePath, '.git', 'hooks');
+        fs.mkdirSync(hooksDir, { recursive: true });
+        const preCommitPath = path.join(hooksDir, 'pre-commit');
+        const postMergePath = path.join(hooksDir, 'post-merge');
+        fs.writeFileSync(preCommitPath, '#!/bin/sh\nnpx --no-install aigit commit staged\nnpx --no-install aigit dump\n', 'utf8');
+        fs.chmodSync(preCommitPath, 0o644);
+        fs.writeFileSync(postMergePath, '#!/bin/sh\necho custom hook\n', 'utf8');
+        fs.chmodSync(postMergePath, 0o755);
+
+        const report = await buildDoctorReport(workspacePath, { fix: false });
+
+        expect(report.checks.hooks.installed).not.toContain('pre-commit');
+        expect(report.checks.hooks.installed).not.toContain('post-merge');
+        expect(report.checks.hooks.missing).toEqual(expect.arrayContaining(['pre-commit', 'post-merge']));
     });
 });

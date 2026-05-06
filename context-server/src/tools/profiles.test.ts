@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { resolveProfile, filterByProfile, ProfileName } from './profiles';
+import { resolveMcpWorkspaceArg } from '../db';
 
 describe('profiles', () => {
     describe('resolveProfile', () => {
@@ -94,6 +95,17 @@ describe('profiles', () => {
             const onlyUnknown = [{ name: 'unknown_tool' }];
             const result = filterByProfile(onlyUnknown, 'core');
             expect(result).toHaveLength(0);
+        });
+    });
+
+    describe('resolveMcpWorkspaceArg', () => {
+        it('resolves the repo path before or after --profile flags', () => {
+            expect(resolveMcpWorkspaceArg(['mcp', '/repo', '--profile', 'all'], '/cwd')).toBe('/repo');
+            expect(resolveMcpWorkspaceArg(['mcp', '--profile', 'all', '/repo'], '/cwd')).toBe('/repo');
+        });
+
+        it('ignores option values when no repo path is provided', () => {
+            expect(resolveMcpWorkspaceArg(['mcp', '--profile', 'all'], '/cwd')).toBeNull();
         });
     });
 });

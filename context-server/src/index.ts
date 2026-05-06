@@ -8,7 +8,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { compileHydratedContext } from './cli/hydration';
 import { getActiveBranch } from './cli/git';
-import { prisma, initializeDatabase, findWorkspaceRoot } from './db';
+import { prisma, initializeDatabase, getDatabaseWorkspaceRoot } from './db';
 import { createTaskPlanFile } from './cli/taskFiles';
 import { resolveSymbolAtLine, extractAllSymbols, findLinkedContext, anchorFileToSymbols } from './ast/resolver';
 import { semanticSearch } from './rag/search';
@@ -99,7 +99,7 @@ function validationError(toolName: string, error: string) {
 }
 
 function resolveWriteWorkspace(workspacePath?: string): string {
-    return workspacePath ?? findWorkspaceRoot(process.cwd());
+    return workspacePath ?? getDatabaseWorkspaceRoot();
 }
 
 // ── Tool routing ──────────────────────────────────────────────────────────────
