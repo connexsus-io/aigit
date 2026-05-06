@@ -39,3 +39,6 @@
 ## 2024-05-02 - Redundant AST Parsing and Disk I/O
 **Learning:** During context drift detection, calling `fs.existsSync` and `extractAllSymbols` inside a loop iterating over every single memory and decision record triggers redundant, expensive disk I/O and AST parsing for records anchored to the same file (O(N)).
 **Action:** Use a file-level cache (like `Map<string, boolean>` for existence and `Map<string, { symbols?: any[], error?: any }>` for parsed symbols) outside the loop to ensure operations occur at most once per file, significantly reducing the bottleneck. Always explicitly cache failures using an error object or flag rather than `null` to preserve existing error handling behaviors exactly.
+## 2024-05-05 - File-Level Caching for AST Parsing
+**Learning:** During test failure extraction in `extractFailedSymbols`, parsing the entire file AST using `resolveSymbolAtLine` repeatedly for every test failure in the same file resulted in an O(N) performance bottleneck.
+**Action:** Use `extractAllSymbols` to parse the file once and cache the resulting array of `CodeSymbol` objects in a file-level `Map`. Reuse the cached array with `findSymbolForLine` for subsequent failures in the same file to reduce complexity to O(1) parsing per file. Always cache error states as well to preserve the original try/catch skip logic.
