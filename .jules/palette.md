@@ -36,3 +36,7 @@
 ## 2026-04-29 - [Accessible Initial Page Loading States]
 **Learning:** Throughout the application, initial page load states were simple text divs without ARIA roles or loading indicators. This creates layout jumping when content loads and fails to notify screen readers of the initial loading state.
 **Action:** Always wrap initial page loading states in a visual container (like a glass-card), include a spinning loader icon, and attach role="status" and aria-live="polite".
+
+## 2026-05-07 - Focus Management on State Reset
+**Learning:** When clearing a search or resetting a state that unmounts the triggering button (like the 'Clear Search' button in an empty state), keyboard focus is lost and resets to the document body, causing a poor keyboard navigation experience.
+**Action:** Always programmatically return focus to the primary logical input (e.g., the search bar) using a `ref` when a reset action is triggered, wrapping it in a `setTimeout` to ensure it fires after React unmounts the current element.

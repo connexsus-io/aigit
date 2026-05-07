@@ -86,10 +86,12 @@ export default function SearchPage() {
               <button
                 type="button"
                 aria-label="Clear search"
+                title="Clear search"
                 onClick={() => {
                   setQuery('');
                   setResults([]);
                   setSearched(false);
+                  setTimeout(() => inputRef.current?.focus(), 0);
                 }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-white focus-visible:ring-2"
                 style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.25rem' }}
@@ -136,10 +138,12 @@ export default function SearchPage() {
             <p className="text-muted mt-2 mb-4">Try rephrasing your search query to capture different architectural intent.</p>
             <button
               className="btn"
+              title="Clear search"
               onClick={() => {
                 setQuery('');
                 setResults([]);
                 setSearched(false);
+                setTimeout(() => inputRef.current?.focus(), 0);
               }}
             >
               <X size={16} /> Clear Search
