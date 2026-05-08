@@ -40,3 +40,7 @@
 ## 2026-05-07 - Focus Management on State Reset
 **Learning:** When clearing a search or resetting a state that unmounts the triggering button (like the 'Clear Search' button in an empty state), keyboard focus is lost and resets to the document body, causing a poor keyboard navigation experience.
 **Action:** Always programmatically return focus to the primary logical input (e.g., the search bar) using a `ref` when a reset action is triggered, wrapping it in a `setTimeout` to ensure it fires after React unmounts the current element.
+
+## 2026-05-15 - [Focus Restoration for Inline Forms]
+**Learning:** In React components, conditionally replacing an interactive element (e.g., a "Synthesize" button) with an inline form causes the original element to unmount. If the user cancels out of the form using the `Escape` key or a "Cancel" button, focus is dropped to the document body because the triggering element was temporarily removed from the DOM, frustrating keyboard navigation.
+**Action:** When creating toggleable inline forms, always use a `useRef` to store a reference to the triggering element (like the action button). When handling cancellation (via `Escape` or Cancel button clicks), invoke `setTimeout(() => triggerRef.current?.focus(), 0)` to programmatically restore keyboard focus back to the button immediately after the form unmounts.
