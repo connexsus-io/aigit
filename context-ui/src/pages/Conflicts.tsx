@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GitMerge, Check, X, Sparkles, Loader2, RefreshCw } from 'lucide-react';
 import { AIGIT_UI_TOKEN, API_BASE_URL } from '../config';
@@ -24,6 +24,14 @@ export default function ConflictsPage() {
   // For synthesis mode
   const [synthesizeTarget, setSynthesizeTarget] = useState<string | null>(null);
   const [synthText, setSynthText] = useState("");
+  const triggerRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
+
+  const closeSynthesize = (id: string) => {
+    setSynthesizeTarget(null);
+    setTimeout(() => {
+      triggerRefs.current[id]?.focus();
+    }, 0);
+  };
 
   const fetchConflicts = () => {
     setLoading(true);
@@ -166,7 +174,7 @@ export default function ConflictsPage() {
                         placeholder="Refine this memory before assimilation..."
                         onKeyDown={(e) => {
                             if (e.key === 'Escape') {
-                                setSynthesizeTarget(null);
+                                closeSynthesize(item.id);
                             } else if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
                                 if (synthText.trim() && processingId !== item.id) {
                                     handleAction(item.id, (item as ConflictItem & { _renderType?: string })._renderType || '', 'synthesize', synthText);
@@ -185,7 +193,7 @@ export default function ConflictsPage() {
                             {processingId === item.id ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />} Save & Assimilate
                             <kbd aria-hidden="true" className="text-xs" style={{ marginLeft: '0.5rem', fontFamily: 'monospace', opacity: 0.7 }}>Cmd/Ctrl+Enter</kbd>
                         </button>
-                        <button className="btn" onClick={() => setSynthesizeTarget(null)}>
+                        <button className="btn" onClick={() => closeSynthesize(item.id)}>
                             Cancel
                             <kbd aria-hidden="true" className="text-xs text-muted" style={{ marginLeft: '0.5rem', fontFamily: 'monospace' }}>Esc</kbd>
                         </button>
@@ -204,6 +212,7 @@ export default function ConflictsPage() {
                     
                     {(item as ConflictItem & { _renderType?: string })._renderType === 'memory' && (
                         <button 
+                            ref={(el) => { triggerRefs.current[item.id] = el; }}
                             className="btn" 
                             onClick={() => {
                                 setSynthesizeTarget(item.id);

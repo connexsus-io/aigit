@@ -40,3 +40,7 @@
 ## 2026-05-07 - Focus Management on State Reset
 **Learning:** When clearing a search or resetting a state that unmounts the triggering button (like the 'Clear Search' button in an empty state), keyboard focus is lost and resets to the document body, causing a poor keyboard navigation experience.
 **Action:** Always programmatically return focus to the primary logical input (e.g., the search bar) using a `ref` when a reset action is triggered, wrapping it in a `setTimeout` to ensure it fires after React unmounts the current element.
+
+## 2024-05-18 - Managing Focus Restoration for Dynamic Element Lists
+**Learning:** When dealing with dynamic lists of items (e.g. iterative rows of data) where each item can toggle an inline form that unmounts its triggering button, keyboard focus restoration requires tracking multiple distinct trigger elements. A single `useRef` is insufficient and will be overwritten by the last rendered item.
+**Action:** Use a dictionary structure for the ref: `const refs = useRef<{ [key: string]: HTMLElement | null }>({})`. When assigning the ref in the loop, use the item's unique ID (`ref={(el) => refs.current[item.id] = el}`). When dismissing the inline form, use the specific item ID to restore focus (`refs.current[item.id]?.focus()`).
