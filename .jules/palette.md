@@ -40,3 +40,7 @@
 ## 2026-05-07 - Focus Management on State Reset
 **Learning:** When clearing a search or resetting a state that unmounts the triggering button (like the 'Clear Search' button in an empty state), keyboard focus is lost and resets to the document body, causing a poor keyboard navigation experience.
 **Action:** Always programmatically return focus to the primary logical input (e.g., the search bar) using a `ref` when a reset action is triggered, wrapping it in a `setTimeout` to ensure it fires after React unmounts the current element.
+## 2025-05-10 - Focus restoration after conditional unmount
+
+**Learning:** When an item is successfully removed from a dynamic list in React (e.g. after a submit/assimilate action), attempting to restore focus to its original triggering button using a `ref` will fail because the button is unmounted from the DOM.
+**Action:** Only restore focus to triggering elements on non-destructive actions (like 'Cancel' or 'Escape'). If the action removes the element, let standard focus management apply or explicitly shift focus to a stable parent container instead.
