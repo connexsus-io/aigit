@@ -153,7 +153,7 @@ export async function anchorFileToSymbols(filePath: string, workspacePath: strin
     }
 
     if (updatePromises.length > 0) {
-        await prisma.$transaction(updatePromises);
+        await Promise.all(updatePromises);
     }
 
     return { anchored, total };
