@@ -44,3 +44,7 @@
 
 **Learning:** When an item is successfully removed from a dynamic list in React (e.g. after a submit/assimilate action), attempting to restore focus to its original triggering button using a `ref` will fail because the button is unmounted from the DOM.
 **Action:** Only restore focus to triggering elements on non-destructive actions (like 'Cancel' or 'Escape'). If the action removes the element, let standard focus management apply or explicitly shift focus to a stable parent container instead.
+
+## 2026-05-12 - Unhandled empty arrays cause false-positive success states
+**Learning:** If a network request fails without explicit error handling, and the initial state of `items` is an empty array (`[]`), the UI might erroneously present a "Success" or "Clean" state instead of an error message.
+**Action:** Always include an explicit `error` state, catch network failures, and display an actionable error UI with a retry button instead of defaulting to the empty state logic.
