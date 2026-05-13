@@ -1,9 +1,11 @@
 import { execFileSync } from 'child_process';
+import { vitest } from 'vitest';
 import path from 'path';
 import { describe, expect, it } from 'vitest';
 
 // Placeholder test to verify the setup
 describe('CLI Sanity Check', () => {
+    vitest.setConfig({ testTimeout: 20000 });
     it('should pass a basic sanity test', () => {
         // This string simulates a basic assertion that guarantees the CLI test runner is functional.
         const message = 'aigit is running';

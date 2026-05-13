@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GitMerge, Check, X, Sparkles, Loader2, RefreshCw } from 'lucide-react';
+import { GitMerge, Check, X, Sparkles, Loader2, RefreshCw, AlertCircle } from 'lucide-react';
 import { AIGIT_UI_TOKEN, API_BASE_URL } from '../config';
 
 interface ConflictItem {
@@ -19,6 +19,7 @@ interface ConflictItem {
 export default function ConflictsPage() {
   const [items, setItems] = useState<ConflictItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
 
   // For synthesis mode
@@ -28,8 +29,12 @@ export default function ConflictsPage() {
 
   const fetchConflicts = () => {
     setLoading(true);
+    setError(false);
     fetch(`${API_BASE_URL}/api/conflicts`, { headers: { 'X-Aigit-Ui-Token': AIGIT_UI_TOKEN } })
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error("Network response was not ok");
+        return res.json();
+      })
       .then(data => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const mems = (data.memories || []).map((m: any) => ({ ...m, _renderType: 'memory' }));
@@ -40,6 +45,7 @@ export default function ConflictsPage() {
       })
       .catch(err => {
         console.error(err);
+        setError(true);
         setLoading(false);
       });
   };
@@ -95,7 +101,25 @@ export default function ConflictsPage() {
         </div>
       )}
 
-      {!loading && items.length === 0 && (
+      {!loading && error && (
+        <div className="glass-card mt-8" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center' }}>
+          <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(350, 80%, 55%, 0.1)' }}>
+            <AlertCircle size={48} color="var(--danger)" />
+          </div>
+          <h3 className="text-lg text-danger">Failed to load conflicts</h3>
+          <p className="text-muted mt-2 mb-4">There was an error communicating with the server.</p>
+          <button
+            className="btn btn-primary"
+            onClick={fetchConflicts}
+            aria-label="Retry loading conflicts"
+          >
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+            Try Again
+          </button>
+        </div>
+      )}
+
+      {!loading && !error && items.length === 0 && (
         <div className="glass-card mt-8" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center' }}>
           <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(150, 70%, 45%, 0.1)' }}>
             <GitMerge size={48} color="var(--success)" />

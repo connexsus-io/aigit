@@ -6,5 +6,8 @@
     "scripts": {
         "check:ledger": "node context-server/scripts/check-ledger-regression.mjs",
         "test": "npm test --prefix context-server"
+    },
+    "devDependencies": {
+        "@playwright/test": "^1.60.0"
     }
 }

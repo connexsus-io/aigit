@@ -44,3 +44,6 @@
 
 **Learning:** When an item is successfully removed from a dynamic list in React (e.g. after a submit/assimilate action), attempting to restore focus to its original triggering button using a `ref` will fail because the button is unmounted from the DOM.
 **Action:** Only restore focus to triggering elements on non-destructive actions (like 'Cancel' or 'Escape'). If the action removes the element, let standard focus management apply or explicitly shift focus to a stable parent container instead.
+## 2024-05-18 - Graceful Degradation in Dashboard/Lists
+**Learning:** Components frequently rely on the absence of elements (e.g. `items.length === 0`) to render empty states. However, when an API request fails, this will fall back to displaying the standard clean empty state, masking the network failure from the user and causing confusion.
+**Action:** Always implement an explicit `error` state variable to catch and render failure states properly when interacting with APIs, and ensure regular empty states are strictly guarded by `!error`.
