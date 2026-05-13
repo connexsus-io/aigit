@@ -8,7 +8,7 @@ import GraphPage from './pages/Graph';
 import SettingsPage from './pages/Settings';
 
 const Sidebar = () => (
-  <nav className="sidebar animate-fade-in">
+  <nav className="sidebar animate-fade-in" aria-label="Main Navigation">
     <div className="brand">
       <BrainCircuit size={28} color="var(--brand-primary)" />
       <span>Aigit Context</span>
@@ -48,8 +48,24 @@ function App() {
   return (
     <BrowserRouter>
       <div className="app-layout">
+        <a
+          href="#main-content"
+          className="btn btn-primary"
+          style={{
+            position: 'absolute',
+            top: '1rem',
+            left: '1rem',
+            zIndex: 50,
+            transform: 'translateY(-150%)',
+            transition: 'transform 0.2s ease'
+          }}
+          onFocus={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
+          onBlur={(e) => { e.currentTarget.style.transform = 'translateY(-150%)'; }}
+        >
+          Skip to main content
+        </a>
         <Sidebar />
-        <main className="main-content">
+        <main id="main-content" className="main-content" tabIndex={-1} style={{ outline: 'none' }}>
           <Routes>
             <Route path="/stats" element={<DashboardPage />} />
             <Route path="/search" element={<SearchPage />} />
