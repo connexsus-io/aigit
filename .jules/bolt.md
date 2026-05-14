@@ -42,3 +42,6 @@
 ## 2024-05-05 - File-Level Caching for AST Parsing
 **Learning:** During test failure extraction in `extractFailedSymbols`, parsing the entire file AST using `resolveSymbolAtLine` repeatedly for every test failure in the same file resulted in an O(N) performance bottleneck.
 **Action:** Use `extractAllSymbols` to parse the file once and cache the resulting array of `CodeSymbol` objects in a file-level `Map`. Reuse the cached array with `findSymbolForLine` for subsequent failures in the same file to reduce complexity to O(1) parsing per file. Always cache error states as well to preserve the original try/catch skip logic.
+## 2024-05-18 - Optimize redundant JSON.parse in nested loops
+**Learning:** In `context-server/src/swarm/conflict.ts`, the `detectConflicts` function was performing `JSON.parse` operations inside a doubly-nested $O(N^2)$ loop over decisions, causing a massive performance bottleneck as the swarm scaled.
+**Action:** When performing pairwise comparisons across arrays, always evaluate whether expensive string deserialization (like `JSON.parse`) is happening in the inner loop. Refactor by parsing the data exactly once in a single pass, then group related entities into Hash Maps before performing targeted, smaller subset comparisons.

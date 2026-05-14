@@ -110,33 +110,66 @@ export async function detectConflicts(swarmId: string) {
 
     const conflicts: Array<{ a: typeof decisions[0]; b: typeof decisions[0]; reason: string }> = [];
 
-    for (let i = 0; i < decisions.length; i++) {
-        for (let j = i + 1; j < decisions.length; j++) {
-            const a = decisions[i];
-            const b = decisions[j];
+    // ⚡ Bolt Performance Optimization:
+    // Replaced O(N²) nested loops and repeated JSON.parse calls with O(N) hash map lookups.
+    // Group decisions by filePath and symbolName in a single pass to dramatically reduce comparisons.
 
-            // Skip same-agent decisions
-            if (a.fromAgentId === b.fromAgentId) continue;
+    const fileGroups = new Map<string, Array<{ d: typeof decisions[0]; payload: any }>>();
+    const symbolGroups = new Map<string, Array<{ d: typeof decisions[0]; payload: any }>>();
 
-            try {
-                const payloadA = JSON.parse(a.payload);
-                const payloadB = JSON.parse(b.payload);
+    for (const d of decisions) {
+        try {
+            const payload = JSON.parse(d.payload);
+            const item = { d, payload };
 
-                const sameFile = payloadA.filePath && payloadB.filePath && payloadA.filePath === payloadB.filePath;
-                const sameSymbol = payloadA.symbolName && payloadB.symbolName && payloadA.symbolName === payloadB.symbolName;
+            if (payload.filePath) {
+                const group = fileGroups.get(payload.filePath) || [];
+                group.push(item);
+                fileGroups.set(payload.filePath, group);
+            }
+            if (payload.symbolName) {
+                const group = symbolGroups.get(payload.symbolName) || [];
+                group.push(item);
+                symbolGroups.set(payload.symbolName, group);
+            }
+        } catch {
+            // Skip unparseable payloads
+        }
+    }
 
-                if (sameFile || sameSymbol) {
-                    conflicts.push({
-                        a, b,
-                        reason: sameSymbol
-                            ? `Both agents modified symbol @${payloadA.symbolName}`
-                            : `Both agents modified file ${payloadA.filePath}`,
-                    });
-                }
-            } catch {
-                // Skip unparseable payloads
+    const seenPairs = new Set<string>();
+
+    const checkGroup = (group: Array<{ d: typeof decisions[0]; payload: any }>, isSymbol: boolean) => {
+        for (let i = 0; i < group.length; i++) {
+            for (let j = i + 1; j < group.length; j++) {
+                const a = group[i];
+                const b = group[j];
+
+                // Skip same-agent decisions
+                if (a.d.fromAgentId === b.d.fromAgentId) continue;
+
+                // Ensure we don't add the same conflict twice if they match both file and symbol
+                const key = a.d.id < b.d.id ? `${a.d.id}-${b.d.id}` : `${b.d.id}-${a.d.id}`;
+                if (seenPairs.has(key)) continue;
+                seenPairs.add(key);
+
+                conflicts.push({
+                    a: a.d,
+                    b: b.d,
+                    reason: isSymbol
+                        ? `Both agents modified symbol @${a.payload.symbolName}`
+                        : `Both agents modified file ${a.payload.filePath}`,
+                });
             }
         }
+    };
+
+    for (const group of symbolGroups.values()) {
+        if (group.length > 1) checkGroup(group, true);
+    }
+
+    for (const group of fileGroups.values()) {
+        if (group.length > 1) checkGroup(group, false);
     }
 
     return conflicts;
