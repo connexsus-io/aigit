@@ -22,12 +22,11 @@ runs:
       run: |
         echo "Running aigit ci-report..."
         
-        # We assume aigit is globally installed in the runner or available via npx.
-        # Alternatively, if this is inside an aigit repository, we can use local script.
-        # In a generic usage, users would install aigit globally before calling this action.
-        # Given this is a local setup or standard npm setup, we use standard npx.
-        
-        REPORT=$(npx aigit ci-report --pr-title "${{ inputs.pr_title }}" --changed-files "${{ inputs.changed_files }}")
+        if command -v aigit >/dev/null 2>&1; then
+          REPORT=$(aigit ci-report --pr-title "${{ inputs.pr_title }}" --changed-files "${{ inputs.changed_files }}")
+        else
+          REPORT=$(npx aigit ci-report --pr-title "${{ inputs.pr_title }}" --changed-files "${{ inputs.changed_files }}")
+        fi
         
         # We need to multi-line export for GitHub Actions Output
         # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#multiline-strings

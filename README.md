@@ -162,6 +162,16 @@ aigit check-conflicts main
 | `aigit mcp <repo> --profile all` | Explicitly expose advanced MCP tools. |
 | `aigit advanced` | Show secondary advanced/experimental commands. |
 
+## Release Parity Check
+
+Before publishing or linking a release, verify the built package surface matches the documented CLI:
+
+```bash
+npm run build --prefix context-server
+npm run check:cli-package --prefix context-server
+(cd context-server && npm pack --dry-run --json)
+```
+
 ## MCP Setup
 
 `aigit init` prints a config snippet. A typical MCP config looks like:
