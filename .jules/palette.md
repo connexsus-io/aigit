@@ -48,3 +48,7 @@
 ## 2026-05-12 - Unhandled empty arrays cause false-positive success states
 **Learning:** If a network request fails without explicit error handling, and the initial state of `items` is an empty array (`[]`), the UI might erroneously present a "Success" or "Clean" state instead of an error message.
 **Action:** Always include an explicit `error` state, catch network failures, and display an actionable error UI with a retry button instead of defaulting to the empty state logic.
+
+## 2024-05-15 - Unhandled empty arrays cause false-positive success states
+**Learning:** If a network request fails without explicit error handling, and the initial state of `items` is an empty array (`[]`), the UI might erroneously present a "Success" or "Clean" state instead of an error message.
+**Action:** Always include an explicit `error` state, catch network failures, and display an actionable error UI with a retry button instead of defaulting to the empty state logic.
