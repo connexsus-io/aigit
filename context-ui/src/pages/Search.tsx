@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Search as SearchIcon, SearchX, Cpu, Fingerprint, FileCode2, Loader2, X } from 'lucide-react';
+import { Search as SearchIcon, SearchX, Cpu, Fingerprint, FileCode2, Loader2, X, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AIGIT_UI_TOKEN, API_BASE_URL } from '../config';
 
@@ -17,6 +17,7 @@ export default function SearchPage() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [searched, setSearched] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -35,20 +36,25 @@ export default function SearchPage() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearch = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!query.trim()) return;
     
     setLoading(true);
     setSearched(true);
+    setError(null);
     try {
       const res = await fetch(`${API_BASE_URL}/api/search?q=${encodeURIComponent(query)}`, {
         headers: { 'X-Aigit-Ui-Token': AIGIT_UI_TOKEN }
       });
+      if (!res.ok) {
+        throw new Error('Failed to communicate with semantic search engine');
+      }
       const data = await res.json();
       setResults(data);
     } catch (err) {
       console.error("Search failed:", err);
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
     } finally {
       setLoading(false);
     }
@@ -90,6 +96,7 @@ export default function SearchPage() {
                 onClick={() => {
                   setQuery('');
                   setResults([]);
+                  setError(null);
                   setSearched(false);
                   setTimeout(() => inputRef.current?.focus(), 0);
                 }}
@@ -129,7 +136,24 @@ export default function SearchPage() {
           </div>
         )}
 
-        {!loading && searched && results.length === 0 && (
+        {!loading && error && (
+          <div className="glass-card flex flex-col items-center justify-center p-12 text-center" role="alert" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '4rem', textAlign: 'center' }}>
+            <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(350, 80%, 55%, 0.1)' }}>
+              <SearchX size={48} color="var(--danger)" />
+            </div>
+            <h3 className="text-lg">Search Failed</h3>
+            <p className="text-muted mt-2 mb-4">{error}</p>
+            <button
+              className="btn btn-primary"
+              aria-label="Retry search"
+              onClick={() => handleSearch()}
+            >
+              <RefreshCw size={16} /> Retry Search
+            </button>
+          </div>
+        )}
+
+        {!loading && searched && !error && results.length === 0 && (
           <div className="glass-card flex flex-col items-center justify-center p-12 text-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '4rem', textAlign: 'center' }}>
             <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(0,0%,100%,0.05)' }}>
               <SearchX size={48} color="var(--text-muted)" />
@@ -142,6 +166,7 @@ export default function SearchPage() {
               onClick={() => {
                 setQuery('');
                 setResults([]);
+                setError(null);
                 setSearched(false);
                 setTimeout(() => inputRef.current?.focus(), 0);
               }}
