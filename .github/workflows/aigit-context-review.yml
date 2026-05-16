@@ -35,16 +35,25 @@ jobs:
             const filenames = files.data.map(f => f.filename).join(',');
             core.setOutput('files', filenames);
 
-      - name: Install Project Dependencies
-        run: npm install
+      - name: Install Aigit CLI Dependencies
+        working-directory: ./context-server
+        run: npm ci
 
       - name: Build Aigit CLI Workspace
+        working-directory: ./context-server
         run: |
-          cd context-server
-          npm install
           npx prisma generate
           npm run build
-          npm link
+
+      - name: Verify Packaged CLI Surface
+        working-directory: ./context-server
+        run: |
+          npm run check:cli-package
+          npm pack --dry-run --json
+
+      - name: Link Aigit CLI
+        working-directory: ./context-server
+        run: npm link
 
       - name: Run Aigit CI Report
         uses: ./.github/actions/aigit-ci

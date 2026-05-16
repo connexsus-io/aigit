@@ -5,7 +5,6 @@ import { describe, expect, it } from 'vitest';
 // Placeholder test to verify the setup
 describe('CLI Sanity Check', () => {
     it('should pass a basic sanity test', () => {
-        // This string simulates a basic assertion that guarantees the CLI test runner is functional.
         const message = 'aigit is running';
         expect(message).toContain('aigit');
     });
@@ -22,11 +21,18 @@ describe('CLI Sanity Check', () => {
         expect(output).toContain('init');
         expect(output).toContain('doctor');
         expect(output).toContain('hydrate');
+        expect(output).toContain('load');
+        expect(output).toContain('dump');
         expect(output).toContain('repair');
+        expect(output).toContain('handoff');
+        expect(output).toContain('mcp');
         expect(output).toContain('advanced');
+        expect(output).toContain('commit');
+        expect(output).toContain('query');
         expect(output).not.toMatch(/^\s+swarm\b/m);
         expect(output).not.toMatch(/^\s+heal\b/m);
         expect(output).not.toMatch(/^\s+deps-graph\b/m);
+        expect(output).not.toMatch(/^\s+ci-report\b/m);
     });
 
     it('lists broad commands in advanced help', () => {
