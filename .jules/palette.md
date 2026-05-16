@@ -48,3 +48,6 @@
 ## 2026-05-12 - Unhandled empty arrays cause false-positive success states
 **Learning:** If a network request fails without explicit error handling, and the initial state of `items` is an empty array (`[]`), the UI might erroneously present a "Success" or "Clean" state instead of an error message.
 **Action:** Always include an explicit `error` state, catch network failures, and display an actionable error UI with a retry button instead of defaulting to the empty state logic.
+## 2026-05-16 - Prevent Silent API Failures in Search
+**Learning:** Network errors in search or autocomplete fields often fail silently and default to "empty state" UI, misleading users into thinking their query returned zero results rather than indicating a system error.
+**Action:** Always wrap API search calls in explicit error catching, setting a dedicated `error` state. Conditionally render a user-friendly error block (e.g., "Search Failed") with an actionable retry button, overriding the empty state logic when an error is present.
