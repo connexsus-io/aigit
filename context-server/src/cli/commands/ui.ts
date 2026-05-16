@@ -69,9 +69,17 @@ export function createUiApp({ workspacePath, currentBranch, uiOrigin, uiToken }:
     // CORS is intentionally scoped to the one Vite instance spawned by `aigit ui`.
     app.use((req: Request, res: Response, next: NextFunction) => {
         const origin = req.headers.origin;
-        if (origin === uiOrigin) {
-            res.header('Access-Control-Allow-Origin', uiOrigin);
-            res.header('Vary', 'Origin');
+        if (origin) {
+            try {
+                const url = new URL(origin);
+                // Dynamically check against the passed uiOrigin to support dynamic ports, while ensuring it is local
+                if (origin === uiOrigin && url.protocol === 'http:' && (url.hostname === '127.0.0.1' || url.hostname === 'localhost')) {
+                    res.header('Access-Control-Allow-Origin', origin);
+                    res.header('Vary', 'Origin');
+                }
+            } catch (e) {
+                // Ignore invalid URLs
+            }
         }
         res.header('Access-Control-Allow-Headers', 'Content-Type, X-Aigit-Ui-Token');
         res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
