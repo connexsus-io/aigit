@@ -42,3 +42,6 @@
 ## 2024-05-05 - File-Level Caching for AST Parsing
 **Learning:** During test failure extraction in `extractFailedSymbols`, parsing the entire file AST using `resolveSymbolAtLine` repeatedly for every test failure in the same file resulted in an O(N) performance bottleneck.
 **Action:** Use `extractAllSymbols` to parse the file once and cache the resulting array of `CodeSymbol` objects in a file-level `Map`. Reuse the cached array with `findSymbolForLine` for subsequent failures in the same file to reduce complexity to O(1) parsing per file. Always cache error states as well to preserve the original try/catch skip logic.
+## 2024-05-16 - O(N^2) JSON.parse in Conflict Detection
+**Learning:** Parsing JSON strings repeatedly inside an O(N^2) pairwise comparison loop (e.g., when comparing swarm decisions) introduces significant redundant CPU overhead, converting an otherwise simple attribute comparison into a parsing bottleneck.
+**Action:** Always pre-parse stringified payloads into memory in an initial O(N) pass before executing any O(N^2) combinatorial checks. Store the original object alongside the parsed payload to maintain parity and easily construct the return results.
