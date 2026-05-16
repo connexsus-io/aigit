@@ -110,39 +110,31 @@ export async function detectConflicts(swarmId: string) {
 
     const conflicts: Array<{ a: typeof decisions[0]; b: typeof decisions[0]; reason: string }> = [];
 
-    // ⚡ Bolt Performance Optimization:
-    // Parse payloads once outside the O(N^2) comparison loop to avoid redundant JSON.parse calls.
-    const parsedDecisions = [];
-    for (const d of decisions) {
-        try {
-            parsedDecisions.push({ original: d, parsedPayload: JSON.parse(d.payload) });
-        } catch {
-            // Skip unparseable payloads
-        }
-    }
-
-    for (let i = 0; i < parsedDecisions.length; i++) {
-        for (let j = i + 1; j < parsedDecisions.length; j++) {
-            const a = parsedDecisions[i];
-            const b = parsedDecisions[j];
+    for (let i = 0; i < decisions.length; i++) {
+        for (let j = i + 1; j < decisions.length; j++) {
+            const a = decisions[i];
+            const b = decisions[j];
 
             // Skip same-agent decisions
-            if (a.original.fromAgentId === b.original.fromAgentId) continue;
+            if (a.fromAgentId === b.fromAgentId) continue;
 
-            const payloadA = a.parsedPayload;
-            const payloadB = b.parsedPayload;
+            try {
+                const payloadA = JSON.parse(a.payload);
+                const payloadB = JSON.parse(b.payload);
 
-            const sameFile = payloadA.filePath && payloadB.filePath && payloadA.filePath === payloadB.filePath;
-            const sameSymbol = payloadA.symbolName && payloadB.symbolName && payloadA.symbolName === payloadB.symbolName;
+                const sameFile = payloadA.filePath && payloadB.filePath && payloadA.filePath === payloadB.filePath;
+                const sameSymbol = payloadA.symbolName && payloadB.symbolName && payloadA.symbolName === payloadB.symbolName;
 
-            if (sameFile || sameSymbol) {
-                conflicts.push({
-                    a: a.original,
-                    b: b.original,
-                    reason: sameSymbol
-                        ? `Both agents modified symbol @${payloadA.symbolName}`
-                        : `Both agents modified file ${payloadA.filePath}`,
-                });
+                if (sameFile || sameSymbol) {
+                    conflicts.push({
+                        a, b,
+                        reason: sameSymbol
+                            ? `Both agents modified symbol @${payloadA.symbolName}`
+                            : `Both agents modified file ${payloadA.filePath}`,
+                    });
+                }
+            } catch {
+                // Skip unparseable payloads
             }
         }
     }
