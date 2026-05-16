@@ -169,9 +169,9 @@ aigit check-conflicts main
 Before publishing or linking a release, verify the built package surface matches the documented CLI:
 
 ```bash
-npm run build --prefix context-server
-npm run check:cli-package --prefix context-server
-(cd context-server && npm pack --dry-run --json)
+npm run build
+npm run check:cli-package
+npm pack --dry-run --json
 ```
 
 ## MCP Setup
