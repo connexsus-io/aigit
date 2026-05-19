@@ -4,7 +4,7 @@ import type { CommandHandler } from './types';
 import chalk from 'chalk';
 import path from 'path';
 import { spawn } from 'child_process';
-import { randomBytes, timingSafeEqual } from 'crypto';
+import { randomBytes, timingSafeEqual, createHash } from 'crypto';
 import { z } from 'zod';
 import { getActiveBranch } from '../git';
 import { semanticSearch } from '../../rag/search';
@@ -53,12 +53,13 @@ export interface UiAppOptions {
     uiToken: string;
 }
 
+// 🛡️ Sentinel: Fix timing attack vulnerability
+// Hashing the tokens before comparison prevents timing attacks that could otherwise leak the length or contents of the token.
 function isMatchingToken(provided: string | undefined, expected: string): boolean {
-    if (!provided || provided.length !== expected.length) return false;
-    const providedBuffer = Buffer.from(provided);
-    const expectedBuffer = Buffer.from(expected);
-    if (providedBuffer.length !== expectedBuffer.length) return false;
-    return timingSafeEqual(providedBuffer, expectedBuffer);
+    if (!provided) return false;
+    const providedHash = createHash('sha256').update(provided).digest();
+    const expectedHash = createHash('sha256').update(expected).digest();
+    return timingSafeEqual(providedHash, expectedHash);
 }
 
 export function createUiApp({ workspacePath, currentBranch, uiOrigin, uiToken }: UiAppOptions) {
