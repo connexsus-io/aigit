@@ -1,11 +1,31 @@
 
-import { BrowserRouter, Routes, Route, NavLink, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, NavLink, Navigate, useLocation } from 'react-router-dom';
 import { Activity, GitMerge, Settings, BrainCircuit, Search as SearchIcon, Network } from 'lucide-react';
 import DashboardPage from './pages/Dashboard';
 import ConflictsPage from './pages/Conflicts';
 import SearchPage from './pages/Search';
 import GraphPage from './pages/Graph';
 import SettingsPage from './pages/Settings';
+
+function RouteTitleUpdater() {
+  const location = useLocation();
+
+  useEffect(() => {
+    const routeMap: Record<string, string> = {
+      '/stats': 'Platform Stats - Aigit Context',
+      '/search': 'Semantic Search - Aigit Context',
+      '/graph': 'Context Graph - Aigit Context',
+      '/conflicts': 'Conflict Resolution - Aigit Context',
+      '/settings': 'Settings - Aigit Context',
+    };
+
+    const title = routeMap[location.pathname] || 'Aigit Context Dashboard';
+    document.title = title;
+  }, [location]);
+
+  return null;
+}
 
 const Sidebar = () => (
   <nav className="sidebar animate-fade-in" aria-label="Main Navigation">
@@ -65,6 +85,7 @@ function App() {
           Skip to main content
         </a>
         <Sidebar />
+        <RouteTitleUpdater />
         <main id="main-content" className="main-content" tabIndex={-1} style={{ outline: 'none' }}>
           <Routes>
             <Route path="/stats" element={<DashboardPage />} />
