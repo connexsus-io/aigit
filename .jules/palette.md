@@ -51,3 +51,7 @@
 ## 2026-05-16 - Prevent Silent API Failures in Search
 **Learning:** Network errors in search or autocomplete fields often fail silently and default to "empty state" UI, misleading users into thinking their query returned zero results rather than indicating a system error.
 **Action:** Always wrap API search calls in explicit error catching, setting a dedicated `error` state. Conditionally render a user-friendly error block (e.g., "Search Failed") with an actionable retry button, overriding the empty state logic when an error is present.
+
+## 2025-05-22 - Dynamic Route Announcements for SPAs
+**Learning:** In React SPAs, navigating between pages using `react-router-dom` does not natively update the `document.title`, preventing screen readers from announcing page changes and making tab navigation confusing.
+**Action:** Implemented a dedicated `<RouteAnnouncer />` component that listens to `useLocation()` and updates `document.title` on route changes. This ensures accessible page announcements.
