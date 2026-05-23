@@ -1,11 +1,30 @@
 
-import { BrowserRouter, Routes, Route, NavLink, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, NavLink, Navigate, useLocation } from 'react-router-dom';
 import { Activity, GitMerge, Settings, BrainCircuit, Search as SearchIcon, Network } from 'lucide-react';
 import DashboardPage from './pages/Dashboard';
 import ConflictsPage from './pages/Conflicts';
 import SearchPage from './pages/Search';
 import GraphPage from './pages/Graph';
 import SettingsPage from './pages/Settings';
+
+const PageTitle = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    const titles: Record<string, string> = {
+      '/stats': 'Platform Stats - Aigit Context Dashboard',
+      '/search': 'Semantic Search - Aigit Context Dashboard',
+      '/graph': 'Context Graph - Aigit Context Dashboard',
+      '/conflicts': 'Conflict Resolution - Aigit Context Dashboard',
+      '/settings': 'Settings - Aigit Context Dashboard'
+    };
+
+    document.title = titles[location.pathname] || 'Aigit Context Dashboard';
+  }, [location.pathname]);
+
+  return null;
+};
 
 const Sidebar = () => (
   <nav className="sidebar animate-fade-in" aria-label="Main Navigation">
@@ -47,6 +66,7 @@ const Sidebar = () => (
 function App() {
   return (
     <BrowserRouter>
+      <PageTitle />
       <div className="app-layout">
         <a
           href="#main-content"
