@@ -4,7 +4,7 @@ import type { CommandHandler } from './types';
 import chalk from 'chalk';
 import path from 'path';
 import { spawn } from 'child_process';
-import { randomBytes, timingSafeEqual } from 'crypto';
+import { randomBytes, timingSafeEqual, createHash } from 'crypto';
 import { z } from 'zod';
 import { getActiveBranch } from '../git';
 import { semanticSearch } from '../../rag/search';
@@ -54,10 +54,9 @@ export interface UiAppOptions {
 }
 
 function isMatchingToken(provided: string | undefined, expected: string): boolean {
-    if (!provided || provided.length !== expected.length) return false;
-    const providedBuffer = Buffer.from(provided);
-    const expectedBuffer = Buffer.from(expected);
-    if (providedBuffer.length !== expectedBuffer.length) return false;
+    if (!provided || provided.length > 1024) return false;
+    const providedBuffer = createHash('sha256').update(provided).digest();
+    const expectedBuffer = createHash('sha256').update(expected).digest();
     return timingSafeEqual(providedBuffer, expectedBuffer);
 }
 

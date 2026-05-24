@@ -53,3 +53,7 @@
 **Vulnerability:** The CORS policy in the `context-server/src/cli/commands/ui.ts` server hardcoded the expected port to `UI_PORT` (5173), ignoring the dynamically passed `uiOrigin` parameter. This would break CORS for any user running the app on a dynamically assigned port if 5173 was already in use.
 **Learning:** Hardcoding ports in dynamically spawned local servers makes the application brittle and fails when default ports are occupied. When an architecture passes origin data explicitly (e.g., `uiOrigin` as a function parameter), overriding that parameter with a hardcoded constant breaks the intended dynamic behavior.
 **Prevention:** In `context-server/src/cli/commands/ui.ts`, strictly validate that the requested `origin` exactly matches the dynamically passed `uiOrigin` parameter, while also securely parsing it with `new URL(origin)` to ensure the host is `localhost` or `127.0.0.1` and the protocol is `http:`.
+## 2024-05-24 - [Fix timing side-channel in token comparison]
+**Vulnerability:** The length check in `isMatchingToken` created a timing side-channel by failing fast if the token lengths didn't match. An attacker could brute-force the expected token length based on response timing.
+**Learning:** When using `timingSafeEqual`, fast-failing length checks negate the timing protection. Buffer lengths must always be equal when calling `timingSafeEqual`.
+**Prevention:** Always hash the inputs to guarantee uniform buffer lengths before performing a constant-time comparison, removing length-based early exits.
