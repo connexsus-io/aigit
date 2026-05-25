@@ -45,3 +45,7 @@
 ## 2024-05-18 - Optimize redundant JSON.parse in nested loops
 **Learning:** In `context-server/src/swarm/conflict.ts`, the `detectConflicts` function was performing `JSON.parse` operations inside a doubly-nested $O(N^2)$ loop over decisions, causing a massive performance bottleneck as the swarm scaled.
 **Action:** When performing pairwise comparisons across arrays, always evaluate whether expensive string deserialization (like `JSON.parse`) is happening in the inner loop. Refactor by parsing the data exactly once in a single pass, then group related entities into Hash Maps before performing targeted, smaller subset comparisons.
+
+## 2025-05-21 - Optimize AST Fallback Line Counter
+**Learning:** In the fallback regex-based AST extractor (`context-server/src/ast/fallback.ts`), we originally counted lines for symbols by taking `content.substring(0, match.index).split('\n').length`. Because this ran inside a loop for every regex match, it had a time and space complexity of `O(N * M)` where N is file size and M is number of symbols. This resulted in huge overhead and heavy garbage collection during memory sweeps for large code files.
+**Action:** Replaced `substring().split()` with a simple iterative linear scan (`while` loop counting `\n` characters) that picks up where the previous match left off (`lastIndex`). This turns the complexity into an efficient `O(N)` string iteration, drastically improving performance. Always favor iterative scanning over creating new substrings/arrays inside tight processing loops.
