@@ -79,12 +79,24 @@ export function extractSymbolsFallback(filePath: string): CodeSymbol[] {
         const regex = new RegExp(patternDef.regex.source, patternDef.regex.flags);
         let match: RegExpExecArray | null;
 
+        // ⚡ Bolt Performance Optimization:
+        // Replaced O(N^2) `substring().split('\n')` inside the loop with an O(N) iterative line counter.
+        // This makes AST fallback extraction significantly faster for large files.
+        let currentLine = 1;
+        let lastIndex = 0;
+
         while ((match = regex.exec(content)) !== null) {
             // Get the last capture group (the name)
             const name = match[match.length - 1] || match[1];
             if (!name) continue;
 
-            const startLine = content.substring(0, match.index).split('\n').length;
+            // Efficiently count newlines in the skipped portion
+            for (let i = lastIndex; i < match.index; i++) {
+                if (content[i] === '\n') currentLine++;
+            }
+            lastIndex = match.index;
+
+            const startLine = currentLine;
 
             // Estimate end line: find next blank line or end of indented block
             let endLine = startLine;

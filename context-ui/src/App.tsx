@@ -1,5 +1,6 @@
 
-import { BrowserRouter, Routes, Route, NavLink, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, NavLink, Navigate, useLocation } from 'react-router-dom';
 import { Activity, GitMerge, Settings, BrainCircuit, Search as SearchIcon, Network } from 'lucide-react';
 import DashboardPage from './pages/Dashboard';
 import ConflictsPage from './pages/Conflicts';
@@ -44,9 +45,40 @@ const Sidebar = () => (
   </nav>
 );
 
+function TitleUpdater() {
+  const location = useLocation();
+
+  useEffect(() => {
+    let title = 'Aigit Context';
+    switch (location.pathname) {
+      case '/stats':
+        title = 'Platform Stats - Aigit Context';
+        break;
+      case '/search':
+        title = 'Semantic Search - Aigit Context';
+        break;
+      case '/graph':
+        title = 'Context Graph - Aigit Context';
+        break;
+      case '/conflicts':
+        title = 'Conflict Resolution - Aigit Context';
+        break;
+      case '/settings':
+        title = 'Settings - Aigit Context';
+        break;
+      default:
+        break;
+    }
+    document.title = title;
+  }, [location]);
+
+  return null;
+}
+
 function App() {
   return (
     <BrowserRouter>
+      <TitleUpdater />
       <div className="app-layout">
         <a
           href="#main-content"
