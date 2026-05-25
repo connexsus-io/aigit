@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Search as SearchIcon, SearchX, Cpu, Fingerprint, FileCode2, Loader2, X, RefreshCw } from 'lucide-react';
+import { Search as SearchIcon, SearchX, Cpu, Fingerprint, FileCode2, Loader2, X, RefreshCw, Copy, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AIGIT_UI_TOKEN, API_BASE_URL } from '../config';
 
@@ -19,7 +19,18 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searched, setSearched] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleCopy = async (id: string, text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -207,6 +218,21 @@ export default function SearchPage() {
 
                     <p className="text-base text-primary leading-relaxed" style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>{item.text}</p>
                   </div>
+                  <button
+                    className="btn"
+                    onClick={() => handleCopy(item.id, item.text)}
+                    aria-label={copiedId === item.id ? "Copied" : "Copy context to clipboard"}
+                    title={copiedId === item.id ? "Copied" : "Copy to clipboard"}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      padding: '0.5rem',
+                      marginLeft: '1rem',
+                      color: copiedId === item.id ? 'var(--success)' : 'var(--text-muted)'
+                    }}
+                  >
+                    {copiedId === item.id ? <Check size={18} /> : <Copy size={18} />}
+                  </button>
                 </div>
               </motion.div>
             ))}

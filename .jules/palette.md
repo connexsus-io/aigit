@@ -52,6 +52,10 @@
 **Learning:** Network errors in search or autocomplete fields often fail silently and default to "empty state" UI, misleading users into thinking their query returned zero results rather than indicating a system error.
 **Action:** Always wrap API search calls in explicit error catching, setting a dedicated `error` state. Conditionally render a user-friendly error block (e.g., "Search Failed") with an actionable retry button, overriding the empty state logic when an error is present.
 
+## 2024-05-17 - Keyboard Accessible Copy to Clipboard Feedback
+**Learning:** When adding copy-to-clipboard micro-interactions, icon-only feedback must remain understandable to screen-reader and sighted users after the icon changes.
+**Action:** Pair temporary success icons with dynamic `aria-label` and `title` values so the control clearly announces and displays the copied state.
+
 ## 2024-05-24 - Dynamic Document Title Updates for SPAs
 **Learning:** In React SPAs utilizing standard client-side routing (like `react-router-dom`), standard page transitions do not trigger a full page reload, meaning the `<title>` element remains static. This is a severe accessibility issue because screen readers rely on the title change to announce a successful navigation and to inform the user of their new context.
 **Action:** When implementing or modifying an SPA with client-side routing, always utilize a listener (such as `useLocation` and `useEffect`) to dynamically update `document.title` based on the current active route, ensuring users utilizing assistive technologies are explicitly notified of view changes.
