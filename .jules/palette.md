@@ -51,3 +51,7 @@
 ## 2026-05-16 - Prevent Silent API Failures in Search
 **Learning:** Network errors in search or autocomplete fields often fail silently and default to "empty state" UI, misleading users into thinking their query returned zero results rather than indicating a system error.
 **Action:** Always wrap API search calls in explicit error catching, setting a dedicated `error` state. Conditionally render a user-friendly error block (e.g., "Search Failed") with an actionable retry button, overriding the empty state logic when an error is present.
+
+## 2024-05-24 - Dynamic Document Title Updates for SPAs
+**Learning:** In React SPAs utilizing standard client-side routing (like `react-router-dom`), standard page transitions do not trigger a full page reload, meaning the `<title>` element remains static. This is a severe accessibility issue because screen readers rely on the title change to announce a successful navigation and to inform the user of their new context.
+**Action:** When implementing or modifying an SPA with client-side routing, always utilize a listener (such as `useLocation` and `useEffect`) to dynamically update `document.title` based on the current active route, ensuring users utilizing assistive technologies are explicitly notified of view changes.
