@@ -59,3 +59,7 @@
 ## 2024-05-24 - Dynamic Document Title Updates for SPAs
 **Learning:** In React SPAs utilizing standard client-side routing (like `react-router-dom`), standard page transitions do not trigger a full page reload, meaning the `<title>` element remains static. This is a severe accessibility issue because screen readers rely on the title change to announce a successful navigation and to inform the user of their new context.
 **Action:** When implementing or modifying an SPA with client-side routing, always utilize a listener (such as `useLocation` and `useEffect`) to dynamically update `document.title` based on the current active route, ensuring users utilizing assistive technologies are explicitly notified of view changes.
+
+## 2026-05-26 - [Keyboard Navigation in Search Inputs]
+**Learning:** Implementing inline clear functionality (an 'X' button inside an input) breaks keyboard flow if it requires mousing over. Keyboard users need a consistent way to clear inputs and maintain focus. Furthermore, adding invisible shortcuts (like Escape to clear) creates hidden features that remain undiscoverable to most users.
+**Action:** When adding clear functionality to a search input, always map the `Escape` key to trigger the clear action (if the query is not empty). Additionally, add a visual `<kbd>Esc</kbd>` hint next to the clear button to expose the shortcut to all users, ensuring discoverability and maintaining keyboard accessibility flow.
