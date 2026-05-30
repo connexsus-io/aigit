@@ -59,3 +59,7 @@
 ## 2024-05-24 - Dynamic Document Title Updates for SPAs
 **Learning:** In React SPAs utilizing standard client-side routing (like `react-router-dom`), standard page transitions do not trigger a full page reload, meaning the `<title>` element remains static. This is a severe accessibility issue because screen readers rely on the title change to announce a successful navigation and to inform the user of their new context.
 **Action:** When implementing or modifying an SPA with client-side routing, always utilize a listener (such as `useLocation` and `useEffect`) to dynamically update `document.title` based on the current active route, ensuring users utilizing assistive technologies are explicitly notified of view changes.
+
+## 2024-05-30 - [Input Cancellation Discoverability]
+**Learning:** Search inputs often require manual interaction to clear the text. By introducing standard keyboard cancellation patterns (like `Escape` to clear) and matching them with a visual hint (`<kbd>Esc</kbd>`) next to the action button, we dramatically improve discoverability and keyboard accessibility for users.
+**Action:** When adding clear functionality to a search input, always map the `Escape` key to trigger the clear action (if the query is not empty), and add a visual `<kbd>Esc</kbd>` hint next to the clear button to ensure discoverability and keyboard accessibility.
