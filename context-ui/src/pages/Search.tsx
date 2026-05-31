@@ -88,9 +88,18 @@ export default function SearchPage() {
               type="text" 
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape' && query.length > 0) {
+                  setQuery('');
+                  setResults([]);
+                  setError(null);
+                  setSearched(false);
+                  setTimeout(() => inputRef.current?.focus(), 0);
+                }
+              }}
               placeholder="e.g. How does authentication layout work?" 
               className="w-full bg-black/20 border border-white/10 rounded-lg py-3 pl-12 pr-10 text-white focus:outline-none focus:border-brand-primary"
-              style={{ width: '100%', padding: '0.75rem 2.5rem 0.75rem 3rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-dim)', borderRadius: '8px', color: '#fff', fontSize: '1rem' }}
+              style={{ width: '100%', padding: '0.75rem 4rem 0.75rem 3rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-dim)', borderRadius: '8px', color: '#fff', fontSize: '1rem' }}
             />
             {query.length === 0 ? (
               <div
@@ -112,9 +121,10 @@ export default function SearchPage() {
                   setTimeout(() => inputRef.current?.focus(), 0);
                 }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-white focus-visible:ring-2"
-                style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.25rem' }}
+                style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
               >
                 <X size={16} />
+                <kbd aria-hidden="true" style={{ fontSize: '0.7rem', fontFamily: 'monospace', opacity: 0.7 }}>Esc</kbd>
               </button>
             )}
           </div>
