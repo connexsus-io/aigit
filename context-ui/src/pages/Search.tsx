@@ -149,7 +149,7 @@ export default function SearchPage() {
 
         {!loading && !searched && (
           <div className="glass-card flex flex-col items-center justify-center p-12 text-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '4rem', textAlign: 'center' }}>
-            <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(0,0%,100%,0.05)' }}>
+            <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(0,0%,100%,0.05)' }} aria-hidden="true">
               <SearchIcon size={48} color="var(--brand-primary)" />
             </div>
             <h3 className="text-lg">Ready to Search</h3>
@@ -159,7 +159,7 @@ export default function SearchPage() {
 
         {!loading && error && (
           <div className="glass-card flex flex-col items-center justify-center p-12 text-center" role="alert" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '4rem', textAlign: 'center' }}>
-            <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(350, 80%, 55%, 0.1)' }}>
+            <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(350, 80%, 55%, 0.1)' }} aria-hidden="true">
               <SearchX size={48} color="var(--danger)" />
             </div>
             <h3 className="text-lg">Search Failed</h3>
@@ -176,7 +176,7 @@ export default function SearchPage() {
 
         {!loading && searched && !error && results.length === 0 && (
           <div className="glass-card flex flex-col items-center justify-center p-12 text-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '4rem', textAlign: 'center' }}>
-            <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(0,0%,100%,0.05)' }}>
+            <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(0,0%,100%,0.05)' }} aria-hidden="true">
               <SearchX size={48} color="var(--text-muted)" />
             </div>
             <h3 className="text-lg">No semantic matches found</h3>
@@ -211,8 +211,8 @@ export default function SearchPage() {
                 <div className="flex justify-between items-start" style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <div style={{ flex: 1 }}>
                     <div className="flex items-center gap-3 mb-3" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
-                       <span className="text-xs font-bold uppercase tracking-wider" style={{ color: item.type === 'memory' ? 'var(--brand-primary)' : 'var(--brand-secondary)'}}>
-                        {item.type === 'memory' ? <Fingerprint size={14} className="inline mr-1"/> : <Cpu size={14} className="inline mr-1"/>}
+                       <span className="text-xs font-bold uppercase tracking-wider flex items-center" style={{ color: item.type === 'memory' ? 'var(--brand-primary)' : 'var(--brand-secondary)'}}>
+                        {item.type === 'memory' ? <Fingerprint size={14} className="inline mr-1" aria-hidden="true"/> : <Cpu size={14} className="inline mr-1" aria-hidden="true"/>}
                         {item.type}
                       </span>
                       <span className="text-muted text-sm px-2 py-0.5 rounded-full" style={{ background: 'hsla(0,0%,100%,0.05)', fontSize: '0.8rem', padding: '0.125rem 0.5rem', borderRadius: '999px' }}>
@@ -222,7 +222,7 @@ export default function SearchPage() {
                     
                     {item.filePath && (
                       <div className="text-sm text-muted mb-3 flex items-center gap-2" style={{ marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: 0.8 }}>
-                        <FileCode2 size={14} /> <code>{item.filePath} {item.symbolName ? `> ${item.symbolName}` : ''}</code>
+                        <FileCode2 size={14} aria-hidden="true" /> <code>{item.filePath} {item.symbolName ? `> ${item.symbolName}` : ''}</code>
                       </div>
                     )}
 

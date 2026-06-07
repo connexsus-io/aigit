@@ -63,3 +63,7 @@
 ## 2024-05-30 - [Input Cancellation Discoverability]
 **Learning:** Search inputs often require manual interaction to clear the text. By introducing standard keyboard cancellation patterns (like `Escape` to clear) and matching them with a visual hint (`<kbd>Esc</kbd>`) next to the action button, we dramatically improve discoverability and keyboard accessibility for users.
 **Action:** When adding clear functionality to a search input, always map the `Escape` key to trigger the clear action (if the query is not empty), and add a visual `<kbd>Esc</kbd>` hint next to the clear button to ensure discoverability and keyboard accessibility.
+
+## 2026-06-07 - [Consistent Metadata Visualization]
+**Learning:** Visual metadata identifiers (like item type icons and file indicators) must be consistently applied across different views (like Search and Inbox) to establish a predictable mental model for users scanning complex information. Inconsistencies slow down cognitive processing and make screens feel disjointed.
+**Action:** When rendering identical domain objects (like Memories and Decisions) across different pages, ensure their visual representation (including icons and layout spacing) is consistently applied to maintain scannability.
