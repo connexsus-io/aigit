@@ -9,49 +9,63 @@ export function generateMermaidGraph(
     m += 'flowchart TD\n\n';
     m += '  %% Nodes\n';
 
-    // 1. Task Nodes
-    tasks.forEach(t => {
-        const title = t.title.replace(/"/g, "'");
-        m += `  Task_${t.id.replace(/-/g, '')}["📋 ${title}"]:::task\n`;
-    });
+    // ⚡ Bolt Performance Optimization:
+    // Pre-calculate mapped IDs and replace Array.forEach with simple for loops
+    // to avoid massive closure allocation overhead and repeated string replacements (regex execution)
 
-    // 2. Memory Nodes
-    memories.forEach(mem => {
+    const tasksLen = tasks.length;
+    const taskIds = new Array(tasksLen);
+    for (let i = 0; i < tasksLen; i++) {
+        const t = tasks[i];
+        taskIds[i] = t.id.replace(/-/g, '');
+        const title = t.title.replace(/"/g, "'");
+        m += `  Task_${taskIds[i]}["📋 ${title}"]:::task\n`;
+    }
+
+    const memLen = memories.length;
+    const memIds = new Array(memLen);
+    for (let i = 0; i < memLen; i++) {
+        const mem = memories[i];
+        memIds[i] = mem.id.replace(/-/g, '');
         let cleanContent = mem.content.split('\n')[0].replace(/"/g, "'");
         cleanContent = cleanContent.length > 40 ? cleanContent.substring(0, 40) + '...' : cleanContent;
-        m += `  Mem_${mem.id.replace(/-/g, '')}("🧠 ${cleanContent}"):::memory\n`;
-    });
+        m += `  Mem_${memIds[i]}("🧠 ${cleanContent}"):::memory\n`;
+    }
 
-    // 3. Decision Nodes
-    decisions.forEach(d => {
+    const decLen = decisions.length;
+    const decIds = new Array(decLen);
+    for (let i = 0; i < decLen; i++) {
+        const d = decisions[i];
+        decIds[i] = d.id.replace(/-/g, '');
         const chosen = d.chosen.replace(/"/g, "'");
-        m += `  Dec_${d.id.replace(/-/g, '')}{"🧭 ${chosen}"}:::decision\n`;
-    });
+        m += `  Dec_${decIds[i]}{"🧭 ${chosen}"}:::decision\n`;
+    }
 
     m += '\n  %% Causal Links\n';
 
-    // Link Tasks -> Decisions
-    tasks.forEach(t => {
-        t.decisions.forEach(d => {
-            m += `  Task_${t.id.replace(/-/g, '')} -->|Spawned| Dec_${d.id.replace(/-/g, '')}\n`;
-        });
-    });
+    for (let i = 0; i < tasksLen; i++) {
+        const t = tasks[i];
+        const tid = taskIds[i];
+        const decs = t.decisions;
+        const decsLen = decs.length;
+        for (let j = 0; j < decsLen; j++) {
+            m += `  Task_${tid} -->|Spawned| Dec_${decs[j].id.replace(/-/g, '')}\n`;
+        }
+    }
 
-    // Pre-group decisions by filePath for faster lookups
-    const decisionsByFile = new Map<string, typeof decisions>();
+    const decisionsByFile = new Map<string, string[]>();
+    const decisionsByFileAndSymbol = new Map<string, string[]>();
 
-    // ⚡ Bolt Performance Optimization:
-    // Pre-group decisions by composite key (filePath + symbolName) to avoid O(N*M) filtering inside the loop
-    const decisionsByFileAndSymbol = new Map<string, typeof decisions>();
-
-    for (const d of decisions) {
+    for (let i = 0; i < decLen; i++) {
+        const d = decisions[i];
+        const dId = decIds[i];
         if (!d.filePath) continue;
         let group = decisionsByFile.get(d.filePath);
         if (!group) {
             group = [];
             decisionsByFile.set(d.filePath, group);
         }
-        group.push(d);
+        group.push(dId);
 
         const key = `${d.filePath}::${d.symbolName || ''}`;
         let symGroup = decisionsByFileAndSymbol.get(key);
@@ -59,52 +73,61 @@ export function generateMermaidGraph(
             symGroup = [];
             decisionsByFileAndSymbol.set(key, symGroup);
         }
-        symGroup.push(d);
+        symGroup.push(dId);
     }
 
-    // Pre-group memories by filePath
-    const memoriesByFile = new Map<string, typeof memories>();
-    for (const mem of memories) {
+    const memoriesByFile = new Map<string, string[]>();
+    for (let i = 0; i < memLen; i++) {
+        const mem = memories[i];
+        const mId = memIds[i];
         if (!mem.filePath) continue;
         let group = memoriesByFile.get(mem.filePath);
         if (!group) {
             group = [];
             memoriesByFile.set(mem.filePath, group);
         }
-        group.push(mem);
+        group.push(mId);
     }
 
-    // Link Memories -> Decisions (heuristic: if they share a file/symbol or just generic linkage)
-    // For a cleaner graph, let's link Memories to Decisions if they share the same filePath and symbolName
-    memories.forEach(mem => {
+    for (let i = 0; i < memLen; i++) {
+        const mem = memories[i];
         if (mem.filePath) {
             const key = `${mem.filePath}::${mem.symbolName || ''}`;
             const relatedDecisions = decisionsByFileAndSymbol.get(key) || [];
-            relatedDecisions.forEach(d => {
-                m += `  Mem_${mem.id.replace(/-/g, '')} -.->|Influenced| Dec_${d.id.replace(/-/g, '')}\n`;
-            });
+            const relLen = relatedDecisions.length;
+            if (relLen > 0) {
+                const memId = memIds[i];
+                for (let j = 0; j < relLen; j++) {
+                    m += `  Mem_${memId} -.->|Influenced| Dec_${relatedDecisions[j]}\n`;
+                }
+            }
         }
-    });
+    }
 
     m += '\n  %% Subgraphs by File Path\n';
     const files = new Set<string>();
     for (const f of memoriesByFile.keys()) files.add(f);
     for (const f of decisionsByFile.keys()) files.add(f);
 
-    Array.from(files).forEach((file, i) => {
+    const filesArr = Array.from(files);
+    const filesArrLen = filesArr.length;
+    for (let i = 0; i < filesArrLen; i++) {
+        const file = filesArr[i];
         m += `  subgraph File${i} ["📁 ${file}"]\n`;
 
         const fileMemories = memoriesByFile.get(file) || [];
-        fileMemories.forEach(mem => {
-            m += `    Mem_${mem.id.replace(/-/g, '')}\n`;
-        });
+        const fmLen = fileMemories.length;
+        for (let j = 0; j < fmLen; j++) {
+            m += `    Mem_${fileMemories[j]}\n`;
+        }
 
         const fileDecisions = decisionsByFile.get(file) || [];
-        fileDecisions.forEach(d => {
-            m += `    Dec_${d.id.replace(/-/g, '')}\n`;
-        });
+        const fdLen = fileDecisions.length;
+        for (let j = 0; j < fdLen; j++) {
+            m += `    Dec_${fileDecisions[j]}\n`;
+        }
         m += `  end\n\n`;
-    });
+    }
 
     m += '  %% Styling\n';
     m += '  classDef task fill:#4f46e5,stroke:#fff,stroke-width:2px,color:#fff,rx:5,ry:5\n';

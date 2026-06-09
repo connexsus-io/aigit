@@ -42,13 +42,20 @@ export async function generateArchitectureDocs(projectName: string, branch: stri
 
     // ── Core Memories ─────────────────────────────────────────────
     md += `## Core Principles & Memories\n\n`;
-    const coreMemories = memories.filter(m => !m.filePath);
-    if (coreMemories.length === 0) {
+
+    // ⚡ Bolt Performance Optimization:
+    // Replaced .filter() and .forEach() with a single loop to avoid intermediate array allocations.
+    let hasCore = false;
+    for (let i = 0; i < memories.length; i++) {
+        if (!memories[i].filePath) {
+             md += `- **[${memories[i].type}]**: ${memories[i].content} *(Added: ${memories[i].createdAt.toISOString().split('T')[0]})*\n`;
+             hasCore = true;
+        }
+    }
+
+    if (!hasCore) {
         md += `*No core memories recorded yet.*\n\n`;
     } else {
-        coreMemories.forEach(m => {
-            md += `- **[${m.type}]**: ${m.content} *(Added: ${m.createdAt.toISOString().split('T')[0]})*\n`;
-        });
         md += `\n`;
     }
 
@@ -91,12 +98,16 @@ export async function generateArchitectureDocs(projectName: string, branch: stri
             md += `### \`${file}\`\n\n`;
 
             const fileMemories = memoriesByFile.get(file) || [];
-            // Filter out default fallback git hooks so we only show dense semantic memories per file
-            const semanticFileMemories = fileMemories.filter(m => !m.content.startsWith('Automatic Git Commit Context'));
+            let hasSemantic = false;
             
-            if (semanticFileMemories.length > 0) {
-                md += `**Memories:**\n`;
-                semanticFileMemories.forEach(m => {
+            for (let i = 0; i < fileMemories.length; i++) {
+                const m = fileMemories[i];
+                if (!m.content.startsWith('Automatic Git Commit Context')) {
+                    if (!hasSemantic) {
+                         md += `**Memories:**\n`;
+                         hasSemantic = true;
+                    }
+
                     const symbol = m.symbolName ? ` \`@${m.symbolName}\`` : '';
                     let cleanContent = m.content;
                     if (cleanContent.includes('Files Changed:') && cleanContent.includes('Statistics:')) {
@@ -105,18 +116,21 @@ export async function generateArchitectureDocs(projectName: string, branch: stri
                         cleanContent = cleanContent.substring(0, 300) + '...';
                     }
                     md += `- [${m.type}]${symbol}: ${cleanContent}\n`;
-                });
+                }
+            }
+            if (hasSemantic) {
                 md += `\n`;
             }
 
             const fileDecisions = decisionsByFile.get(file) || [];
             if (fileDecisions.length > 0) {
                 md += `**Decisions:**\n`;
-                fileDecisions.forEach(d => {
+                for(let i=0; i<fileDecisions.length; i++) {
+                    const d = fileDecisions[i];
                     const symbol = d.symbolName ? ` \`@${d.symbolName}\`` : '';
                     md += `- ${symbol}: Choose **${d.chosen}** over (${d.rejected.join(', ')}).\n`;
                     md += `  > *Reasoning: ${d.reasoning}*\n`;
-                });
+                }
                 md += `\n`;
             }
         }
@@ -127,7 +141,8 @@ export async function generateArchitectureDocs(projectName: string, branch: stri
     if (tasks.length === 0) {
         md += `*No tasks recorded yet.*\n\n`;
     } else {
-        tasks.forEach(task => {
+        for (let i=0; i<tasks.length; i++) {
+            const task = tasks[i];
             const statusIcon =
                 task.status === 'DONE' ? '✅' :
                 task.status === 'BLOCKED' ? '⚠️' :
@@ -140,15 +155,16 @@ export async function generateArchitectureDocs(projectName: string, branch: stri
             md += `- **Branch**: ${task.gitBranch}\n`;
             md += `- **Created**: ${task.createdAt.toISOString().split('T')[0]}\n`;
             md += `- **Plan**: \`.aigit/tasks/${task.slug}.md\`\n`;
-            if (task.decisions.length > 0) {
+            if (task.decisions && task.decisions.length > 0) {
                 md += `- **Outcomes**:\n`;
-                task.decisions.forEach(d => {
+                for(let j=0; j<task.decisions.length; j++) {
+                    const d = task.decisions[j];
                     const loc = d.filePath ? ` (in \`${d.filePath}\`)` : '';
                     md += `  - Decided on **${d.chosen}**${loc}.\n`;
-                });
+                }
             }
             md += `\n`;
-        });
+        }
     }
 
     return md;
