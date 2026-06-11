@@ -63,3 +63,7 @@
 ## 2024-05-30 - [Input Cancellation Discoverability]
 **Learning:** Search inputs often require manual interaction to clear the text. By introducing standard keyboard cancellation patterns (like `Escape` to clear) and matching them with a visual hint (`<kbd>Esc</kbd>`) next to the action button, we dramatically improve discoverability and keyboard accessibility for users.
 **Action:** When adding clear functionality to a search input, always map the `Escape` key to trigger the clear action (if the query is not empty), and add a visual `<kbd>Esc</kbd>` hint next to the clear button to ensure discoverability and keyboard accessibility.
+
+## 2024-03-24 - Accessible Inline Results
+**Learning:** When updating a React frontend with dynamically rendered inline result blocks after async operations, always attach `role="status"` (or `role="alert"` for errors) and `aria-live="polite"` to the container. Decorative icons within these blocks or other non-interactive decorative elements should explicitly use `aria-hidden="true"`. This ensures assistive technologies announce the result correctly without adding unnecessary noise from decorative icons.
+**Action:** Consistently apply ARIA roles and live regions to dynamic feedback blocks, and use `aria-hidden="true"` on decorative icons like `lucide-react` icons.
