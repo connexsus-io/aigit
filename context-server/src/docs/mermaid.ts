@@ -9,33 +9,44 @@ export function generateMermaidGraph(
     m += 'flowchart TD\n\n';
     m += '  %% Nodes\n';
 
+    // Cache UUID replacements to avoid repeated regex operations
+    const getCleanId = (id: string) => id.replace(/-/g, '');
+    const cleanTaskIds = new Map<string, string>();
+    for (const t of tasks) cleanTaskIds.set(t.id, getCleanId(t.id));
+
+    const cleanMemIds = new Map<string, string>();
+    for (const mem of memories) cleanMemIds.set(mem.id, getCleanId(mem.id));
+
+    const cleanDecIds = new Map<string, string>();
+    for (const d of decisions) cleanDecIds.set(d.id, getCleanId(d.id));
+
     // 1. Task Nodes
-    tasks.forEach(t => {
+    for (const t of tasks) {
         const title = t.title.replace(/"/g, "'");
-        m += `  Task_${t.id.replace(/-/g, '')}["📋 ${title}"]:::task\n`;
-    });
+        m += `  Task_${cleanTaskIds.get(t.id)}["📋 ${title}"]:::task\n`;
+    }
 
     // 2. Memory Nodes
-    memories.forEach(mem => {
+    for (const mem of memories) {
         let cleanContent = mem.content.split('\n')[0].replace(/"/g, "'");
         cleanContent = cleanContent.length > 40 ? cleanContent.substring(0, 40) + '...' : cleanContent;
-        m += `  Mem_${mem.id.replace(/-/g, '')}("🧠 ${cleanContent}"):::memory\n`;
-    });
+        m += `  Mem_${cleanMemIds.get(mem.id)}("🧠 ${cleanContent}"):::memory\n`;
+    }
 
     // 3. Decision Nodes
-    decisions.forEach(d => {
+    for (const d of decisions) {
         const chosen = d.chosen.replace(/"/g, "'");
-        m += `  Dec_${d.id.replace(/-/g, '')}{"🧭 ${chosen}"}:::decision\n`;
-    });
+        m += `  Dec_${cleanDecIds.get(d.id)}{"🧭 ${chosen}"}:::decision\n`;
+    }
 
     m += '\n  %% Causal Links\n';
 
     // Link Tasks -> Decisions
-    tasks.forEach(t => {
-        t.decisions.forEach(d => {
-            m += `  Task_${t.id.replace(/-/g, '')} -->|Spawned| Dec_${d.id.replace(/-/g, '')}\n`;
-        });
-    });
+    for (const t of tasks) {
+        for (const d of t.decisions) {
+            m += `  Task_${cleanTaskIds.get(t.id)} -->|Spawned| Dec_${cleanDecIds.get(d.id)}\n`;
+        }
+    }
 
     // Pre-group decisions by filePath for faster lookups
     const decisionsByFile = new Map<string, typeof decisions>();
@@ -76,35 +87,37 @@ export function generateMermaidGraph(
 
     // Link Memories -> Decisions (heuristic: if they share a file/symbol or just generic linkage)
     // For a cleaner graph, let's link Memories to Decisions if they share the same filePath and symbolName
-    memories.forEach(mem => {
+    for (const mem of memories) {
         if (mem.filePath) {
             const key = `${mem.filePath}::${mem.symbolName || ''}`;
             const relatedDecisions = decisionsByFileAndSymbol.get(key) || [];
-            relatedDecisions.forEach(d => {
-                m += `  Mem_${mem.id.replace(/-/g, '')} -.->|Influenced| Dec_${d.id.replace(/-/g, '')}\n`;
-            });
+            for (const d of relatedDecisions) {
+                m += `  Mem_${cleanMemIds.get(mem.id)} -.->|Influenced| Dec_${cleanDecIds.get(d.id)}\n`;
+            }
         }
-    });
+    }
 
     m += '\n  %% Subgraphs by File Path\n';
     const files = new Set<string>();
     for (const f of memoriesByFile.keys()) files.add(f);
     for (const f of decisionsByFile.keys()) files.add(f);
 
-    Array.from(files).forEach((file, i) => {
+    const sortedFiles = Array.from(files);
+    for (let i = 0; i < sortedFiles.length; i++) {
+        const file = sortedFiles[i];
         m += `  subgraph File${i} ["📁 ${file}"]\n`;
 
         const fileMemories = memoriesByFile.get(file) || [];
-        fileMemories.forEach(mem => {
-            m += `    Mem_${mem.id.replace(/-/g, '')}\n`;
-        });
+        for (const mem of fileMemories) {
+            m += `    Mem_${cleanMemIds.get(mem.id)}\n`;
+        }
 
         const fileDecisions = decisionsByFile.get(file) || [];
-        fileDecisions.forEach(d => {
-            m += `    Dec_${d.id.replace(/-/g, '')}\n`;
-        });
+        for (const d of fileDecisions) {
+            m += `    Dec_${cleanDecIds.get(d.id)}\n`;
+        }
         m += `  end\n\n`;
-    });
+    }
 
     m += '  %% Styling\n';
     m += '  classDef task fill:#4f46e5,stroke:#fff,stroke-width:2px,color:#fff,rx:5,ry:5\n';
