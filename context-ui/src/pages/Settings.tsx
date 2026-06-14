@@ -44,7 +44,7 @@ export default function SettingsPage() {
            <div className="flex items-start justify-between" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
              <div>
                 <h3 className="flex items-center gap-2 text-lg mb-2" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                  <DatabaseZap size={20} className="text-brand-secondary" style={{ color: 'var(--brand-secondary)' }}/> 
+                  <DatabaseZap size={20} className="text-brand-secondary" style={{ color: 'var(--brand-secondary)' }} aria-hidden="true" />
                   Database Garbage Collection
                 </h3>
                 <p className="text-muted mb-4 max-w-2xl" style={{ maxWidth: '42rem', marginBottom: '1rem', lineHeight: 1.6 }}>
@@ -53,11 +53,16 @@ export default function SettingsPage() {
                    <strong>Architectural decisions and developer memories are strictly preserved.</strong>
                 </p>
                 {result && (
-                  <div className={`mt-4 p-4 rounded-lg border ${result.success ? 'border-success bg-success/10 text-success' : 'border-danger bg-danger/10 text-danger'}`} style={{ marginTop: '1rem', padding: '1rem', borderRadius: '8px', border: result.success ? '1px solid var(--success)' : '1px solid var(--danger)', color: result.success ? '#fff' : '#ff4d4f', background: result.success ? 'rgba(39, 174, 96, 0.2)' : 'rgba(255, 77, 79, 0.1)' }}>
+                  <div
+                    role={result.success ? "status" : "alert"}
+                    aria-live="polite"
+                    className={`mt-4 p-4 rounded-lg border ${result.success ? 'border-success bg-success/10 text-success' : 'border-danger bg-danger/10 text-danger'}`}
+                    style={{ marginTop: '1rem', padding: '1rem', borderRadius: '8px', border: result.success ? '1px solid var(--success)' : '1px solid var(--danger)', color: result.success ? '#fff' : '#ff4d4f', background: result.success ? 'rgba(39, 174, 96, 0.2)' : 'rgba(255, 77, 79, 0.1)' }}
+                  >
                       {result.success ? (
-                         <span className="flex items-center gap-2" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Check size={18}/> GC Complete. Freed {result.deleted} obsolete context items. Database structurally compacted.</span>
+                         <span className="flex items-center gap-2" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Check size={18} aria-hidden="true" /> GC Complete. Freed {result.deleted} obsolete context items. Database structurally compacted.</span>
                       ) : (
-                         <span className="flex items-center gap-2" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><ShieldAlert size={18}/> Exception: {result.message}</span>
+                         <span className="flex items-center gap-2" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><ShieldAlert size={18} aria-hidden="true" /> Exception: {result.message}</span>
                       )}
                   </div>
                 )}

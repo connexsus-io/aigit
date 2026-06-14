@@ -63,3 +63,7 @@
 ## 2024-05-30 - [Input Cancellation Discoverability]
 **Learning:** Search inputs often require manual interaction to clear the text. By introducing standard keyboard cancellation patterns (like `Escape` to clear) and matching them with a visual hint (`<kbd>Esc</kbd>`) next to the action button, we dramatically improve discoverability and keyboard accessibility for users.
 **Action:** When adding clear functionality to a search input, always map the `Escape` key to trigger the clear action (if the query is not empty), and add a visual `<kbd>Esc</kbd>` hint next to the clear button to ensure discoverability and keyboard accessibility.
+
+## 2026-06-14 - Settings Result Accessibility
+**Learning:** When displaying dynamic inline results from async operations (like Garbage Collection), assistive technologies will silently ignore the update unless the container has `role="status"` (or `alert` for errors) and `aria-live="polite"`. Decorative icons within these blocks must also have `aria-hidden="true"` to reduce screen reader noise.
+**Action:** Always add `role="status"` or `role="alert"` alongside `aria-live="polite"` to conditionally rendered inline result blocks, and hide decorative structural icons.
