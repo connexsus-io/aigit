@@ -63,3 +63,7 @@
 ## 2024-05-30 - [Input Cancellation Discoverability]
 **Learning:** Search inputs often require manual interaction to clear the text. By introducing standard keyboard cancellation patterns (like `Escape` to clear) and matching them with a visual hint (`<kbd>Esc</kbd>`) next to the action button, we dramatically improve discoverability and keyboard accessibility for users.
 **Action:** When adding clear functionality to a search input, always map the `Escape` key to trigger the clear action (if the query is not empty), and add a visual `<kbd>Esc</kbd>` hint next to the clear button to ensure discoverability and keyboard accessibility.
+
+## 2024-06-16 - Accessible Result States for Async Forms
+**Learning:** When a form or button submission generates an inline result block instead of navigating away or using a toast (e.g. the Garbage Collection results), screen readers will not naturally read the newly appearing text. If the icons within that block are not marked as decorative, it can also create unnecessary screen reader noise.
+**Action:** When conditionally rendering inline result or error blocks after async operations, always attach `role="status"` (or `role="alert"` for errors) and `aria-live="polite"` to the container. Furthermore, explicitly set `aria-hidden="true"` on any decorative outcome icons like `Check` or `ShieldAlert`.
