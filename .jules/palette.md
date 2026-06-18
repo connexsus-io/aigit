@@ -63,3 +63,7 @@
 ## 2024-05-30 - [Input Cancellation Discoverability]
 **Learning:** Search inputs often require manual interaction to clear the text. By introducing standard keyboard cancellation patterns (like `Escape` to clear) and matching them with a visual hint (`<kbd>Esc</kbd>`) next to the action button, we dramatically improve discoverability and keyboard accessibility for users.
 **Action:** When adding clear functionality to a search input, always map the `Escape` key to trigger the clear action (if the query is not empty), and add a visual `<kbd>Esc</kbd>` hint next to the clear button to ensure discoverability and keyboard accessibility.
+
+## 2026-06-18 - Decorative Icon Screen Reader Noise
+**Learning:** The application extensively uses decorative `lucide-react` icons next to text labels (like in navigation and stat cards). Without explicit `aria-hidden="true"` attributes, these SVGs can cause screen readers to announce redundant "image" or graphic tags, adding unnecessary noise.
+**Action:** Always add `aria-hidden="true"` to decorative icons or their immediate wrapper elements when they accompany descriptive text.

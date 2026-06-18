@@ -11,25 +11,25 @@ import SettingsPage from './pages/Settings';
 const Sidebar = () => (
   <nav className="sidebar animate-fade-in" aria-label="Main Navigation">
     <div className="brand">
-      <BrainCircuit size={28} color="var(--brand-primary)" />
+      <BrainCircuit size={28} color="var(--brand-primary)" aria-hidden="true" />
       <span>Aigit Context</span>
     </div>
     
     <div className="nav-links mt-8" style={{ marginTop: '2rem' }}>
       <NavLink to="/stats" className={({isActive}) => `nav-link ${isActive ? 'active' : ''}`}>
-        <Activity size={20} />
+        <Activity size={20} aria-hidden="true" />
         Platform Stats
       </NavLink>
       <NavLink to="/search" className={({isActive}) => `nav-link ${isActive ? 'active' : ''}`}>
-        <SearchIcon size={20} />
+        <SearchIcon size={20} aria-hidden="true" />
         Semantic Search
       </NavLink>
       <NavLink to="/graph" className={({isActive}) => `nav-link ${isActive ? 'active' : ''}`}>
-        <Network size={20} />
+        <Network size={20} aria-hidden="true" />
         Context Graph
       </NavLink>
       <NavLink to="/conflicts" className={({isActive}) => `nav-link ${isActive ? 'active' : ''}`}>
-        <GitMerge size={20} />
+        <GitMerge size={20} aria-hidden="true" />
         Conflict Resolution
       </NavLink>
     </div>
@@ -38,7 +38,7 @@ const Sidebar = () => (
     
     <div className="nav-links">
       <NavLink to="/settings" className={({isActive}) => `nav-link ${isActive ? 'active' : ''}`}>
-        <Settings size={20} />
+        <Settings size={20} aria-hidden="true" />
         Settings
       </NavLink>
     </div>

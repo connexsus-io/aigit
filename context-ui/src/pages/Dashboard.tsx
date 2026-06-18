@@ -146,7 +146,7 @@ export default function DashboardPage() {
       <div className="stats-grid stagger-1">
         <motion.div className="glass-card" whileHover={{ y: -4 }}>
           <div className="flex gap-4 items-center mb-4">
-            <div className="p-3 rounded-full" style={{ background: 'var(--brand-primary-glow)' }}>
+            <div className="p-3 rounded-full" style={{ background: 'var(--brand-primary-glow)' }} aria-hidden="true">
               <Database size={24} color="var(--brand-primary)" />
             </div>
             <h3 className="text-muted">Total Memories</h3>
@@ -156,7 +156,7 @@ export default function DashboardPage() {
 
         <motion.div className="glass-card stagger-2" whileHover={{ y: -4 }}>
           <div className="flex gap-4 items-center mb-4">
-            <div className="p-3 rounded-full" style={{ background: 'var(--brand-secondary-glow)' }}>
+            <div className="p-3 rounded-full" style={{ background: 'var(--brand-secondary-glow)' }} aria-hidden="true">
               <Brain size={24} color="var(--brand-secondary)" />
             </div>
             <h3 className="text-muted">Architectural Decisions</h3>
@@ -166,7 +166,7 @@ export default function DashboardPage() {
 
         <motion.div className="glass-card stagger-3" whileHover={{ y: -4 }}>
           <div className="flex gap-4 items-center mb-4">
-            <div className="p-3 rounded-full" style={{ background: 'var(--success-glow)' }}>
+            <div className="p-3 rounded-full" style={{ background: 'var(--success-glow)' }} aria-hidden="true">
               <CheckCircle2 size={24} color="var(--success)" />
             </div>
             <h3 className="text-muted">Tasks Orchestrated</h3>
