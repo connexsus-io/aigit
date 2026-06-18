@@ -5,6 +5,20 @@ export function generateMermaidGraph(
     memories: Memory[],
     decisions: Decision[]
 ): string {
+    // ⚡ Bolt Performance Optimization:
+    // Pre-calculate and cache repetitive regex replacements for UUID hyphens
+    // into mapping arrays/objects outside of loops to avoid execution overhead.
+    const cleanId = (id: string) => id.replace(/-/g, '');
+    const cleanIds = new Map<string, string>();
+    const getCleanId = (id: string) => {
+        let cached = cleanIds.get(id);
+        if (!cached) {
+            cached = cleanId(id);
+            cleanIds.set(id, cached);
+        }
+        return cached;
+    };
+
     let m = '```mermaid\n';
     m += 'flowchart TD\n\n';
     m += '  %% Nodes\n';
@@ -12,20 +26,20 @@ export function generateMermaidGraph(
     // 1. Task Nodes
     tasks.forEach(t => {
         const title = t.title.replace(/"/g, "'");
-        m += `  Task_${t.id.replace(/-/g, '')}["📋 ${title}"]:::task\n`;
+        m += `  Task_${getCleanId(t.id)}["📋 ${title}"]:::task\n`;
     });
 
     // 2. Memory Nodes
     memories.forEach(mem => {
         let cleanContent = mem.content.split('\n')[0].replace(/"/g, "'");
         cleanContent = cleanContent.length > 40 ? cleanContent.substring(0, 40) + '...' : cleanContent;
-        m += `  Mem_${mem.id.replace(/-/g, '')}("🧠 ${cleanContent}"):::memory\n`;
+        m += `  Mem_${getCleanId(mem.id)}("🧠 ${cleanContent}"):::memory\n`;
     });
 
     // 3. Decision Nodes
     decisions.forEach(d => {
         const chosen = d.chosen.replace(/"/g, "'");
-        m += `  Dec_${d.id.replace(/-/g, '')}{"🧭 ${chosen}"}:::decision\n`;
+        m += `  Dec_${getCleanId(d.id)}{"🧭 ${chosen}"}:::decision\n`;
     });
 
     m += '\n  %% Causal Links\n';
@@ -33,7 +47,7 @@ export function generateMermaidGraph(
     // Link Tasks -> Decisions
     tasks.forEach(t => {
         t.decisions.forEach(d => {
-            m += `  Task_${t.id.replace(/-/g, '')} -->|Spawned| Dec_${d.id.replace(/-/g, '')}\n`;
+            m += `  Task_${getCleanId(t.id)} -->|Spawned| Dec_${getCleanId(d.id)}\n`;
         });
     });
 
@@ -81,7 +95,7 @@ export function generateMermaidGraph(
             const key = `${mem.filePath}::${mem.symbolName || ''}`;
             const relatedDecisions = decisionsByFileAndSymbol.get(key) || [];
             relatedDecisions.forEach(d => {
-                m += `  Mem_${mem.id.replace(/-/g, '')} -.->|Influenced| Dec_${d.id.replace(/-/g, '')}\n`;
+                m += `  Mem_${getCleanId(mem.id)} -.->|Influenced| Dec_${getCleanId(d.id)}\n`;
             });
         }
     });
@@ -96,12 +110,12 @@ export function generateMermaidGraph(
 
         const fileMemories = memoriesByFile.get(file) || [];
         fileMemories.forEach(mem => {
-            m += `    Mem_${mem.id.replace(/-/g, '')}\n`;
+            m += `    Mem_${getCleanId(mem.id)}\n`;
         });
 
         const fileDecisions = decisionsByFile.get(file) || [];
         fileDecisions.forEach(d => {
-            m += `    Dec_${d.id.replace(/-/g, '')}\n`;
+            m += `    Dec_${getCleanId(d.id)}\n`;
         });
         m += `  end\n\n`;
     });
