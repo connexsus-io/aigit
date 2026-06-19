@@ -103,7 +103,7 @@ export default function DashboardPage() {
     return (
       <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center', marginTop: '2rem' }}>
         <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(350, 80%, 55%, 0.1)' }}>
-          <AlertCircle size={48} color="var(--danger)" />
+          <AlertCircle size={48} color="var(--danger)" aria-hidden="true" />
         </div>
         <h3 className="text-lg">Failed to load platform stats</h3>
         <p className="text-muted mt-2 mb-4">There was an error communicating with the telemetry server.</p>
@@ -147,7 +147,7 @@ export default function DashboardPage() {
         <motion.div className="glass-card" whileHover={{ y: -4 }}>
           <div className="flex gap-4 items-center mb-4">
             <div className="p-3 rounded-full" style={{ background: 'var(--brand-primary-glow)' }}>
-              <Database size={24} color="var(--brand-primary)" />
+              <Database size={24} color="var(--brand-primary)" aria-hidden="true" />
             </div>
             <h3 className="text-muted">Total Memories</h3>
           </div>
@@ -157,7 +157,7 @@ export default function DashboardPage() {
         <motion.div className="glass-card stagger-2" whileHover={{ y: -4 }}>
           <div className="flex gap-4 items-center mb-4">
             <div className="p-3 rounded-full" style={{ background: 'var(--brand-secondary-glow)' }}>
-              <Brain size={24} color="var(--brand-secondary)" />
+              <Brain size={24} color="var(--brand-secondary)" aria-hidden="true" />
             </div>
             <h3 className="text-muted">Architectural Decisions</h3>
           </div>
@@ -167,7 +167,7 @@ export default function DashboardPage() {
         <motion.div className="glass-card stagger-3" whileHover={{ y: -4 }}>
           <div className="flex gap-4 items-center mb-4">
             <div className="p-3 rounded-full" style={{ background: 'var(--success-glow)' }}>
-              <CheckCircle2 size={24} color="var(--success)" />
+              <CheckCircle2 size={24} color="var(--success)" aria-hidden="true" />
             </div>
             <h3 className="text-muted">Tasks Orchestrated</h3>
           </div>
@@ -198,7 +198,7 @@ export default function DashboardPage() {
               </ResponsiveContainer>
             ) : (
               <ChartEmptyState
-                icon={<Database size={28} color="var(--brand-primary)" />}
+                icon={<Database size={28} color="var(--brand-primary)" aria-hidden="true" />}
                 title="No agent memories tracked yet."
                 description="Memories will appear here once agents begin adding context."
                 isRefreshing={isRefreshing}
@@ -230,7 +230,7 @@ export default function DashboardPage() {
               </ResponsiveContainer>
              ) : (
               <ChartEmptyState
-                icon={<Brain size={28} color="var(--brand-secondary)" />}
+                icon={<Brain size={28} color="var(--brand-secondary)" aria-hidden="true" />}
                 title="No agent decisions tracked yet."
                 description="Architectural decisions will appear here once recorded."
                 isRefreshing={isRefreshing}

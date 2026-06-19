@@ -67,3 +67,7 @@
 ## 2026-06-07 - [Consistent Metadata Visualization]
 **Learning:** Visual metadata identifiers (like item type icons and file indicators) must be consistently applied across different views (like Search and Inbox) to establish a predictable mental model for users scanning complex information. Inconsistencies slow down cognitive processing and make screens feel disjointed.
 **Action:** When rendering identical domain objects (like Memories and Decisions) across different pages, ensure their visual representation (including icons and layout spacing) is consistently applied to maintain scannability.
+
+## 2026-06-19 - [Accessible Decorative Icons & Result States]
+**Learning:** Screen readers announce all inline SVG icons by default unless explicitly hidden. In dynamically rendered result blocks (like GC settings) and visual empty states, this creates significant auditory noise. Additionally, if the result block doesn't have an appropriate `role` or `aria-live` attribute, screen readers will not announce the state change when the action finishes.
+**Action:** Always add `aria-hidden="true"` to structural or decorative icons (like `lucide-react` imports) that do not provide unique functional context. When a result block is dynamically rendered after an action, explicitly attach `role="status"` (or `alert` for errors) and `aria-live="polite"` to its container.
