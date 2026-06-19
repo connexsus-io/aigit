@@ -95,7 +95,7 @@ export default function GraphPage() {
       ) : (
         <div className="glass-card mt-8" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center' }}>
           <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(350, 80%, 55%, 0.1)' }}>
-            <AlertCircle size={48} color="var(--danger)" />
+            <AlertCircle size={48} color="var(--danger)" aria-hidden="true" />
           </div>
           <h3 className="text-lg text-danger">Failed to Load Graph Data</h3>
           <p className="text-muted mt-2 mb-4">We were unable to retrieve the architecture graph data from the server.</p>
