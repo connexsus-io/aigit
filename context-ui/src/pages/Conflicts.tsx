@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GitMerge, Check, X, Sparkles, Loader2, RefreshCw, AlertCircle } from 'lucide-react';
+import { GitMerge, Check, X, Sparkles, Loader2, RefreshCw, AlertCircle, Fingerprint, Cpu, FileCode2 } from 'lucide-react';
 import { AIGIT_UI_TOKEN, API_BASE_URL } from '../config';
 
 interface ConflictItem {
@@ -151,7 +151,8 @@ export default function ConflictsPage() {
               <div className="flex justify-between items-start">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs font-bold uppercase tracking-wider" style={{ color: (item as ConflictItem & { _renderType?: string })._renderType === 'memory' ? 'var(--brand-primary)' : 'var(--brand-secondary)'}}>
+                    <span className="text-xs font-bold uppercase tracking-wider flex items-center" style={{ color: (item as ConflictItem & { _renderType?: string })._renderType === 'memory' ? 'var(--brand-primary)' : 'var(--brand-secondary)'}}>
+                      {(item as ConflictItem & { _renderType?: string })._renderType === 'memory' ? <Fingerprint size={14} className="inline mr-1" aria-hidden="true"/> : <Cpu size={14} className="inline mr-1" aria-hidden="true"/>}
                       {(item as ConflictItem & { _renderType?: string })._renderType}
                     </span>
                     <span className="text-muted text-sm px-2 py-0.5 rounded-full" style={{ background: 'hsla(0,0%,100%,0.05)' }}>
@@ -164,7 +165,11 @@ export default function ConflictsPage() {
                     )}
                   </div>
                   
-                  {item.filePath && <code className="text-sm text-muted mb-4 block">File: {item.filePath}</code>}
+                  {item.filePath && (
+                    <div className="text-sm text-muted mb-4 flex items-center gap-2" style={{ opacity: 0.8 }}>
+                      <FileCode2 size={14} aria-hidden="true" /> <code>{item.filePath}</code>
+                    </div>
+                  )}
 
                   {(item as ConflictItem & { _renderType?: string })._renderType === 'memory' ? (
                     <p className="text-lg mt-2 font-medium" style={{ whiteSpace: 'pre-wrap' }}>{item.content}</p>
