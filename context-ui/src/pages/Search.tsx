@@ -150,7 +150,7 @@ export default function SearchPage() {
         {!loading && !searched && (
           <div className="glass-card flex flex-col items-center justify-center p-12 text-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '4rem', textAlign: 'center' }}>
             <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(0,0%,100%,0.05)' }}>
-              <SearchIcon size={48} color="var(--brand-primary)" />
+              <SearchIcon size={48} color="var(--brand-primary)" aria-hidden="true" />
             </div>
             <h3 className="text-lg">Ready to Search</h3>
             <p className="text-muted mt-2">Enter a query above to search architectural decisions and code memories.</p>
@@ -160,7 +160,7 @@ export default function SearchPage() {
         {!loading && error && (
           <div className="glass-card flex flex-col items-center justify-center p-12 text-center" role="alert" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '4rem', textAlign: 'center' }}>
             <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(350, 80%, 55%, 0.1)' }}>
-              <SearchX size={48} color="var(--danger)" />
+              <SearchX size={48} color="var(--danger)" aria-hidden="true" />
             </div>
             <h3 className="text-lg">Search Failed</h3>
             <p className="text-muted mt-2 mb-4">{error}</p>
@@ -177,7 +177,7 @@ export default function SearchPage() {
         {!loading && searched && !error && results.length === 0 && (
           <div className="glass-card flex flex-col items-center justify-center p-12 text-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '4rem', textAlign: 'center' }}>
             <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(0,0%,100%,0.05)' }}>
-              <SearchX size={48} color="var(--text-muted)" />
+              <SearchX size={48} color="var(--text-muted)" aria-hidden="true" />
             </div>
             <h3 className="text-lg">No semantic matches found</h3>
             <p className="text-muted mt-2 mb-4">Try rephrasing your search query to capture different architectural intent.</p>

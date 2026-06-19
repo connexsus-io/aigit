@@ -104,7 +104,7 @@ export default function ConflictsPage() {
       {!loading && error && (
         <div className="glass-card mt-8" role="alert" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center' }}>
           <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(350, 80%, 55%, 0.1)' }}>
-            <AlertCircle size={48} color="var(--danger)" />
+            <AlertCircle size={48} color="var(--danger)" aria-hidden="true" />
           </div>
           <h3 className="text-lg">Failed to load conflicts</h3>
           <p className="text-muted mt-2 mb-4">{error}</p>
@@ -123,7 +123,7 @@ export default function ConflictsPage() {
       {!loading && !error && items.length === 0 && (
         <div className="glass-card mt-8" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center' }}>
           <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(150, 70%, 45%, 0.1)' }}>
-            <GitMerge size={48} color="var(--success)" />
+            <GitMerge size={48} color="var(--success)" aria-hidden="true" />
           </div>
           <h3>Ledger is clean</h3>
           <p className="text-muted mt-2 mb-4">All semantic memories and decisions have been assimilated into the current branch.</p>
