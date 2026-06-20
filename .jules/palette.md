@@ -71,3 +71,6 @@
 ## 2026-06-19 - [Accessible Decorative Icons & Result States]
 **Learning:** Screen readers announce all inline SVG icons by default unless explicitly hidden. In dynamically rendered result blocks (like GC settings) and visual empty states, this creates significant auditory noise. Additionally, if the result block doesn't have an appropriate `role` or `aria-live` attribute, screen readers will not announce the state change when the action finishes.
 **Action:** Always add `aria-hidden="true"` to structural or decorative icons (like `lucide-react` imports) that do not provide unique functional context. When a result block is dynamically rendered after an action, explicitly attach `role="status"` (or `alert` for errors) and `aria-live="polite"` to its container.
+## 2024-06-20 - Ensure Decorative Icons have aria-hidden
+**Learning:** Decorative icons within interactive elements (like search input fields) can cause screen reader noise if they don't explicitly have the `aria-hidden="true"` attribute.
+**Action:** Always ensure that structural or decorative icons, especially those from libraries like `lucide-react` within interactive components, use `aria-hidden="true"` to improve accessibility.
