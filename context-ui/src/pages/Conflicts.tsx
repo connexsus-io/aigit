@@ -25,6 +25,7 @@ export default function ConflictsPage() {
   // For synthesis mode
   const [synthesizeTarget, setSynthesizeTarget] = useState<string | null>(null);
   const [synthText, setSynthText] = useState("");
+  const [actionErrors, setActionErrors] = useState<{ [id: string]: string }>({});
   const synthButtonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
 
   const fetchConflicts = () => {
@@ -57,8 +58,13 @@ export default function ConflictsPage() {
 
   const handleAction = async (id: string, type: string, action: string, content?: string) => {
     setProcessingId(id);
+    setActionErrors(prev => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
     try {
-      await fetch(`${API_BASE_URL}/api/resolve`, {
+      const res = await fetch(`${API_BASE_URL}/api/resolve`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,6 +72,12 @@ export default function ConflictsPage() {
         },
         body: JSON.stringify({ id, type, action, content })
       });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`Failed to resolve: ${res.status} ${errText}`);
+      }
+
       // Remove from UI without full refetch for snappy experience
       setItems(prev => prev.filter(i => i.id !== id));
       if (synthesizeTarget === id) {
@@ -73,6 +85,10 @@ export default function ConflictsPage() {
       }
     } catch (err) {
       console.error("Failed to resolve", err);
+      setActionErrors(prev => ({
+        ...prev,
+        [id]: err instanceof Error ? err.message : String(err)
+      }));
     } finally {
       setProcessingId(null);
     }
@@ -182,6 +198,13 @@ export default function ConflictsPage() {
                   )}
                 </div>
               </div>
+
+              {actionErrors[item.id] && (
+                <div className="mt-4 p-3 rounded-lg border border-danger bg-danger/10 text-danger text-sm flex items-center gap-2" role="alert" aria-live="assertive">
+                  <AlertCircle size={16} aria-hidden="true" />
+                  <span>{actionErrors[item.id]}</span>
+                </div>
+              )}
 
               {synthesizeTarget === item.id ? (
                 <div className="mt-6 p-4 rounded-lg border border-brand-primary bg-black/20">

@@ -71,3 +71,7 @@
 ## 2026-06-19 - [Accessible Decorative Icons & Result States]
 **Learning:** Screen readers announce all inline SVG icons by default unless explicitly hidden. In dynamically rendered result blocks (like GC settings) and visual empty states, this creates significant auditory noise. Additionally, if the result block doesn't have an appropriate `role` or `aria-live` attribute, screen readers will not announce the state change when the action finishes.
 **Action:** Always add `aria-hidden="true"` to structural or decorative icons (like `lucide-react` imports) that do not provide unique functional context. When a result block is dynamically rendered after an action, explicitly attach `role="status"` (or `alert` for errors) and `aria-live="polite"` to its container.
+
+## 2026-06-25 - Prevent Silent Inline Action Failures
+**Learning:** Optimistically removing an item from a list during an asynchronous action (like "Assimilate" or "Discard") creates a severe UX issue if the network request fails silently (`!res.ok` ignored). The item appears to have been processed successfully, but the backend state hasn't changed, leading to ghost data on subsequent refreshes.
+**Action:** When performing inline asynchronous actions on list items, always verify `res.ok` before optimistically updating the UI state. In case of failure, halt the UI update and display a localized error state within the specific item's context using an accessible `role="alert"` container, so the user knows exactly which action failed and why.
