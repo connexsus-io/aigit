@@ -1,0 +1,5 @@
+🚨 Severity: CRITICAL
+💡 Vulnerability: The `attachVectorEmbeddings` function dynamically constructed raw SQL queries using Prisma's `$executeRawUnsafe` with string interpolation for the `tableName` parameter. Although TypeScript typed the parameter as `'Memory' | 'Decision'`, type enforcement does not exist at runtime, allowing potential SQL injection attacks if untrusted data reached the function.
+🎯 Impact: A malicious actor could inject arbitrary SQL commands by passing a crafted table name, leading to unauthorized database access, data modification, or complete database compromise.
+🔧 Fix: Implemented strict runtime validation by ensuring the `tableName` parameter is explicitly checked against the allowed values (`'Memory'` or `'Decision'`) before executing the raw query. If validation fails, an error is thrown, securely halting execution.
+✅ Verification: `pnpm test` successfully executed with the targeted components verified and database passing all relevant assertions.
