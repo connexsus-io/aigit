@@ -21,6 +21,7 @@ export default function ConflictsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [itemErrors, setItemErrors] = useState<{ [key: string]: string }>({});
 
   // For synthesis mode
   const [synthesizeTarget, setSynthesizeTarget] = useState<string | null>(null);
@@ -57,8 +58,14 @@ export default function ConflictsPage() {
 
   const handleAction = async (id: string, type: string, action: string, content?: string) => {
     setProcessingId(id);
+    setItemErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors[id];
+      return newErrors;
+    });
+
     try {
-      await fetch(`${API_BASE_URL}/api/resolve`, {
+      const res = await fetch(`${API_BASE_URL}/api/resolve`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,6 +73,12 @@ export default function ConflictsPage() {
         },
         body: JSON.stringify({ id, type, action, content })
       });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `Server responded with ${res.status}`);
+      }
+
       // Remove from UI without full refetch for snappy experience
       setItems(prev => prev.filter(i => i.id !== id));
       if (synthesizeTarget === id) {
@@ -73,6 +86,10 @@ export default function ConflictsPage() {
       }
     } catch (err) {
       console.error("Failed to resolve", err);
+      setItemErrors(prev => ({
+        ...prev,
+        [id]: err instanceof Error ? err.message : "An unknown error occurred"
+      }));
     } finally {
       setProcessingId(null);
     }
@@ -182,6 +199,16 @@ export default function ConflictsPage() {
                   )}
                 </div>
               </div>
+
+              {itemErrors[item.id] && (
+                <div className="mt-4 p-3 rounded-md border border-danger/50 text-sm flex items-start gap-2 bg-danger/10 text-danger" role="alert">
+                    <AlertCircle size={16} aria-hidden="true" className="mt-1 shrink-0" />
+                    <div>
+                        <strong className="block mb-1">Failed to resolve conflict</strong>
+                        <span>{itemErrors[item.id]}</span>
+                    </div>
+                </div>
+              )}
 
               {synthesizeTarget === item.id ? (
                 <div className="mt-6 p-4 rounded-lg border border-brand-primary bg-black/20">
