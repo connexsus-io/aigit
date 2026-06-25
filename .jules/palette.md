@@ -71,3 +71,7 @@
 ## 2026-06-19 - [Accessible Decorative Icons & Result States]
 **Learning:** Screen readers announce all inline SVG icons by default unless explicitly hidden. In dynamically rendered result blocks (like GC settings) and visual empty states, this creates significant auditory noise. Additionally, if the result block doesn't have an appropriate `role` or `aria-live` attribute, screen readers will not announce the state change when the action finishes.
 **Action:** Always add `aria-hidden="true"` to structural or decorative icons (like `lucide-react` imports) that do not provide unique functional context. When a result block is dynamically rendered after an action, explicitly attach `role="status"` (or `alert` for errors) and `aria-live="polite"` to its container.
+
+## 2026-06-25 - Context-Aware ARIA Labels for List Actions
+**Learning:** When repeating generic action buttons (like 'Keep' or 'Discard') inside lists, screen reader users lose context on which item the action targets if they navigate by buttons. We must include item-specific data in the `aria-label`.
+**Action:** Always append identifying information (like origin branch or item title) to `aria-label` attributes on repeated action buttons within mapped lists to provide clear, contextual target information.

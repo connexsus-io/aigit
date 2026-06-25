@@ -235,6 +235,7 @@ export default function ConflictsPage() {
                         onClick={() => handleAction(item.id, (item as ConflictItem & { _renderType?: string })._renderType || '', 'assimilate')}
                         disabled={processingId === item.id}
                         aria-busy={processingId === item.id}
+                        aria-label={`Keep and assimilate context from ${item.originBranch}`}
                     >
                         {processingId === item.id ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />} Keep & Assimilate
                     </button>
@@ -247,6 +248,7 @@ export default function ConflictsPage() {
                                 setSynthesizeTarget(item.id);
                                 setSynthText(item.content || "");
                             }}
+                            aria-label={`Synthesize context from ${item.originBranch}`}
                         >
                             <Sparkles size={16} /> Synthesize
                         </button>
@@ -261,6 +263,7 @@ export default function ConflictsPage() {
                         }}
                         disabled={processingId === item.id}
                         aria-busy={processingId === item.id}
+                        aria-label={`Discard context from ${item.originBranch}`}
                     >
                         {processingId === item.id ? <Loader2 size={16} className="animate-spin" /> : <X size={16} />} Discard Context
                     </button>
