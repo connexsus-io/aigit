@@ -24,32 +24,37 @@ export function generateMermaidGraph(
     m += '  %% Nodes\n';
 
     // 1. Task Nodes
-    tasks.forEach(t => {
+    for (let i = 0; i < tasks.length; i++) {
+        const t = tasks[i];
         const title = t.title.replace(/"/g, "'");
         m += `  Task_${getCleanId(t.id)}["📋 ${title}"]:::task\n`;
-    });
+    }
 
     // 2. Memory Nodes
-    memories.forEach(mem => {
+    for (let i = 0; i < memories.length; i++) {
+        const mem = memories[i];
         let cleanContent = mem.content.split('\n')[0].replace(/"/g, "'");
         cleanContent = cleanContent.length > 40 ? cleanContent.substring(0, 40) + '...' : cleanContent;
         m += `  Mem_${getCleanId(mem.id)}("🧠 ${cleanContent}"):::memory\n`;
-    });
+    }
 
     // 3. Decision Nodes
-    decisions.forEach(d => {
+    for (let i = 0; i < decisions.length; i++) {
+        const d = decisions[i];
         const chosen = d.chosen.replace(/"/g, "'");
         m += `  Dec_${getCleanId(d.id)}{"🧭 ${chosen}"}:::decision\n`;
-    });
+    }
 
     m += '\n  %% Causal Links\n';
 
     // Link Tasks -> Decisions
-    tasks.forEach(t => {
-        t.decisions.forEach(d => {
+    for (let i = 0; i < tasks.length; i++) {
+        const t = tasks[i];
+        for (let j = 0; j < t.decisions.length; j++) {
+            const d = t.decisions[j];
             m += `  Task_${getCleanId(t.id)} -->|Spawned| Dec_${getCleanId(d.id)}\n`;
-        });
-    });
+        }
+    }
 
     // Pre-group decisions by filePath for faster lookups
     const decisionsByFile = new Map<string, typeof decisions>();
@@ -90,35 +95,41 @@ export function generateMermaidGraph(
 
     // Link Memories -> Decisions (heuristic: if they share a file/symbol or just generic linkage)
     // For a cleaner graph, let's link Memories to Decisions if they share the same filePath and symbolName
-    memories.forEach(mem => {
+    for (let i = 0; i < memories.length; i++) {
+        const mem = memories[i];
         if (mem.filePath) {
             const key = `${mem.filePath}::${mem.symbolName || ''}`;
             const relatedDecisions = decisionsByFileAndSymbol.get(key) || [];
-            relatedDecisions.forEach(d => {
+            for (let j = 0; j < relatedDecisions.length; j++) {
+                const d = relatedDecisions[j];
                 m += `  Mem_${getCleanId(mem.id)} -.->|Influenced| Dec_${getCleanId(d.id)}\n`;
-            });
+            }
         }
-    });
+    }
 
     m += '\n  %% Subgraphs by File Path\n';
     const files = new Set<string>();
     for (const f of memoriesByFile.keys()) files.add(f);
     for (const f of decisionsByFile.keys()) files.add(f);
 
-    Array.from(files).forEach((file, i) => {
+    const filesArray = Array.from(files);
+    for (let i = 0; i < filesArray.length; i++) {
+        const file = filesArray[i];
         m += `  subgraph File${i} ["📁 ${file}"]\n`;
 
         const fileMemories = memoriesByFile.get(file) || [];
-        fileMemories.forEach(mem => {
+        for (let j = 0; j < fileMemories.length; j++) {
+            const mem = fileMemories[j];
             m += `    Mem_${getCleanId(mem.id)}\n`;
-        });
+        }
 
         const fileDecisions = decisionsByFile.get(file) || [];
-        fileDecisions.forEach(d => {
+        for (let j = 0; j < fileDecisions.length; j++) {
+            const d = fileDecisions[j];
             m += `    Dec_${getCleanId(d.id)}\n`;
-        });
+        }
         m += `  end\n\n`;
-    });
+    }
 
     m += '  %% Styling\n';
     m += '  classDef task fill:#4f46e5,stroke:#fff,stroke-width:2px,color:#fff,rx:5,ry:5\n';

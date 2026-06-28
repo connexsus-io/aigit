@@ -11,6 +11,10 @@ async function attachVectorEmbeddings(
     tableName: 'Memory' | 'Decision',
     entries: Array<{ id: string; embedding?: string | null }>
 ) {
+    if (tableName !== 'Memory' && tableName !== 'Decision') {
+        throw new Error(`Invalid table name: ${tableName}`);
+    }
+
     const entriesWithEmbeddings = entries.filter(entry => entry.embedding);
     if (entriesWithEmbeddings.length === 0) return;
 
