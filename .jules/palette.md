@@ -75,3 +75,7 @@
 ## 2026-06-25 - [Accessible Action Buttons in Lists]
 **Learning:** When rendering identical action buttons (like "Keep & Assimilate" or "Discard") inside a dynamic list, global screen reader context is lost. Sighted users can infer which item a button affects by its proximity, but screen reader users just hear "Discard button, Discard button, Discard button", making it impossible to know which item they are acting upon without navigating backwards.
 **Action:** Always provide unique, item-specific `aria-label` attributes for repeating action buttons inside a mapped list (e.g., `aria-label={"Discard " + item.type + " from " + item.originBranch}`). This ensures each button announces its specific target context.
+
+## 2026-06-25 - Prevent Silent Inline Action Failures
+**Learning:** Optimistically removing an item from a list during an asynchronous action (like "Assimilate" or "Discard") creates a severe UX issue if the network request fails silently (`!res.ok` ignored). The item appears to have been processed successfully, but the backend state hasn't changed, leading to ghost data on subsequent refreshes.
+**Action:** When performing inline asynchronous actions on list items, always verify `res.ok` before optimistically updating the UI state. In case of failure, halt the UI update and display a localized error state within the specific item's context using an accessible `role="alert"` container, so the user knows exactly which action failed and why.
