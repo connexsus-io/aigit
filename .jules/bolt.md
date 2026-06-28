@@ -52,3 +52,6 @@
 ## 2026-06-18 - [Pre-calculate repetitive string replacements]
 **Learning:** Performing regex replacements inside iterative string building (such as replacing hyphens in UUIDs dynamically with `id.replace(/-/g, '')`) multiple times per entity inside multiple loops creates significant execution overhead.
 **Action:** Pre-calculate and cache these repetitive regex operations into mapping arrays or `Map` objects outside of loops so the sanitized value can be looked up cheaply in subsequent O(N) loops.
+## 2026-06-28 - [Replace Array Methods with Loops]
+**Learning:** In performance-critical document generation paths (like Mermaid and Markdown architecture generation), repeatedly chaining array iteration methods like `.forEach` and `.filter` causes significant closure allocation overhead and unnecessary garbage collection pauses during large iterations.
+**Action:** When handling array iterations and accumulations over potentially large data sets (like `memories`, `decisions`, and `tasks`), always refactor chained array methods into single-pass, standard `for` loops. This avoids creating intermediate array representations and eliminates closure execution costs.
