@@ -79,3 +79,7 @@
 ## 2026-06-25 - Prevent Silent Inline Action Failures
 **Learning:** Optimistically removing an item from a list during an asynchronous action (like "Assimilate" or "Discard") creates a severe UX issue if the network request fails silently (`!res.ok` ignored). The item appears to have been processed successfully, but the backend state hasn't changed, leading to ghost data on subsequent refreshes.
 **Action:** When performing inline asynchronous actions on list items, always verify `res.ok` before optimistically updating the UI state. In case of failure, halt the UI update and display a localized error state within the specific item's context using an accessible `role="alert"` container, so the user knows exactly which action failed and why.
+
+## 2024-06-20 - Ensure Decorative Icons have aria-hidden
+**Learning:** Decorative icons within interactive elements (like search input fields) can cause screen reader noise if they don't explicitly have the `aria-hidden="true"` attribute.
+**Action:** Always ensure that structural or decorative icons, especially those from libraries like `lucide-react` within interactive components, use `aria-hidden="true"` to improve accessibility.
