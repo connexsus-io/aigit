@@ -57,3 +57,8 @@
 **Vulnerability:** The `isMatchingToken` function in `context-server/src/cli/commands/ui.ts` leaked the expected token length and allowed timing side-channels by performing early returns on length mismatch before executing `timingSafeEqual`.
 **Learning:** When comparing secrets (like tokens or passwords) using `timingSafeEqual`, fast-failing based on string length is a vulnerability because it tells an attacker the exact length of the secret they are trying to guess. `timingSafeEqual` also throws an error if the buffer lengths are different.
 **Prevention:** To prevent length leakage and timing side-channels, always hash both the provided and expected inputs with a secure hash function (e.g., SHA-256) so that the inputs to `timingSafeEqual` are guaranteed to be identically sized, regardless of the original secret length. Additionally, implement an early-return maximum length limit (e.g., `> 1024` chars) before hashing to mitigate DoS via CPU exhaustion.
+
+## 2026-06-28 - [CRITICAL] Prevent SQL Injection in Raw Queries
+**Vulnerability:** The `attachVectorEmbeddings` function in `context-server/src/cli/sync.ts` used `` to dynamically interpolate the `tableName` argument without explicit runtime validation, relying solely on TypeScript typings.
+**Learning:** Relying purely on TypeScript union types is insufficient for runtime security and can trigger SQL injection vulnerabilities if user input or upstream components bypass compile-time checks.
+**Prevention:** Always implement explicit runtime validation against a strict allowlist (e.g., checking if the table name strictly equals 'Memory' or 'Decision') before executing dynamic table names with raw SQL queries.
