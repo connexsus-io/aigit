@@ -57,3 +57,8 @@
 **Vulnerability:** The `isMatchingToken` function in `context-server/src/cli/commands/ui.ts` leaked the expected token length and allowed timing side-channels by performing early returns on length mismatch before executing `timingSafeEqual`.
 **Learning:** When comparing secrets (like tokens or passwords) using `timingSafeEqual`, fast-failing based on string length is a vulnerability because it tells an attacker the exact length of the secret they are trying to guess. `timingSafeEqual` also throws an error if the buffer lengths are different.
 **Prevention:** To prevent length leakage and timing side-channels, always hash both the provided and expected inputs with a secure hash function (e.g., SHA-256) so that the inputs to `timingSafeEqual` are guaranteed to be identically sized, regardless of the original secret length. Additionally, implement an early-return maximum length limit (e.g., `> 1024` chars) before hashing to mitigate DoS via CPU exhaustion.
+
+## 2026-06-25 - Prevent SQL Injection via Dynamic Table Names in Prisma $executeRawUnsafe
+**Vulnerability:** A raw SQL query constructed with Prisma's `$executeRawUnsafe` interpolated a dynamic `tableName` variable directly without validation, risking SQL injection.
+**Learning:** Prisma's union types for `tableName` (e.g., `'Memory' | 'Decision'`) exist only at compile-time and provide no runtime security, meaning malicious runtime input could bypass type checks.
+**Prevention:** When using dynamic table names with `$executeRawUnsafe`, strictly validate the variable against an explicit runtime allowlist before execution, throwing an error for disallowed values.

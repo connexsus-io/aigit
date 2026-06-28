@@ -186,7 +186,7 @@ export default function ConflictsPage() {
               {synthesizeTarget === item.id ? (
                 <div className="mt-6 p-4 rounded-lg border border-brand-primary bg-black/20">
                     <h4 id={`synth-heading-${item.id}`} className="mb-2 text-sm text-brand-primary flex items-center gap-2">
-                        <Sparkles size={16}/> Edit & Synthesize Knowledge
+                        <Sparkles size={16} aria-hidden="true"/> Edit & Synthesize Knowledge
                     </h4>
                     <textarea 
                         aria-labelledby={`synth-heading-${item.id}`}
@@ -215,14 +215,19 @@ export default function ConflictsPage() {
                             disabled={processingId === item.id || !synthText.trim()}
                             aria-busy={processingId === item.id}
                             title={!synthText.trim() ? "Please enter text to synthesize" : "Save & Assimilate (Cmd/Ctrl + Enter)"}
+                            aria-label={`Save and assimilate synthesized ${(item as ConflictItem & { _renderType?: string })._renderType} from ${item.originBranch}`}
                         >
-                            {processingId === item.id ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />} Save & Assimilate
+                            {processingId === item.id ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <Check size={16} aria-hidden="true" />} Save & Assimilate
                             <kbd aria-hidden="true" className="text-xs" style={{ marginLeft: '0.5rem', fontFamily: 'monospace', opacity: 0.7 }}>Cmd/Ctrl+Enter</kbd>
                         </button>
-                        <button className="btn" onClick={() => {
-                            setSynthesizeTarget(null);
-                            setTimeout(() => synthButtonRefs.current[item.id]?.focus(), 0);
-                        }}>
+                        <button
+                            className="btn"
+                            onClick={() => {
+                                setSynthesizeTarget(null);
+                                setTimeout(() => synthButtonRefs.current[item.id]?.focus(), 0);
+                            }}
+                            aria-label={`Cancel synthesis for ${(item as ConflictItem & { _renderType?: string })._renderType} from ${item.originBranch}`}
+                        >
                             Cancel
                             <kbd aria-hidden="true" className="text-xs text-muted" style={{ marginLeft: '0.5rem', fontFamily: 'monospace' }}>Esc</kbd>
                         </button>
@@ -235,8 +240,9 @@ export default function ConflictsPage() {
                         onClick={() => handleAction(item.id, (item as ConflictItem & { _renderType?: string })._renderType || '', 'assimilate')}
                         disabled={processingId === item.id}
                         aria-busy={processingId === item.id}
+                        aria-label={`Keep and assimilate ${(item as ConflictItem & { _renderType?: string })._renderType} from ${item.originBranch}`}
                     >
-                        {processingId === item.id ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />} Keep & Assimilate
+                        {processingId === item.id ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <Check size={16} aria-hidden="true" />} Keep & Assimilate
                     </button>
                     
                     {(item as ConflictItem & { _renderType?: string })._renderType === 'memory' && (
@@ -247,8 +253,9 @@ export default function ConflictsPage() {
                                 setSynthesizeTarget(item.id);
                                 setSynthText(item.content || "");
                             }}
+                            aria-label={`Synthesize ${(item as ConflictItem & { _renderType?: string })._renderType} from ${item.originBranch}`}
                         >
-                            <Sparkles size={16} /> Synthesize
+                            <Sparkles size={16} aria-hidden="true" /> Synthesize
                         </button>
                     )}
                     
@@ -261,8 +268,9 @@ export default function ConflictsPage() {
                         }}
                         disabled={processingId === item.id}
                         aria-busy={processingId === item.id}
+                        aria-label={`Discard ${(item as ConflictItem & { _renderType?: string })._renderType} from ${item.originBranch}`}
                     >
-                        {processingId === item.id ? <Loader2 size={16} className="animate-spin" /> : <X size={16} />} Discard Context
+                        {processingId === item.id ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <X size={16} aria-hidden="true" />} Discard Context
                     </button>
                 </div>
               )}
