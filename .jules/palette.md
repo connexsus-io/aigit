@@ -83,3 +83,7 @@
 ## 2024-06-20 - Ensure Decorative Icons have aria-hidden
 **Learning:** Decorative icons within interactive elements (like search input fields) can cause screen reader noise if they don't explicitly have the `aria-hidden="true"` attribute.
 **Action:** Always ensure that structural or decorative icons, especially those from libraries like `lucide-react` within interactive components, use `aria-hidden="true"` to improve accessibility.
+
+## 2026-06-29 - [Accessible Action Buttons in Lists]
+**Learning:** Repeating action buttons (like "Copy context") inside dynamic lists lose their global context when read by a screen reader. A screen reader user would hear "Copy context, Copy context" repeatedly without knowing which item the action belongs to.
+**Action:** Always provide unique, item-specific `aria-label` attributes for repeating action buttons inside a mapped list (e.g., `aria-label={`Copy ${item.type} context from ${item.filePath || 'unknown file'} to clipboard`}`) to ensure each button announces its specific target context.

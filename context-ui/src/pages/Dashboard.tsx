@@ -58,7 +58,7 @@ function ChartEmptyState({
         aria-label="Refresh dashboard data"
         style={{ padding: '0.45rem 0.8rem' }}
       >
-        <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
+        <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} aria-hidden="true" />
         {isRefreshing ? 'Refreshing...' : 'Refresh Data'}
       </button>
     </div>
@@ -114,7 +114,7 @@ export default function DashboardPage() {
           aria-busy={isRefreshing}
           aria-label="Retry loading platform stats"
         >
-          <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} />
+          <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} aria-hidden="true" />
           {isRefreshing ? 'Retrying...' : 'Try Again'}
         </button>
       </div>
@@ -139,7 +139,7 @@ export default function DashboardPage() {
           <p className="text-muted">Currently active on branch <code className="text-gradient font-bold">{stats.currentBranch}</code></p>
         </div>
         <button className="btn btn-primary" onClick={() => fetchStats(true)} disabled={isRefreshing} aria-busy={isRefreshing}>
-          <Activity size={16} className={isRefreshing ? 'animate-spin' : ''} /> {isRefreshing ? 'Refreshing...' : 'Refresh Telemetry'}
+          <Activity size={16} className={isRefreshing ? 'animate-spin' : ''} aria-hidden="true" /> {isRefreshing ? 'Refreshing...' : 'Refresh Telemetry'}
         </button>
       </header>
 
