@@ -65,7 +65,7 @@ export default function GraphPage() {
           <p className="text-muted">Live dependency mapping of your workspace semantic state.</p>
         </div>
         <button className="btn btn-primary" onClick={fetchGraph} disabled={loading} aria-busy={loading}>
-          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> {loading ? 'Scanning...' : 'Refresh Graph'}
+          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} aria-hidden="true" /> {loading ? 'Scanning...' : 'Refresh Graph'}
         </button>
       </header>
 
@@ -106,7 +106,7 @@ export default function GraphPage() {
             aria-busy={loading}
             aria-label="Retry loading architecture graph"
           >
-            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} aria-hidden="true" />
             {loading ? 'Retrying...' : 'Try Again'}
           </button>
         </div>

@@ -107,7 +107,7 @@ export default function ConflictsPage() {
           disabled={loading || processingId !== null}
           aria-busy={loading}
         >
-          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> {loading ? 'Scanning...' : 'Refresh Inbox'}
+          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} aria-hidden="true" /> {loading ? 'Scanning...' : 'Refresh Inbox'}
         </button>
       </header>
 
@@ -131,7 +131,7 @@ export default function ConflictsPage() {
             aria-busy={loading}
             aria-label="Retry loading conflicts"
           >
-            <RefreshCw size={16} /> Try Again
+            <RefreshCw size={16} aria-hidden="true" /> Try Again
           </button>
         </div>
       )}
@@ -148,7 +148,7 @@ export default function ConflictsPage() {
             onClick={fetchConflicts}
             aria-label="Re-scan for semantic intersections"
           >
-            <RefreshCw size={16} /> Re-scan Ledger
+            <RefreshCw size={16} aria-hidden="true" /> Re-scan Ledger
           </button>
         </div>
       )}

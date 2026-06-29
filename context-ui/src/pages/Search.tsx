@@ -123,7 +123,7 @@ export default function SearchPage() {
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-white focus-visible:ring-2 flex items-center gap-1"
                 style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
               >
-                <X size={16} />
+                <X size={16} aria-hidden="true" />
                 <kbd aria-hidden="true" style={{ fontSize: '0.75rem', fontFamily: 'monospace', opacity: 0.7, border: '1px solid var(--border-dim)', borderRadius: '4px', padding: '0.125rem 0.375rem', backgroundColor: 'var(--bg-surface)' }}>Esc</kbd>
               </button>
             )}
@@ -169,7 +169,7 @@ export default function SearchPage() {
               aria-label="Retry search"
               onClick={() => handleSearch()}
             >
-              <RefreshCw size={16} /> Retry Search
+              <RefreshCw size={16} aria-hidden="true" /> Retry Search
             </button>
           </div>
         )}
@@ -192,7 +192,7 @@ export default function SearchPage() {
                 setTimeout(() => inputRef.current?.focus(), 0);
               }}
             >
-              <X size={16} /> Clear Search
+              <X size={16} aria-hidden="true" /> Clear Search
             </button>
           </div>
         )}
@@ -231,7 +231,7 @@ export default function SearchPage() {
                   <button
                     className="btn"
                     onClick={() => handleCopy(item.id, item.text)}
-                    aria-label={copiedId === item.id ? "Copied" : "Copy context to clipboard"}
+                    aria-label={copiedId === item.id ? "Copied" : `Copy ${item.type} context from ${item.filePath || 'unknown file'} to clipboard`}
                     title={copiedId === item.id ? "Copied" : "Copy to clipboard"}
                     style={{
                       background: 'transparent',
@@ -241,7 +241,7 @@ export default function SearchPage() {
                       color: copiedId === item.id ? 'var(--success)' : 'var(--text-muted)'
                     }}
                   >
-                    {copiedId === item.id ? <Check size={18} /> : <Copy size={18} />}
+                    {copiedId === item.id ? <Check size={18} aria-hidden="true" /> : <Copy size={18} aria-hidden="true" />}
                   </button>
                 </div>
               </motion.div>
