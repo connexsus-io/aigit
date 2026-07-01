@@ -106,6 +106,7 @@ export default function ConflictsPage() {
           onClick={fetchConflicts}
           disabled={loading || processingId !== null}
           aria-busy={loading}
+          title={processingId !== null ? "Please wait for the current action to finish" : undefined}
         >
           <RefreshCw size={16} className={loading ? 'animate-spin' : ''} aria-hidden="true" /> {loading ? 'Scanning...' : 'Refresh Inbox'}
         </button>
@@ -235,9 +236,9 @@ export default function ConflictsPage() {
                          <button
                             className="btn btn-primary"
                             onClick={() => handleAction(item.id, (item as ConflictItem & { _renderType?: string })._renderType || '', 'synthesize', synthText)}
-                            disabled={processingId === item.id || !synthText.trim()}
+                            disabled={processingId !== null || !synthText.trim()}
                             aria-busy={processingId === item.id}
-                            title={!synthText.trim() ? "Please enter text to synthesize" : "Save & Assimilate (Cmd/Ctrl + Enter)"}
+                            title={processingId !== null && processingId !== item.id ? "Please wait for the current action to finish" : (!synthText.trim() ? "Please enter text to synthesize" : "Save & Assimilate (Cmd/Ctrl + Enter)")}
                             aria-label={`Save and assimilate synthesized ${(item as ConflictItem & { _renderType?: string })._renderType} from ${item.originBranch}`}
                         >
                             {processingId === item.id ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <Check size={16} aria-hidden="true" />} Save & Assimilate
@@ -261,8 +262,9 @@ export default function ConflictsPage() {
                     <button 
                         className="btn btn-primary" 
                         onClick={() => handleAction(item.id, (item as ConflictItem & { _renderType?: string })._renderType || '', 'assimilate')}
-                        disabled={processingId === item.id}
+                        disabled={processingId !== null}
                         aria-busy={processingId === item.id}
+                        title={processingId !== null && processingId !== item.id ? "Please wait for the current action to finish" : undefined}
                         aria-label={`Keep and assimilate ${(item as ConflictItem & { _renderType?: string })._renderType} from ${item.originBranch}`}
                     >
                         {processingId === item.id ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <Check size={16} aria-hidden="true" />} Keep & Assimilate
@@ -272,6 +274,8 @@ export default function ConflictsPage() {
                         <button 
                             ref={(el) => { synthButtonRefs.current[item.id] = el; }}
                             className="btn" 
+                            disabled={processingId !== null}
+                            title={processingId !== null && processingId !== item.id ? "Please wait for the current action to finish" : undefined}
                             onClick={() => {
                                 setSynthesizeTarget(item.id);
                                 setSynthText(item.content || "");
@@ -289,8 +293,9 @@ export default function ConflictsPage() {
                                 handleAction(item.id, (item as ConflictItem & { _renderType?: string })._renderType || '', 'discard');
                             }
                         }}
-                        disabled={processingId === item.id}
+                        disabled={processingId !== null}
                         aria-busy={processingId === item.id}
+                        title={processingId !== null && processingId !== item.id ? "Please wait for the current action to finish" : undefined}
                         aria-label={`Discard ${(item as ConflictItem & { _renderType?: string })._renderType} from ${item.originBranch}`}
                     >
                         {processingId === item.id ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <X size={16} aria-hidden="true" />} Discard Context

@@ -87,3 +87,7 @@
 ## 2026-06-29 - [Accessible Action Buttons in Lists]
 **Learning:** Repeating action buttons (like "Copy context") inside dynamic lists lose their global context when read by a screen reader. A screen reader user would hear "Copy context, Copy context" repeatedly without knowing which item the action belongs to.
 **Action:** Always provide unique, item-specific `aria-label` attributes for repeating action buttons inside a mapped list (e.g., `aria-label={`Copy ${item.type} context from ${item.filePath || 'unknown file'} to clipboard`}`) to ensure each button announces its specific target context.
+
+## 2026-06-30 - Prevent Concurrent UI State Conflicts in Action Lists
+**Learning:** When users trigger an asynchronous action on a specific list item (like "Assimilate" or "Discard"), if sibling buttons or global refresh actions aren't disabled, users might click them while the first request is still pending. This can cause conflicting concurrent requests and race conditions in the UI state.
+**Action:** Always disable other related action buttons (such as sibling item actions or global refresh controls) when a specific item is currently processing. Crucially, accompany this disabled state with a helpful tooltip (e.g., `title="Please wait for the current action to finish"`) so users understand why the interface is temporarily locked.
