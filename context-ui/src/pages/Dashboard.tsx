@@ -94,7 +94,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="glass-card flex items-center justify-center mt-8 text-muted" style={{ padding: '2rem' }} role="status" aria-live="polite">
-        <Loader2 className="animate-spin" size={24} style={{ marginRight: '0.5rem' }} /> Loading pulse...
+        <Loader2 className="animate-spin" size={24} aria-hidden="true" style={{ marginRight: '0.5rem' }} /> Loading pulse...
       </div>
     );
   }

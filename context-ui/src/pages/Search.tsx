@@ -135,7 +135,7 @@ export default function SearchPage() {
             aria-busy={loading}
             title={!query.trim() ? "Please enter a search query" : undefined}
           >
-            {loading ? <><Loader2 size={16} className="animate-spin" /> Scanning...</> : 'Search'}
+            {loading ? <><Loader2 size={16} className="animate-spin" aria-hidden="true" /> Scanning...</> : 'Search'}
           </button>
         </form>
       </header>
@@ -143,7 +143,7 @@ export default function SearchPage() {
       <div aria-live="polite" className="mt-8" style={{ marginTop: '2rem' }}>
         {loading && (
           <div className="glass-card flex items-center justify-center text-muted" style={{ padding: '2rem' }} role="status" aria-live="polite">
-            <Loader2 className="animate-spin" size={24} style={{ marginRight: '0.5rem' }} /> Interrogating hyperspace vector embeddings...
+            <Loader2 className="animate-spin" size={24} aria-hidden="true" style={{ marginRight: '0.5rem' }} /> Interrogating hyperspace vector embeddings...
           </div>
         )}
 
