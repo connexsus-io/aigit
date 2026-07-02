@@ -73,7 +73,7 @@ export default function SettingsPage() {
                 aria-busy={running}
                 style={{ marginLeft: '2rem', flexShrink: 0 }}
              >
-                {running ? <><Loader2 size={16} className="animate-spin" /> Running VACUUM...</> : 'Execute Full GC'}
+                {running ? <><Loader2 size={16} className="animate-spin" aria-hidden="true" /> Running VACUUM...</> : 'Execute Full GC'}
              </button>
            </div>
         </div>

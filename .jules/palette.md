@@ -91,3 +91,6 @@
 ## 2026-06-30 - Prevent Concurrent UI State Conflicts in Action Lists
 **Learning:** When users trigger an asynchronous action on a specific list item (like "Assimilate" or "Discard"), if sibling buttons or global refresh actions aren't disabled, users might click them while the first request is still pending. This can cause conflicting concurrent requests and race conditions in the UI state.
 **Action:** Always disable other related action buttons (such as sibling item actions or global refresh controls) when a specific item is currently processing. Crucially, accompany this disabled state with a helpful tooltip (e.g., `title="Please wait for the current action to finish"`) so users understand why the interface is temporarily locked.
+## 2024-05-18 - Decorative Loaders
+**Learning:** Decorative lucide-react icons, such as Loader2, within containers that already use `aria-live` or `aria-busy` create redundant noise for screen readers, as the container will announce the state change on its own.
+**Action:** Always explicitly add `aria-hidden="true"` to `Loader2` and similar decorative icons inside `role="status"` or `aria-busy` containers to reduce noise and improve accessibility.

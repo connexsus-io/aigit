@@ -71,7 +71,7 @@ export default function GraphPage() {
 
       {loading ? (
         <div className="glass-card flex-1 flex items-center justify-center text-muted mt-6" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }} role="status" aria-live="polite">
-          <Loader2 className="animate-spin" size={24} style={{ marginRight: '0.5rem' }} /> Mapping module references...
+          <Loader2 className="animate-spin" size={24} aria-hidden="true" style={{ marginRight: '0.5rem' }} /> Mapping module references...
         </div>
       ) : graphData ? (
         <div className="mt-6 flex-1 flex flex-col" style={{ marginTop: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
