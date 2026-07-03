@@ -94,3 +94,7 @@
 ## 2024-05-18 - Decorative Loaders
 **Learning:** Decorative lucide-react icons, such as Loader2, within containers that already use `aria-live` or `aria-busy` create redundant noise for screen readers, as the container will announce the state change on its own.
 **Action:** Always explicitly add `aria-hidden="true"` to `Loader2` and similar decorative icons inside `role="status"` or `aria-busy` containers to reduce noise and improve accessibility.
+
+## 2026-07-06 - [Accessible Scrollable Regions & Charts]
+**Learning:** Custom interactive or scrollable containers (like chart wrappers or Mermaid diagram viewers) are inherently inaccessible to keyboard-only and screen reader users if they aren't explicitly focusable. A user cannot scroll these containers with the keyboard if they cannot focus them.
+**Action:** Always add `role="region"`, a descriptive `aria-label`, and `tabIndex={0}` to custom scrollable content containers or complex visual blocks (like charts). Furthermore, ensure global CSS includes a specific `:focus-visible` outline for `[role="region"][tabindex="0"]` to provide clear visual feedback without disrupting mouse users.

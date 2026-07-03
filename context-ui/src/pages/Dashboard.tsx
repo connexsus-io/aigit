@@ -101,7 +101,7 @@ export default function DashboardPage() {
 
   if (!stats) {
     return (
-      <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center', marginTop: '2rem' }}>
+      <div role="alert" className="glass-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center', marginTop: '2rem' }}>
         <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(350, 80%, 55%, 0.1)' }}>
           <AlertCircle size={48} color="var(--danger)" aria-hidden="true" />
         </div>
@@ -176,7 +176,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="chart-grid stagger-3">
-        <div className="glass-card">
+        <div role="region" aria-label="Agent Memory Contributions Chart" tabIndex={0} className="glass-card">
           <h3 style={{ marginBottom: '1.5rem', fontSize: '1.125rem' }}>Agent Memory Contributions</h3>
           <div style={{ height: 300 }}>
             {memChartData.length > 0 ? (
@@ -208,7 +208,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="glass-card">
+        <div role="region" aria-label="Agent Decision Contributions Chart" tabIndex={0} className="glass-card">
           <h3 style={{ marginBottom: '1.5rem', fontSize: '1.125rem' }}>Agent Decision Contributions</h3>
           <div style={{ height: 300 }}>
              {decChartData.length > 0 ? (
