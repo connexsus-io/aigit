@@ -86,14 +86,14 @@ export default function GraphPage() {
              </div>
           </div>
           
-          <div className="glass-card flex-1 relative overflow-auto" style={{ flex: 1, overflow: 'auto', background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-dim)', borderRadius: '12px', padding: '2rem' }}>
-            <div id="mermaid-chart" className="flex justify-center min-w-max" style={{ display: 'flex', justifyContent: 'center', minWidth: 'max-content' }}>
+          <div role="region" aria-label="Architecture Graph Visualization" tabIndex={0} className="glass-card flex-1 relative overflow-auto" style={{ flex: 1, overflow: 'auto', background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-dim)', borderRadius: '12px', padding: '2rem' }}>
+            <div id="mermaid-chart" aria-hidden="true" className="flex justify-center min-w-max" style={{ display: 'flex', justifyContent: 'center', minWidth: 'max-content' }}>
                {/* Mermaid injection target */}
             </div>
           </div>
         </div>
       ) : (
-        <div className="glass-card mt-8" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center' }}>
+        <div role="alert" className="glass-card mt-8" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center' }}>
           <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(350, 80%, 55%, 0.1)' }}>
             <AlertCircle size={48} color="var(--danger)" aria-hidden="true" />
           </div>
