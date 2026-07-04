@@ -19,6 +19,7 @@ interface ConflictItem {
 export default function ConflictsPage() {
   const [items, setItems] = useState<ConflictItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [processingId, setProcessingId] = useState<string | null>(null);
 
@@ -28,8 +29,9 @@ export default function ConflictsPage() {
   const [actionErrors, setActionErrors] = useState<{ [id: string]: string }>({});
   const synthButtonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
 
-  const fetchConflicts = () => {
-    setLoading(true);
+  const fetchConflicts = (isRefresh = false) => {
+    if (isRefresh) setIsRefreshing(true);
+    else setLoading(true);
     setError(null);
     fetch(`${API_BASE_URL}/api/conflicts`, { headers: { 'X-Aigit-Ui-Token': AIGIT_UI_TOKEN } })
       .then(res => {
@@ -43,11 +45,13 @@ export default function ConflictsPage() {
         const decs = (data.decisions || []).map((d: any) => ({ ...d, _renderType: 'decision' }));
         setItems([...mems, ...decs]);
         setLoading(false);
+        setIsRefreshing(false);
       })
       .catch(err => {
         console.error(err);
         setError(err instanceof Error ? err.message : String(err));
         setLoading(false);
+        setIsRefreshing(false);
       });
   };
 
@@ -103,12 +107,12 @@ export default function ConflictsPage() {
         </div>
         <button
           className="btn btn-primary"
-          onClick={fetchConflicts}
-          disabled={loading || processingId !== null}
-          aria-busy={loading}
+          onClick={() => fetchConflicts(true)}
+          disabled={loading || isRefreshing || processingId !== null}
+          aria-busy={loading || isRefreshing}
           title={processingId !== null ? "Please wait for the current action to finish" : undefined}
         >
-          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} aria-hidden="true" /> {loading ? 'Scanning...' : 'Refresh Inbox'}
+          <RefreshCw size={16} className={loading || isRefreshing ? 'animate-spin' : ''} aria-hidden="true" /> {loading || isRefreshing ? 'Scanning...' : 'Refresh Inbox'}
         </button>
       </header>
 
@@ -127,12 +131,12 @@ export default function ConflictsPage() {
           <p className="text-muted mt-2 mb-4">{error}</p>
           <button
             className="btn btn-primary"
-            onClick={fetchConflicts}
-            disabled={loading}
-            aria-busy={loading}
+            onClick={() => fetchConflicts(true)}
+            disabled={loading || isRefreshing}
+            aria-busy={loading || isRefreshing}
             aria-label="Retry loading conflicts"
           >
-            <RefreshCw size={16} aria-hidden="true" /> Try Again
+            <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} aria-hidden="true" /> {isRefreshing ? 'Retrying...' : 'Try Again'}
           </button>
         </div>
       )}
@@ -146,10 +150,12 @@ export default function ConflictsPage() {
           <p className="text-muted mt-2 mb-4">All semantic memories and decisions have been assimilated into the current branch.</p>
           <button
             className="btn btn-primary"
-            onClick={fetchConflicts}
+            onClick={() => fetchConflicts(true)}
+            disabled={loading || isRefreshing}
+            aria-busy={loading || isRefreshing}
             aria-label="Re-scan for semantic intersections"
           >
-            <RefreshCw size={16} aria-hidden="true" /> Re-scan Ledger
+            <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} aria-hidden="true" /> {isRefreshing ? 'Scanning...' : 'Re-scan Ledger'}
           </button>
         </div>
       )}
