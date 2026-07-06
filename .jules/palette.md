@@ -98,3 +98,6 @@
 ## 2026-07-06 - [Accessible Scrollable Regions & Charts]
 **Learning:** Custom interactive or scrollable containers (like chart wrappers or Mermaid diagram viewers) are inherently inaccessible to keyboard-only and screen reader users if they aren't explicitly focusable. A user cannot scroll these containers with the keyboard if they cannot focus them.
 **Action:** Always add `role="region"`, a descriptive `aria-label`, and `tabIndex={0}` to custom scrollable content containers or complex visual blocks (like charts). Furthermore, ensure global CSS includes a specific `:focus-visible` outline for `[role="region"][tabindex="0"]` to provide clear visual feedback without disrupting mouse users.
+## 2026-07-06 - [Avoid Global aria-live Wrappers on Dynamic Lists]
+**Learning:** Wrapping a large, dynamically populated list (like search results) with a global `aria-live` attribute causes screen readers to unexpectedly recite the entire contents of the list when it renders, leading to a highly overwhelming and noisy user experience.
+**Action:** Remove `aria-live` from global list wrappers. Instead, add targeted `role="status" aria-live="polite"` attributes to specific empty/loading states, and introduce a concise results summary block (e.g., 'Found 5 matches') above the list to announce the outcome.

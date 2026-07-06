@@ -140,7 +140,7 @@ export default function SearchPage() {
         </form>
       </header>
 
-      <div aria-live="polite" className="mt-8" style={{ marginTop: '2rem' }}>
+      <div className="mt-8" style={{ marginTop: '2rem' }}>
         {loading && (
           <div className="glass-card flex items-center justify-center text-muted" style={{ padding: '2rem' }} role="status" aria-live="polite">
             <Loader2 className="animate-spin" size={24} aria-hidden="true" style={{ marginRight: '0.5rem' }} /> Interrogating hyperspace vector embeddings...
@@ -148,7 +148,7 @@ export default function SearchPage() {
         )}
 
         {!loading && !searched && (
-          <div className="glass-card flex flex-col items-center justify-center p-12 text-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '4rem', textAlign: 'center' }}>
+          <div className="glass-card flex flex-col items-center justify-center p-12 text-center" role="status" aria-live="polite" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '4rem', textAlign: 'center' }}>
             <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(0,0%,100%,0.05)' }}>
               <SearchIcon size={48} color="var(--brand-primary)" aria-hidden="true" />
             </div>
@@ -175,7 +175,7 @@ export default function SearchPage() {
         )}
 
         {!loading && searched && !error && results.length === 0 && (
-          <div className="glass-card flex flex-col items-center justify-center p-12 text-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '4rem', textAlign: 'center' }}>
+          <div className="glass-card flex flex-col items-center justify-center p-12 text-center" role="status" aria-live="polite" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '4rem', textAlign: 'center' }}>
             <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(0,0%,100%,0.05)' }}>
               <SearchX size={48} color="var(--text-muted)" aria-hidden="true" />
             </div>
@@ -194,6 +194,12 @@ export default function SearchPage() {
             >
               <X size={16} aria-hidden="true" /> Clear Search
             </button>
+          </div>
+        )}
+
+        {!loading && searched && !error && results.length > 0 && (
+          <div role="status" aria-live="polite" className="mb-4 text-muted text-sm" style={{ marginBottom: '1rem', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+            Found {results.length} semantic {results.length === 1 ? 'match' : 'matches'}.
           </div>
         )}
 
