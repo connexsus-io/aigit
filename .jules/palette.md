@@ -101,3 +101,6 @@
 ## 2024-07-04 - Prevent Layout Shifts on Data Refresh
 **Learning:** When fetching data updates in response to explicit user action (e.g. clicking "Refresh" on an already populated page), reusing the initial full-page `loading` state causes the entire component list to unmount and flashes a full-page spinner. This creates a jarring layout shift and destroys keyboard focus if the triggering button also unmounts.
 **Action:** Always separate initial load state (`loading`) from background background update state (`isRefreshing`). Use `isRefreshing` to disable controls and show inline button spinners while keeping the main content mounted, preserving layout stability and focus.
+## 2026-07-06 - [Avoid Global aria-live Wrappers on Dynamic Lists]
+**Learning:** Wrapping a large, dynamically populated list (like search results) with a global `aria-live` attribute causes screen readers to unexpectedly recite the entire contents of the list when it renders, leading to a highly overwhelming and noisy user experience.
+**Action:** Remove `aria-live` from global list wrappers. Instead, add targeted `role="status" aria-live="polite"` attributes to specific empty/loading states, and introduce a concise results summary block (e.g., 'Found 5 matches') above the list to announce the outcome.
