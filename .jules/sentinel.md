@@ -62,3 +62,8 @@
 **Vulnerability:** A raw SQL query constructed with Prisma's `$executeRawUnsafe` interpolated a dynamic `tableName` variable directly without validation, risking SQL injection.
 **Learning:** Prisma's union types for `tableName` (e.g., `'Memory' | 'Decision'`) exist only at compile-time and provide no runtime security, meaning malicious runtime input could bypass type checks.
 **Prevention:** When using dynamic table names with `$executeRawUnsafe`, strictly validate the variable against an explicit runtime allowlist before execution, throwing an error for disallowed values.
+
+## 2024-05-28 - [CRITICAL] Fix Hardcoded Database Credentials in Prisma Config
+**Vulnerability:** Found a hardcoded database connection URL `postgresql://user:password@localhost:5432/database` in `context-server/prisma.config.ts`. Exposing database credentials in source code is a major security risk.
+**Learning:** Hardcoding connection strings or passwords, even for local development or fallback defaults, creates a risk of these secrets being committed to version control and exposed to unauthorized parties.
+**Prevention:** Always use environment variables (`process.env.DATABASE_URL`) to manage database connection strings and sensitive credentials.
