@@ -104,3 +104,7 @@
 ## 2026-07-06 - [Avoid Global aria-live Wrappers on Dynamic Lists]
 **Learning:** Wrapping a large, dynamically populated list (like search results) with a global `aria-live` attribute causes screen readers to unexpectedly recite the entire contents of the list when it renders, leading to a highly overwhelming and noisy user experience.
 **Action:** Remove `aria-live` from global list wrappers. Instead, add targeted `role="status" aria-live="polite"` attributes to specific empty/loading states, and introduce a concise results summary block (e.g., 'Found 5 matches') above the list to announce the outcome.
+
+## 2026-07-07 - [Accessible Critical Action Buttons]
+**Learning:** Standalone destructive or critical system action buttons (like Database Garbage Collection) often use concise text like "Execute Full GC" which may lack sufficient context for screen reader users when read out of the surrounding visual context.
+**Action:** Always provide an explicit and descriptive `aria-label` (e.g., `aria-label="Execute full database garbage collection"`) for critical standalone buttons to ensure users utilizing assistive technologies fully understand the action's specific context and impact before triggering it.
