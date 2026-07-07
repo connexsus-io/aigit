@@ -71,6 +71,7 @@ export default function SettingsPage() {
                 onClick={runGC}
                 disabled={running}
                 aria-busy={running}
+                aria-label={running ? "Running VACUUM: full database garbage collection" : "Execute Full GC: full database garbage collection"}
                 style={{ marginLeft: '2rem', flexShrink: 0 }}
              >
                 {running ? <><Loader2 size={16} className="animate-spin" aria-hidden="true" /> Running VACUUM...</> : 'Execute Full GC'}
