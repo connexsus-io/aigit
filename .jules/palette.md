@@ -108,3 +108,6 @@
 ## 2026-07-07 - [Accessible Critical Action Buttons]
 **Learning:** Standalone destructive or critical system action buttons (like Database Garbage Collection) often use concise text like "Execute Full GC" which may lack sufficient context for screen reader users when read out of the surrounding visual context.
 **Action:** Always provide an explicit and descriptive `aria-label` (e.g., `aria-label="Execute full database garbage collection"`) for critical standalone buttons to ensure users utilizing assistive technologies fully understand the action's specific context and impact before triggering it.
+## 2024-07-08 - Prevent Layout Shifts on Data Refresh
+**Learning:** When implementing data refresh features (like 'Refresh Graph'), reusing the initial `loading` state causes the component to unmount existing data and triggers a jarring full-page layout shift.
+**Action:** Always separate the initial load state from the background refresh state (e.g., using `isRefreshing`). Use `isRefreshing` to display localized loading indicators while keeping the existing content visible, preserving layout stability and focus.
