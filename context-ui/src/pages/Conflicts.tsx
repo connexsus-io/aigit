@@ -134,7 +134,7 @@ export default function ConflictsPage() {
             onClick={() => fetchConflicts(true)}
             disabled={loading || isRefreshing}
             aria-busy={loading || isRefreshing}
-            aria-label="Retry loading conflicts"
+            aria-label={isRefreshing ? 'Retrying loading conflicts...' : 'Try again to load conflicts'}
           >
             <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} aria-hidden="true" /> {isRefreshing ? 'Retrying...' : 'Try Again'}
           </button>
@@ -153,7 +153,7 @@ export default function ConflictsPage() {
             onClick={() => fetchConflicts(true)}
             disabled={loading || isRefreshing}
             aria-busy={loading || isRefreshing}
-            aria-label="Re-scan for semantic intersections"
+            aria-label={isRefreshing ? 'Scanning ledger for semantic intersections...' : 'Re-scan ledger for semantic intersections'}
           >
             <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} aria-hidden="true" /> {isRefreshing ? 'Scanning...' : 'Re-scan Ledger'}
           </button>

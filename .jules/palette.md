@@ -111,3 +111,7 @@
 ## 2024-07-08 - Prevent Layout Shifts on Data Refresh
 **Learning:** When implementing data refresh features (like 'Refresh Graph'), reusing the initial `loading` state causes the component to unmount existing data and triggers a jarring full-page layout shift.
 **Action:** Always separate the initial load state from the background refresh state (e.g., using `isRefreshing`). Use `isRefreshing` to display localized loading indicators while keeping the existing content visible, preserving layout stability and focus.
+
+## 2024-07-26 - [Dynamic aria-label for Loading States]
+**Learning:** When adding an `aria-label` to dynamic buttons where the visible text changes based on state (e.g., a loading state that changes "Try Again" to "Retrying..."), a static ARIA label will override the dynamic visible text for screen readers. This causes a disconnect between the visual UI and assistive technology, violating WCAG 2.5.3 (Label in Name).
+**Action:** Always ensure the `aria-label` is dynamically updated to reflect the button's current visible text (e.g., `aria-label={isRefreshing ? 'Retrying loading...' : 'Try again'}`).

@@ -55,7 +55,7 @@ function ChartEmptyState({
         onClick={onRefresh}
         disabled={isRefreshing}
         aria-busy={isRefreshing}
-        aria-label="Refresh dashboard data"
+        aria-label={isRefreshing ? 'Refreshing dashboard data...' : 'Refresh dashboard data'}
         style={{ padding: '0.45rem 0.8rem' }}
       >
         <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} aria-hidden="true" />
@@ -112,7 +112,7 @@ export default function DashboardPage() {
           onClick={() => fetchStats(true)}
           disabled={isRefreshing}
           aria-busy={isRefreshing}
-          aria-label="Retry loading platform stats"
+          aria-label={isRefreshing ? 'Retrying to load platform stats...' : 'Try again to load platform stats'}
         >
           <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} aria-hidden="true" />
           {isRefreshing ? 'Retrying...' : 'Try Again'}
