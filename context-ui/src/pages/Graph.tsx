@@ -108,7 +108,7 @@ export default function GraphPage() {
             onClick={() => fetchGraph(true)}
             disabled={loading || isRefreshing}
             aria-busy={loading || isRefreshing}
-            aria-label="Retry loading architecture graph"
+            aria-label={loading || isRefreshing ? 'Retrying to load architecture graph...' : 'Try again to load architecture graph'}
           >
             <RefreshCw size={16} className={loading || isRefreshing ? 'animate-spin' : ''} aria-hidden="true" />
             {loading || isRefreshing ? 'Retrying...' : 'Try Again'}

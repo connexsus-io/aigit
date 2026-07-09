@@ -1,12 +1,12 @@
 💡 What:
-Introduced a separate `isRefreshing` state in `context-ui/src/pages/Graph.tsx` to handle background data fetching.
+Updated static `aria-label` attributes on dynamically changing buttons (like "Refresh", "Try Again") to dynamic values that always contain the visible button text across all states (e.g., loading states). Affected files: `Conflicts.tsx`, `Dashboard.tsx`, and `Graph.tsx`.
 
 🎯 Why:
-Previously, clicking the "Refresh Graph" or "Try Again" buttons reused the initial `loading` state. This caused the entire component to unmount its data and flash a full-page loading spinner, resulting in a jarring layout shift. By separating the initial load state from the background refresh state, the existing graph or error state remains visible while updating.
+To comply with WCAG 2.5.3 (Label in Name). Previously, the visible text inside buttons changed dynamically during async loading operations, but the static `aria-label` did not. Because `aria-label` overrides visible text for assistive technologies, screen readers would not announce the loading state change, and the disconnect between visible text and accessible name constituted an accessibility violation.
 
 📸 Before/After:
-Before: Clicking refresh triggered a full-page loading state, replacing content.
-After: Clicking refresh shows a spinning icon on the button itself ("Scanning...") while keeping the content (or error) mounted and stable.
+Before: The visible text was `Retrying...` but the screen reader announced `Retry loading conflicts`.
+After: The visible text is `Retrying...` and the screen reader announces `Retrying loading conflicts...`.
 
 ♿ Accessibility:
-Maintained correct `aria-busy` and `disabled` attributes on the buttons by updating them to respect both the `loading` and `isRefreshing` states, ensuring screen readers announce the progressing background state.
+Prevents WCAG 2.5.3 (Label in Name) violations and ensures screen reader users correctly receive auditory feedback on dynamic loading states.
