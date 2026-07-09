@@ -7,18 +7,22 @@ import { AIGIT_UI_TOKEN, API_BASE_URL } from '../config';
 export default function GraphPage() {
   const [graphData, setGraphData] = useState<{ mermaid: string, totalFiles: number, totalLinks: number } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const fetchGraph = () => {
-    setLoading(true);
+  const fetchGraph = (isRefresh = false) => {
+    if (isRefresh) setIsRefreshing(true);
+    else setLoading(true);
     fetch(`${API_BASE_URL}/api/graph`, { headers: { 'X-Aigit-Ui-Token': AIGIT_UI_TOKEN } })
       .then(res => res.json())
       .then(data => {
         setGraphData(data);
         setLoading(false);
+        setIsRefreshing(false);
       })
       .catch(err => {
         console.error(err);
         setLoading(false);
+        setIsRefreshing(false);
       });
   };
 
@@ -64,8 +68,8 @@ export default function GraphPage() {
           <h2>Architecture Graph</h2>
           <p className="text-muted">Live dependency mapping of your workspace semantic state.</p>
         </div>
-        <button className="btn btn-primary" onClick={fetchGraph} disabled={loading} aria-busy={loading}>
-          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} aria-hidden="true" /> {loading ? 'Scanning...' : 'Refresh Graph'}
+        <button className="btn btn-primary" onClick={() => fetchGraph(true)} disabled={loading || isRefreshing} aria-busy={loading || isRefreshing}>
+          <RefreshCw size={16} className={loading || isRefreshing ? 'animate-spin' : ''} aria-hidden="true" /> {loading || isRefreshing ? 'Scanning...' : 'Refresh Graph'}
         </button>
       </header>
 
@@ -101,13 +105,13 @@ export default function GraphPage() {
           <p className="text-muted mt-2 mb-4">We were unable to retrieve the architecture graph data from the server.</p>
           <button
             className="btn btn-primary"
-            onClick={fetchGraph}
-            disabled={loading}
-            aria-busy={loading}
+            onClick={() => fetchGraph(true)}
+            disabled={loading || isRefreshing}
+            aria-busy={loading || isRefreshing}
             aria-label="Retry loading architecture graph"
           >
-            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} aria-hidden="true" />
-            {loading ? 'Retrying...' : 'Try Again'}
+            <RefreshCw size={16} className={loading || isRefreshing ? 'animate-spin' : ''} aria-hidden="true" />
+            {loading || isRefreshing ? 'Retrying...' : 'Try Again'}
           </button>
         </div>
       )}
