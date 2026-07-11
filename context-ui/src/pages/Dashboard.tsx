@@ -91,59 +91,57 @@ export default function DashboardPage() {
     fetchStats();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="glass-card flex items-center justify-center mt-8 text-muted" style={{ padding: '2rem' }} role="status" aria-live="polite">
-        <Loader2 className="animate-spin" size={24} aria-hidden="true" style={{ marginRight: '0.5rem' }} /> Loading pulse...
-      </div>
-    );
-  }
-
-  if (!stats) {
-    return (
-      <div role="alert" className="glass-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center', marginTop: '2rem' }}>
-        <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(350, 80%, 55%, 0.1)' }}>
-          <AlertCircle size={48} color="var(--danger)" aria-hidden="true" />
-        </div>
-        <h3 className="text-lg">Failed to load platform stats</h3>
-        <p className="text-muted mt-2 mb-4">There was an error communicating with the telemetry server.</p>
-        <button
-          className="btn btn-primary"
-          onClick={() => fetchStats(true)}
-          disabled={isRefreshing}
-          aria-busy={isRefreshing}
-          aria-label={isRefreshing ? 'Retrying to load platform stats...' : 'Try again to load platform stats'}
-        >
-          <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} aria-hidden="true" />
-          {isRefreshing ? 'Retrying...' : 'Try Again'}
-        </button>
-      </div>
-    );
-  }
-
-  const memChartData = stats.memoryAgents.filter(a => a.agentName).map(a => ({
+  const memChartData = stats?.memoryAgents.filter(a => a.agentName).map(a => ({
     name: a.agentName,
     count: a._count.agentName
-  }));
+  })) || [];
 
-  const decChartData = stats.decisionAgents.filter(a => a.agentName).map(a => ({
+  const decChartData = stats?.decisionAgents.filter(a => a.agentName).map(a => ({
     name: a.agentName,
     count: a._count.agentName
-  }));
+  })) || [];
 
   return (
     <div className="animate-fade-in">
       <header className="glass-header">
         <div>
           <h2>Platform Knowledge</h2>
-          <p className="text-muted">Currently active on branch <code className="text-gradient font-bold">{stats.currentBranch}</code></p>
+          <p className="text-muted">Currently active on branch <code className="text-gradient font-bold">{stats?.currentBranch || '...'}</code></p>
         </div>
-        <button className="btn btn-primary" onClick={() => fetchStats(true)} disabled={isRefreshing} aria-busy={isRefreshing}>
-          <Activity size={16} className={isRefreshing ? 'animate-spin' : ''} aria-hidden="true" /> {isRefreshing ? 'Refreshing...' : 'Refresh Telemetry'}
+        <button className="btn btn-primary" onClick={() => fetchStats(true)} disabled={loading || isRefreshing} aria-busy={loading || isRefreshing}>
+          <Activity size={16} className={loading || isRefreshing ? 'animate-spin' : ''} aria-hidden="true" /> {loading || isRefreshing ? 'Refreshing...' : 'Refresh Telemetry'}
         </button>
       </header>
 
-      <div className="stats-grid stagger-1">
+      {loading && (
+        <div className="glass-card flex items-center justify-center mt-8 text-muted" style={{ padding: '2rem' }} role="status" aria-live="polite">
+          <Loader2 className="animate-spin" size={24} aria-hidden="true" style={{ marginRight: '0.5rem' }} /> Loading pulse...
+        </div>
+      )}
+
+      {!loading && !stats && (
+        <div role="alert" className="glass-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center', marginTop: '2rem' }}>
+          <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(350, 80%, 55%, 0.1)' }}>
+            <AlertCircle size={48} color="var(--danger)" aria-hidden="true" />
+          </div>
+          <h3 className="text-lg">Failed to load platform stats</h3>
+          <p className="text-muted mt-2 mb-4">There was an error communicating with the telemetry server.</p>
+          <button
+            className="btn btn-primary"
+            onClick={() => fetchStats(true)}
+            disabled={isRefreshing}
+            aria-busy={isRefreshing}
+            aria-label={isRefreshing ? 'Retrying to load platform stats...' : 'Try again to load platform stats'}
+          >
+            <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} aria-hidden="true" />
+            {isRefreshing ? 'Retrying...' : 'Try Again'}
+          </button>
+        </div>
+      )}
+
+      {!loading && stats && (
+        <>
+          <div className="stats-grid stagger-1">
         <motion.div className="glass-card" whileHover={{ y: -4 }}>
           <div className="flex gap-4 items-center mb-4">
             <div className="p-3 rounded-full" style={{ background: 'var(--brand-primary-glow)' }}>
@@ -240,6 +238,8 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 }

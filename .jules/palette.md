@@ -115,3 +115,7 @@
 ## 2024-07-26 - [Dynamic aria-label for Loading States]
 **Learning:** When adding an `aria-label` to dynamic buttons where the visible text changes based on state (e.g., a loading state that changes "Try Again" to "Retrying..."), a static ARIA label will override the dynamic visible text for screen readers. This causes a disconnect between the visual UI and assistive technology, violating WCAG 2.5.3 (Label in Name).
 **Action:** Always ensure the `aria-label` is dynamically updated to reflect the button's current visible text (e.g., `aria-label={isRefreshing ? 'Retrying loading...' : 'Try again'}`).
+
+## 2026-07-11 - [Preserve Structural Layouts During Loading]
+**Learning:** Components that use early returns for 'loading' or 'error' states completely unmount the structural page shell (like the `<header>` and `<h2>` title). This creates severe layout shifts upon resolution and deprives screen reader users of immediate context regarding which page they just navigated to.
+**Action:** Never use early returns that bypass main page headers. Render the structural page shell unconditionally, and render the loading/error states *within* the content area below the header.
