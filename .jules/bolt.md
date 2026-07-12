@@ -55,3 +55,6 @@
 ## 2026-06-28 - [Replace Array Methods with Loops]
 **Learning:** In performance-critical document generation paths (like Mermaid and Markdown architecture generation), repeatedly chaining array iteration methods like `.forEach` and `.filter` causes significant closure allocation overhead and unnecessary garbage collection pauses during large iterations.
 **Action:** When handling array iterations and accumulations over potentially large data sets (like `memories`, `decisions`, and `tasks`), always refactor chained array methods into single-pass, standard `for` loops. This avoids creating intermediate array representations and eliminates closure execution costs.
+## 2026-07-12 - Array Spread Operator Allocation Overhead
+**Learning:** Using the spread operator with array mapping (e.g., `[...arr.map(x => ...)]`) for merging large datasets allocates intermediate arrays in memory and triggers redundant iterations, resulting in measurable closure execution costs and garbage collection overhead compared to a single-pass loop.
+**Action:** Always instantiate a single result array and use a standard `for` loop with `.push()` to combine datasets instead of chaining array map methods and spread operators.
