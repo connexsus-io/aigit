@@ -24,22 +24,34 @@ export async function buildTimeline(targetPath: string): Promise<TimelineEntry[]
         })
     ]);
 
-    const timeline: TimelineEntry[] = [
-        ...memories.map(m => ({
+    const timeline: TimelineEntry[] = [];
+
+    // ⚡ Bolt Performance Optimization:
+    // Using standard for-loops and .push() avoids the overhead of intermediate array
+    // allocations and closure execution caused by .map() followed by spread syntax (...).
+    const memLen = memories.length;
+    for (let i = 0; i < memLen; i++) {
+        const m = memories[i];
+        timeline.push({
             date: m.createdAt,
             type: 'memory' as const,
             content: `[${m.type.toUpperCase()}] ${m.content}`,
             filePath: m.filePath,
             symbolName: m.symbolName,
-        })),
-        ...decisions.map(d => ({
+        });
+    }
+
+    const decLen = decisions.length;
+    for (let i = 0; i < decLen; i++) {
+        const d = decisions[i];
+        timeline.push({
             date: d.createdAt,
             type: 'decision' as const,
             content: `Context: ${d.context} → Chosen: ${d.chosen}${d.reasoning ? ` (Reason: ${d.reasoning})` : ''}`,
             filePath: d.filePath,
             symbolName: d.symbolName,
-        }))
-    ];
+        });
+    }
 
     // Sort by date ascending (chronological)
     timeline.sort((a, b) => a.date.getTime() - b.date.getTime());
