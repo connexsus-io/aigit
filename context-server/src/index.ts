@@ -475,15 +475,22 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
                 // 1. Bulk process memories
                 if (memories.length > 0) {
-                    const existingContentSet = new Set(targetMemories.map(m => m.content));
+                    const existingContentSet = new Set<string>();
+                    for (let i = 0; i < targetMemories.length; i++) {
+                        existingContentSet.add(targetMemories[i].content);
+                    }
 
-                    const newMemoriesData = memories
-                        .filter(m => !existingContentSet.has(m.content))
-                        .map(m => ({
-                            projectId: m.projectId, gitBranch: tgt, type: m.type, content: m.content,
-                            filePath: m.filePath, lineNumber: m.lineNumber,
-                            symbolName: m.symbolName, symbolType: m.symbolType, symbolRange: m.symbolRange,
-                        }));
+                    const newMemoriesData: any[] = [];
+                    for (let i = 0; i < memories.length; i++) {
+                        const m = memories[i];
+                        if (!existingContentSet.has(m.content)) {
+                            newMemoriesData.push({
+                                projectId: m.projectId, gitBranch: tgt, type: m.type, content: m.content,
+                                filePath: m.filePath, lineNumber: m.lineNumber,
+                                symbolName: m.symbolName, symbolType: m.symbolType, symbolRange: m.symbolRange,
+                            });
+                        }
+                    }
 
                     if (newMemoriesData.length > 0) {
                         await prisma.memory.createMany({ data: newMemoriesData });
@@ -493,9 +500,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
                 // 2. Bulk process tasks
                 if (tasks.length > 0) {
-                    const existingSlugSet = new Set(targetTasks.map(t => t.slug));
+                    const existingSlugSet = new Set<string>();
+                    for (let i = 0; i < targetTasks.length; i++) {
+                        existingSlugSet.add(targetTasks[i].slug);
+                    }
 
-                    const newTasks = tasks.filter(t => !existingSlugSet.has(t.slug));
+                    const newTasks: any[] = [];
+                    for (let i = 0; i < tasks.length; i++) {
+                        const t = tasks[i];
+                        if (!existingSlugSet.has(t.slug)) {
+                            newTasks.push(t);
+                        }
+                    }
 
                     if (newTasks.length > 0) {
                         // Pre-group decisions by source taskId to avoid O(N*M) filtering inside the loop
@@ -523,13 +539,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                             });
 
                             const taskDecisions = decisionsByTaskId.get(t.id);
-                            if (taskDecisions && taskDecisions.length > 0) {
-                                decisionsToInsert.push(...taskDecisions.map(d => ({
-                                    taskId: newTaskId, gitBranch: tgt, context: d.context, chosen: d.chosen,
-                                    rejected: d.rejected as string[], reasoning: d.reasoning,
-                                    filePath: d.filePath, lineNumber: d.lineNumber,
-                                    symbolName: d.symbolName, symbolType: d.symbolType, symbolRange: d.symbolRange,
-                                })));
+                            if (taskDecisions) {
+                                for (let i = 0; i < taskDecisions.length; i++) {
+                                    const d = taskDecisions[i];
+                                    decisionsToInsert.push({
+                                        taskId: newTaskId, gitBranch: tgt, context: d.context, chosen: d.chosen,
+                                        rejected: d.rejected as string[], reasoning: d.reasoning,
+                                        filePath: d.filePath, lineNumber: d.lineNumber,
+                                        symbolName: d.symbolName, symbolType: d.symbolType, symbolRange: d.symbolRange,
+                                    });
+                                }
                             }
                         }
 
