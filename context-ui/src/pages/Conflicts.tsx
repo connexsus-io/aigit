@@ -111,6 +111,7 @@ export default function ConflictsPage() {
           disabled={loading || isRefreshing || processingId !== null}
           aria-busy={loading || isRefreshing}
           title={processingId !== null ? "Please wait for the current action to finish" : undefined}
+          aria-label={loading || isRefreshing ? 'Scanning unassimilated context inbox...' : 'Refresh Inbox'}
         >
           <RefreshCw size={16} className={loading || isRefreshing ? 'animate-spin' : ''} aria-hidden="true" /> {loading || isRefreshing ? 'Scanning...' : 'Refresh Inbox'}
         </button>
