@@ -68,7 +68,7 @@ export default function GraphPage() {
           <h2>Architecture Graph</h2>
           <p className="text-muted">Live dependency mapping of your workspace semantic state.</p>
         </div>
-        <button className="btn btn-primary" onClick={() => fetchGraph(true)} disabled={loading || isRefreshing} aria-busy={loading || isRefreshing}>
+        <button className="btn btn-primary" onClick={() => fetchGraph(true)} disabled={loading || isRefreshing} aria-busy={loading || isRefreshing} aria-label={loading || isRefreshing ? 'Scanning architecture graph...' : 'Refresh Graph'}>
           <RefreshCw size={16} className={loading || isRefreshing ? 'animate-spin' : ''} aria-hidden="true" /> {loading || isRefreshing ? 'Scanning...' : 'Refresh Graph'}
         </button>
       </header>

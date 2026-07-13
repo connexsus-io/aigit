@@ -111,7 +111,7 @@ export default function SearchPage() {
             ) : (
               <button
                 type="button"
-                aria-label="Clear search"
+                aria-label="Clear search (Esc)"
                 title="Clear search"
                 onClick={() => {
                   setQuery('');
@@ -134,6 +134,7 @@ export default function SearchPage() {
             disabled={loading || !query.trim()}
             aria-busy={loading}
             title={!query.trim() ? "Please enter a search query" : undefined}
+            aria-label={loading ? 'Scanning for semantic matches...' : 'Search'}
           >
             {loading ? <><Loader2 size={16} className="animate-spin" aria-hidden="true" /> Scanning...</> : 'Search'}
           </button>
