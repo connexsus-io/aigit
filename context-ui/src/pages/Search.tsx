@@ -133,7 +133,7 @@ export default function SearchPage() {
             className="btn btn-primary px-6"
             disabled={loading || !query.trim()}
             aria-busy={loading}
-            title={!query.trim() ? "Please enter a search query" : undefined}
+            title={loading ? "Please wait for search to complete" : (!query.trim() ? "Please enter a search query" : undefined)}
             aria-label={loading ? 'Scanning for semantic matches...' : 'Search'}
           >
             {loading ? <><Loader2 size={16} className="animate-spin" aria-hidden="true" /> Scanning...</> : 'Search'}
