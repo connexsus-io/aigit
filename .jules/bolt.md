@@ -58,3 +58,6 @@
 ## 2026-07-12 - Array Spread Operator Allocation Overhead
 **Learning:** Using the spread operator with array mapping (e.g., `[...arr.map(x => ...)]`) for merging large datasets allocates intermediate arrays in memory and triggers redundant iterations, resulting in measurable closure execution costs and garbage collection overhead compared to a single-pass loop.
 **Action:** Always instantiate a single result array and use a standard `for` loop with `.push()` to combine datasets instead of chaining array map methods and spread operators.
+## 2026-07-13 - Optimize array iteration with single-pass standard loops in merge_context
+**Learning:** Using chained array mapping methods (`.filter` followed by `.map`) and spread operator insertions (`...array.map(...)`) within loops for large dataset transformations creates significant closure allocation overhead, intermediate array instantiations, and garbage collection pauses. Benchmarks for massive merging operations proved single-pass `for` loops with `.push()` are markedly faster.
+**Action:** Always prefer initializing a single array and using standard `for` loops with `.push()` over functional array methods and spread operators in performance-critical data transformations and mapping processes, particularly in nested iterative logic.
