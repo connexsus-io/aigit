@@ -22,6 +22,7 @@ export default function ConflictsPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [processingAction, setProcessingAction] = useState<string | null>(null);
 
   // For synthesis mode
   const [synthesizeTarget, setSynthesizeTarget] = useState<string | null>(null);
@@ -62,6 +63,7 @@ export default function ConflictsPage() {
 
   const handleAction = async (id: string, type: string, action: string, content?: string) => {
     setProcessingId(id);
+    setProcessingAction(action);
     setActionErrors(prev => {
       const next = { ...prev };
       delete next[id];
@@ -95,6 +97,7 @@ export default function ConflictsPage() {
       }));
     } finally {
       setProcessingId(null);
+      setProcessingAction(null);
     }
   };
 
@@ -143,7 +146,7 @@ export default function ConflictsPage() {
       )}
 
       {!loading && !error && items.length === 0 && (
-        <div className="glass-card mt-8" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center' }}>
+        <div className="glass-card mt-8" role="status" aria-live="polite" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center' }}>
           <div className="p-4 rounded-full mb-4" style={{ background: 'hsla(150, 70%, 45%, 0.1)' }}>
             <GitMerge size={48} color="var(--success)" aria-hidden="true" />
           </div>
@@ -244,11 +247,11 @@ export default function ConflictsPage() {
                             className="btn btn-primary"
                             onClick={() => handleAction(item.id, (item as ConflictItem & { _renderType?: string })._renderType || '', 'synthesize', synthText)}
                             disabled={processingId !== null || !synthText.trim()}
-                            aria-busy={processingId === item.id}
+                            aria-busy={processingId === item.id && processingAction === 'synthesize'}
                             title={processingId !== null && processingId !== item.id ? "Please wait for the current action to finish" : (!synthText.trim() ? "Please enter text to synthesize" : "Save & Assimilate (Cmd/Ctrl + Enter)")}
-                            aria-label={`Save and assimilate synthesized ${(item as ConflictItem & { _renderType?: string })._renderType} from ${item.originBranch}`}
+                            aria-label={processingId === item.id && processingAction === 'synthesize' ? `Saving and assimilating synthesized ${(item as ConflictItem & { _renderType?: string })._renderType} from ${item.originBranch}...` : `Save and assimilate synthesized ${(item as ConflictItem & { _renderType?: string })._renderType} from ${item.originBranch}`}
                         >
-                            {processingId === item.id ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <Check size={16} aria-hidden="true" />} Save & Assimilate
+                            {processingId === item.id && processingAction === 'synthesize' ? <><Loader2 size={16} className="animate-spin" aria-hidden="true" /> Saving...</> : <><Check size={16} aria-hidden="true" /> Save & Assimilate</>}
                             <kbd aria-hidden="true" className="text-xs" style={{ marginLeft: '0.5rem', fontFamily: 'monospace', opacity: 0.7 }}>Cmd/Ctrl+Enter</kbd>
                         </button>
                         <button
@@ -270,11 +273,11 @@ export default function ConflictsPage() {
                         className="btn btn-primary" 
                         onClick={() => handleAction(item.id, (item as ConflictItem & { _renderType?: string })._renderType || '', 'assimilate')}
                         disabled={processingId !== null}
-                        aria-busy={processingId === item.id}
+                        aria-busy={processingId === item.id && processingAction === 'assimilate'}
                         title={processingId !== null && processingId !== item.id ? "Please wait for the current action to finish" : undefined}
-                        aria-label={`Keep and assimilate ${(item as ConflictItem & { _renderType?: string })._renderType} from ${item.originBranch}`}
+                        aria-label={processingId === item.id && processingAction === 'assimilate' ? `Assimilating ${(item as ConflictItem & { _renderType?: string })._renderType} from ${item.originBranch}...` : `Keep and assimilate ${(item as ConflictItem & { _renderType?: string })._renderType} from ${item.originBranch}`}
                     >
-                        {processingId === item.id ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <Check size={16} aria-hidden="true" />} Keep & Assimilate
+                        {processingId === item.id && processingAction === 'assimilate' ? <><Loader2 size={16} className="animate-spin" aria-hidden="true" /> Assimilating...</> : <><Check size={16} aria-hidden="true" /> Keep & Assimilate</>}
                     </button>
                     
                     {(item as ConflictItem & { _renderType?: string })._renderType === 'memory' && (
@@ -301,11 +304,11 @@ export default function ConflictsPage() {
                             }
                         }}
                         disabled={processingId !== null}
-                        aria-busy={processingId === item.id}
+                        aria-busy={processingId === item.id && processingAction === 'discard'}
                         title={processingId !== null && processingId !== item.id ? "Please wait for the current action to finish" : undefined}
-                        aria-label={`Discard ${(item as ConflictItem & { _renderType?: string })._renderType} from ${item.originBranch}`}
+                        aria-label={processingId === item.id && processingAction === 'discard' ? `Discarding ${(item as ConflictItem & { _renderType?: string })._renderType} from ${item.originBranch}...` : `Discard ${(item as ConflictItem & { _renderType?: string })._renderType} from ${item.originBranch}`}
                     >
-                        {processingId === item.id ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <X size={16} aria-hidden="true" />} Discard Context
+                        {processingId === item.id && processingAction === 'discard' ? <><Loader2 size={16} className="animate-spin" aria-hidden="true" /> Discarding...</> : <><X size={16} aria-hidden="true" /> Discard Context</>}
                     </button>
                 </div>
               )}
