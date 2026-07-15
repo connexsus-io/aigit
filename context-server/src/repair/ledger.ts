@@ -124,10 +124,17 @@ export async function analyzeLedgerQuality(workspacePath: string): Promise<Ledge
 
     const memories = ledger.memories ?? [];
     const decisions = ledger.decisions ?? [];
-    const nullEmbeddings = [
-        ...memories.map(memory => memory.embedding),
-        ...decisions.map(decision => decision.embedding),
-    ].filter(embedding => !embedding).length;
+
+    // ⚡ Bolt Performance Optimization:
+    // Using standard for-loops to count falsy elements avoids the memory allocation overhead
+    // and closure execution cost of chained .map() and spread (...) followed by .filter().
+    let nullEmbeddings = 0;
+    for (let i = 0; i < memories.length; i++) {
+        if (!memories[i].embedding) nullEmbeddings++;
+    }
+    for (let i = 0; i < decisions.length; i++) {
+        if (!decisions[i].embedding) nullEmbeddings++;
+    }
 
     const staleTaskFiles: TaskStatusDrift[] = [];
     for (const task of ledger.tasks ?? []) {
