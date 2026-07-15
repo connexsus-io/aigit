@@ -119,6 +119,10 @@
 ## 2026-07-11 - [Preserve Structural Layouts During Loading]
 **Learning:** Components that use early returns for 'loading' or 'error' states completely unmount the structural page shell (like the `<header>` and `<h2>` title). This creates severe layout shifts upon resolution and deprives screen reader users of immediate context regarding which page they just navigated to.
 **Action:** Never use early returns that bypass main page headers. Render the structural page shell unconditionally, and render the loading/error states *within* the content area below the header.
-## 2026-07-13 - Dynamic ARIA Labels for Dynamic Button Text
-**Learning:** When adding an `aria-label` to dynamic buttons where the visible text changes based on state (e.g., a loading state that changes 'Refresh Telemetry' to 'Refreshing...'), the static `aria-label` overrides the dynamic visible text for screen readers. This causes a disconnect between the visual UI and assistive technology, violating WCAG 2.5.3 (Label in Name).
+## 2026-07-14 - [Dynamic ARIA Labels for Dynamic Button Text]
+**Learning:** When adding an `aria-label` to dynamic buttons where the visible text changes based on state (e.g., a loading state that changes 'Keep & Assimilate' to 'Assimilating...'), the static `aria-label` overrides the dynamic visible text for screen readers. This causes a disconnect between the visual UI and assistive technology, violating WCAG 2.5.3 (Label in Name).
 **Action:** Ensure the `aria-label` is also dynamically updated to reflect the button's current visible text when adding `aria-label`s to buttons that change text during loading or refreshing states.
+
+## 2026-07-14 - [Accessible Empty States for Dynamic Lists]
+**Learning:** When a dynamic list (like a conflict resolution inbox) is fully processed and becomes empty, the newly rendered empty state is not automatically announced by screen readers, leaving users wondering if the action succeeded or if the UI is just stuck.
+**Action:** Always add `role="status"` and `aria-live="polite"` to empty state containers that replace dynamic list content, ensuring assistive technologies announce the completion of the workflow.
