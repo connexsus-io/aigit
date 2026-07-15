@@ -27,12 +27,22 @@ export async function showContextLog(workspacePath: string) {
         }
 
         // Combine and sort by date descending
-        const timeline = [
-            ...memories.map(m => ({ type: 'MEMORY', date: m.createdAt, branch: m.gitBranch, details: m.content })),
-            ...decisions.map(d => ({ type: 'DECISION', date: d.createdAt, branch: d.gitBranch, details: `${d.context} ➔ ${d.chosen}` }))
-        ].sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 15);
+        // ⚡ Bolt Performance Optimization:
+        // Using standard for-loops and .push() avoids the overhead of intermediate array allocations
+        // and closure execution caused by .map() followed by spread syntax (...).
+        const timeline: Array<{ type: string, date: Date, branch: string, details: string }> = [];
+        for (let i = 0; i < memories.length; i++) {
+            const m = memories[i];
+            timeline.push({ type: 'MEMORY', date: m.createdAt, branch: m.gitBranch, details: m.content });
+        }
+        for (let i = 0; i < decisions.length; i++) {
+            const d = decisions[i];
+            timeline.push({ type: 'DECISION', date: d.createdAt, branch: d.gitBranch, details: `${d.context} ➔ ${d.chosen}` });
+        }
+        timeline.sort((a, b) => b.date.getTime() - a.date.getTime());
+        const slicedTimeline = timeline.slice(0, 15);
 
-        timeline.forEach((item, index) => {
+        slicedTimeline.forEach((item, index) => {
             const dateStr = item.date.toLocaleString();
             console.log(`[${dateStr}] (${item.branch}) [${item.type}]`);
             console.log(`    ${item.details}\n`);
