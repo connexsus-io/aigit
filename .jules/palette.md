@@ -126,3 +126,7 @@
 ## 2026-07-14 - [Accessible Empty States for Dynamic Lists]
 **Learning:** When a dynamic list (like a conflict resolution inbox) is fully processed and becomes empty, the newly rendered empty state is not automatically announced by screen readers, leaving users wondering if the action succeeded or if the UI is just stuck.
 **Action:** Always add `role="status"` and `aria-live="polite"` to empty state containers that replace dynamic list content, ensuring assistive technologies announce the completion of the workflow.
+
+## 2024-07-28 - [Accessible States for Error Retry Buttons]
+**Learning:** Error states often contain "Retry" or "Try Again" actions. If these actions trigger a background fetch, they must reflect their processing state to assistive technologies, just like primary form submissions. A static `aria-label="Retry search"` while the app is loading creates a disconnect and doesn't prevent multiple submissions.
+**Action:** Always ensure "Retry" buttons in error states have dynamic `aria-label` attributes reflecting the loading state, accompanied by `aria-busy` and `disabled` attributes while the request is in flight.

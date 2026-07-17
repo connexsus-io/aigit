@@ -167,10 +167,12 @@ export default function SearchPage() {
             <p className="text-muted mt-2 mb-4">{error}</p>
             <button
               className="btn btn-primary"
-              aria-label="Retry search"
+              aria-label={loading ? 'Retrying search...' : 'Retry search'}
               onClick={() => handleSearch()}
+              disabled={loading}
+              aria-busy={loading}
             >
-              <RefreshCw size={16} aria-hidden="true" /> Retry Search
+              <RefreshCw size={16} className={loading ? 'animate-spin' : ''} aria-hidden="true" /> {loading ? 'Retrying...' : 'Retry Search'}
             </button>
           </div>
         )}
