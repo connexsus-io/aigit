@@ -1,4 +1,4 @@
-💡 What: Replaced functional array methods (`.filter().map()`, `.map()`) and spread operators (`...array`) with standard `for` loops and `push` inside the `merge_context` handler of `context-server/src/index.ts`.
-🎯 Why: Chaining array mapping methods and spreading mapped array results into `.push()` within tight loops caused significant performance bottlenecks during large cross-branch merges. It created extensive intermediate array allocation, huge closure overhead, and severe garbage collection pauses.
-📊 Impact: Reduced latency of massive merge operations. In local benchmarks containing 5,000 tasks and memories, merging time dropped by over 10x compared to the spread-operator approach. It fundamentally changed O(N) functional iterations allocating many intermediate arrays to a standard iterative insertion.
-🔬 Measurement: Verify using `pnpm test` in `context-server`. Also tested using custom loop-comparison benchmarking.
+💡 What: Added accessible loading states (dynamic aria-label, aria-busy, disabled) and a visual spinner to the 'Retry Search' button on the Search page.
+🎯 Why: Error retry buttons trigger background fetches just like primary actions, but the previous implementation lacked loading states. This meant screen readers didn't know the fetch was occurring, and users could spam-click the button.
+📸 Before/After: N/A - Visual change is only during the loading state, which now matches the primary search button.
+♿ Accessibility: The button now announces its loading state properly to screen readers and prevents multiple rapid submissions.
