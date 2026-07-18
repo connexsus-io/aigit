@@ -1,4 +1,4 @@
-💡 What: Added accessible loading states (dynamic aria-label, aria-busy, disabled) and a visual spinner to the 'Retry Search' button on the Search page.
-🎯 Why: Error retry buttons trigger background fetches just like primary actions, but the previous implementation lacked loading states. This meant screen readers didn't know the fetch was occurring, and users could spam-click the button.
-📸 Before/After: N/A - Visual change is only during the loading state, which now matches the primary search button.
-♿ Accessibility: The button now announces its loading state properly to screen readers and prevents multiple rapid submissions.
+💡 What: Added `role="list"` and `role="listitem"` to UI lists in Conflicts and Search pages, and added an `.sr-only` utility class to provide context for visually ambiguous content.
+🎯 Why: Screen reader users previously heard a series of `<div>` elements without list grouping or semantic context for memory and search result contents. This provides structural meaning and screen-reader specific labels.
+📸 Before/After: Visual UI remains unchanged. The `.sr-only` class hides text visually while exposing it to assistive technologies.
+♿ Accessibility: Improves WCAG compliance for lists (providing explicit roles when non-semantic elements are used) and provides necessary context for screen reader users when parsing visually implied blocks of text.
