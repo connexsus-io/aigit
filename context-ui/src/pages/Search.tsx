@@ -206,11 +206,12 @@ export default function SearchPage() {
           </div>
         )}
 
-        <div className="conflict-list">
+        <div className="conflict-list" role="list">
           <AnimatePresence>
             {results.map((item, i) => (
               <motion.div 
                 key={item.id} 
+                role="listitem"
                 className={`conflict-item shadow-md`}
                 style={{ borderLeft: item.type === 'memory' ? '4px solid var(--brand-primary)' : '4px solid var(--brand-secondary)' }}
                 initial={{ opacity: 0, y: 10 }}
@@ -235,7 +236,7 @@ export default function SearchPage() {
                       </div>
                     )}
 
-                    <p className="text-base text-primary leading-relaxed" style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>{item.text}</p>
+                    <p className="text-base text-primary leading-relaxed" style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6 }}><span className="sr-only">Result content: </span>{item.text}</p>
                   </div>
                   <button
                     className="btn"

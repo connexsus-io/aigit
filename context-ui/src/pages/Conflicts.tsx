@@ -164,11 +164,12 @@ export default function ConflictsPage() {
         </div>
       )}
 
-      <div className="conflict-list mt-8">
+      <div className="conflict-list mt-8" role="list">
         <AnimatePresence>
           {items.map((item, i) => (
             <motion.div 
               key={item.id} 
+              role="listitem"
               className={`conflict-item ${(item as ConflictItem & { _renderType?: string })._renderType} shadow-md`}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -199,7 +200,7 @@ export default function ConflictsPage() {
                   )}
 
                   {(item as ConflictItem & { _renderType?: string })._renderType === 'memory' ? (
-                    <p className="text-lg mt-2 font-medium" style={{ whiteSpace: 'pre-wrap' }}>{item.content}</p>
+                    <p className="text-lg mt-2 font-medium" style={{ whiteSpace: 'pre-wrap' }}><span className="sr-only">Memory content: </span>{item.content}</p>
                   ) : (
                     <div className="mt-2">
                       <p className="text-muted mb-2">Context: {item.context}</p>
