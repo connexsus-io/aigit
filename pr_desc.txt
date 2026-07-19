@@ -1,4 +1,4 @@
-💡 What: Added `role="list"` and `role="listitem"` to UI lists in Conflicts and Search pages, and added an `.sr-only` utility class to provide context for visually ambiguous content.
-🎯 Why: Screen reader users previously heard a series of `<div>` elements without list grouping or semantic context for memory and search result contents. This provides structural meaning and screen-reader specific labels.
-📸 Before/After: Visual UI remains unchanged. The `.sr-only` class hides text visually while exposing it to assistive technologies.
-♿ Accessibility: Improves WCAG compliance for lists (providing explicit roles when non-semantic elements are used) and provides necessary context for screen reader users when parsing visually implied blocks of text.
+💡 What: Added screen-reader-only labels to visually generic metadata (like file paths and agent names) in the Conflicts and Search pages. Also added an `aria-live` summary to announce the number of conflicts found.
+🎯 Why: Without these labels, screen readers would simply read out raw file paths and names without explaining their significance in the layout. Providing an `aria-live` summary for the Conflicts page prevents the list itself from being completely scanned unnecessarily while keeping users informed of the scope of their work.
+📸 Before/After: Visuals remain unchanged, but screen readers now accurately understand context.
+♿ Accessibility: Improves WCAG compliance regarding structural meaning and status announcements.
