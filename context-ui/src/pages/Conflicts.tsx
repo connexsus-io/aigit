@@ -164,6 +164,12 @@ export default function ConflictsPage() {
         </div>
       )}
 
+      {!loading && !error && items.length > 0 && (
+        <div role="status" aria-live="polite" className="mt-8 text-muted text-sm" style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+          Found {items.length} unassimilated {items.length === 1 ? 'item' : 'items'} awaiting review.
+        </div>
+      )}
+
       <div className="conflict-list mt-8" role="list">
         <AnimatePresence>
           {items.map((item, i) => (
@@ -188,14 +194,14 @@ export default function ConflictsPage() {
                     </span>
                     {item.agentName && (
                         <span className="text-primary text-sm px-2 py-0.5 rounded-full" style={{ background: 'var(--brand-primary-glow)', color: 'var(--brand-primary)' }}>
-                           @{item.agentName}
+                           <span className="sr-only">Agent: </span>@{item.agentName}
                         </span>
                     )}
                   </div>
                   
                   {item.filePath && (
                     <div className="text-sm text-muted mb-4 flex items-center gap-2" style={{ opacity: 0.8 }}>
-                      <FileCode2 size={14} aria-hidden="true" /> <code>{item.filePath}</code>
+                      <FileCode2 size={14} aria-hidden="true" /> <code><span className="sr-only">File path: </span>{item.filePath}</code>
                     </div>
                   )}
 

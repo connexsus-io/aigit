@@ -232,7 +232,7 @@ export default function SearchPage() {
                     
                     {item.filePath && (
                       <div className="text-sm text-muted mb-3 flex items-center gap-2" style={{ marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: 0.8 }}>
-                        <FileCode2 size={14} aria-hidden="true" /> <code>{item.filePath} {item.symbolName ? `> ${item.symbolName}` : ''}</code>
+                        <FileCode2 size={14} aria-hidden="true" /> <code><span className="sr-only">File path: </span>{item.filePath} {item.symbolName ? `> ${item.symbolName}` : ''}</code>
                       </div>
                     )}
 
