@@ -23,6 +23,7 @@ export default function ConflictsPage() {
   const [error, setError] = useState<string | null>(null);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [processingAction, setProcessingAction] = useState<string | null>(null);
+  const [liveMessage, setLiveMessage] = useState<string>("");
 
   // For synthesis mode
   const [synthesizeTarget, setSynthesizeTarget] = useState<string | null>(null);
@@ -57,11 +58,10 @@ export default function ConflictsPage() {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchConflicts();
   }, []);
 
-  const handleAction = async (id: string, type: string, action: string, content?: string) => {
+  const handleAction = async (id: string, itemType: string, action: string, content?: string) => {
     setProcessingId(id);
     setProcessingAction(action);
     setActionErrors(prev => {
@@ -76,7 +76,7 @@ export default function ConflictsPage() {
           'Content-Type': 'application/json',
           'X-Aigit-Ui-Token': AIGIT_UI_TOKEN
         },
-        body: JSON.stringify({ id, type, action, content })
+        body: JSON.stringify({ id, type: itemType, action, content })
       });
 
       if (!res.ok) {
@@ -84,10 +84,19 @@ export default function ConflictsPage() {
         throw new Error(`Failed to resolve: ${res.status} ${errText}`);
       }
 
+      const itemToRemove = items.find(i => i.id === id);
+
       // Remove from UI without full refetch for snappy experience
       setItems(prev => prev.filter(i => i.id !== id));
       if (synthesizeTarget === id) {
         setSynthesizeTarget(null);
+      }
+
+      if (itemToRemove) {
+        const actionVerb = action === 'discard' ? 'discarded' : 'assimilated';
+        setLiveMessage(`Successfully ${actionVerb} ${(itemToRemove as ConflictItem & { _renderType?: string })._renderType || itemType} from ${itemToRemove.originBranch}`);
+        // Clear message after a moment so it can be re-announced later if same text happens
+        setTimeout(() => setLiveMessage(""), 5000);
       }
     } catch (err) {
       console.error("Failed to resolve", err);
@@ -103,6 +112,9 @@ export default function ConflictsPage() {
 
   return (
     <div className="animate-fade-in">
+      <div className="sr-only" role="status" aria-live="polite">
+        {liveMessage}
+      </div>
       <header className="glass-header flex justify-between items-center" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h2>Unassimilated Context Inbox</h2>
@@ -223,8 +235,12 @@ export default function ConflictsPage() {
                     <h4 id={`synth-heading-${item.id}`} className="mb-2 text-sm text-brand-primary flex items-center gap-2">
                         <Sparkles size={16} aria-hidden="true"/> Edit & Synthesize Knowledge
                     </h4>
+                    <span id={`synth-desc-${item.id}`} className="sr-only">
+                        Press Command or Control plus Enter to save and assimilate. Press Escape to cancel.
+                    </span>
                     <textarea 
                         aria-labelledby={`synth-heading-${item.id}`}
+                        aria-describedby={`synth-desc-${item.id}`}
                         className="w-full bg-transparent border border-white/10 rounded p-3 text-white focus:outline-none focus:border-brand-primary mb-3"
                         rows={4}
                         style={{ width: '100%' }}
