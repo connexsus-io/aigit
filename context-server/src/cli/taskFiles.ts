@@ -18,7 +18,8 @@ export interface TaskPlanInput {
 }
 
 export function getTaskFilePath(workspacePath: string, slug: string): string {
-    return path.join(workspacePath, '.aigit', 'tasks', `${slug}.md`);
+    const safeSlug = path.basename(slug);
+    return path.join(workspacePath, '.aigit', 'tasks', `${safeSlug}.md`);
 }
 
 export function readTaskFileStatus(workspacePath: string, slug: string): string | null {
