@@ -67,3 +67,8 @@
 **Vulnerability:** Found a hardcoded database connection URL `postgresql://user:password@localhost:5432/database` in `context-server/prisma.config.ts`. Exposing database credentials in source code is a major security risk.
 **Learning:** Hardcoding connection strings or passwords, even for local development or fallback defaults, creates a risk of these secrets being committed to version control and exposed to unauthorized parties.
 **Prevention:** Always use environment variables (`process.env.DATABASE_URL`) to manage database connection strings and sensitive credentials.
+
+## 2026-07-21 - [CRITICAL] Path Traversal in Task File Generation
+**Vulnerability:** The task file generation in `context-server/src/cli/taskFiles.ts` used un-sanitized user input (`slug`) to construct file paths via `path.join()`. This allowed path traversal (e.g., passing `../../etc/passwd` as a slug), potentially enabling arbitrary file overwrites or creation outside the intended `.aigit/tasks` directory.
+**Learning:** Directly using user-provided strings (like CLI arguments or API parameters) in filesystem path construction without stripping directory traversal characters (`../`, `./`, `\`) creates a Critical vulnerability.
+**Prevention:** Always sanitize filename inputs when constructing file paths by extracting only the base name. Using `path.basename(input)` ensures that any directory paths are stripped out, and the result is safely confined to the target directory.
