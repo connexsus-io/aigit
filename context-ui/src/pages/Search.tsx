@@ -20,13 +20,18 @@ export default function SearchPage() {
   const [error, setError] = useState<string | null>(null);
   const [searched, setSearched] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [liveMessage, setLiveMessage] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleCopy = async (id: string, text: string) => {
     try {
       await navigator.clipboard.writeText(text);
       setCopiedId(id);
-      setTimeout(() => setCopiedId(null), 2000);
+      setLiveMessage("Copied to clipboard");
+      setTimeout(() => {
+        setCopiedId(null);
+        setLiveMessage("");
+      }, 2000);
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }
@@ -73,6 +78,9 @@ export default function SearchPage() {
 
   return (
     <div className="animate-fade-in">
+      <div className="sr-only" role="status" aria-live="polite" style={{ position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', clip: 'rect(0,0,0,0)' }}>
+        {liveMessage}
+      </div>
       <header className="glass-header flex flex-col items-start space-y-4">
         <div>
           <h2>Semantic Context Search</h2>

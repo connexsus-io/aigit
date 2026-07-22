@@ -5,3 +5,7 @@
 ## 2024-05-17 - Screen Reader Announcements for Dynamic Deletions
 **Learning:** When users perform inline actions that remove an item from a list (e.g., dismissing an alert or resolving a conflict), visually the item disappears, but screen readers remain silent, leaving users uncertain if the action succeeded.
 **Action:** Implement an invisible `aria-live="polite"` region and dynamically update its text (e.g., "Conflict from feature-branch assimilated") upon successful completion of the destructive/resolution action.
+
+## 2024-05-19 - Inline Action Accessibility
+**Learning:** Inline icon-only actions (like "Copy") that solely rely on visual indicator changes (like an icon swap) fail to inform screen reader users that the action succeeded.
+**Action:** For visually silent asynchronous or inline actions, use an invisible `aria-live="polite"` region combined with temporary text state updates to ensure assistive technologies announce success.
