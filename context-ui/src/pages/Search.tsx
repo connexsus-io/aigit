@@ -52,17 +52,21 @@ export default function SearchPage() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const handleSearch = async (e?: React.FormEvent) => {
+  const handleSearch = async (e?: React.FormEvent, overrideQuery?: string) => {
     if (e) e.preventDefault();
-    if (!query.trim()) return;
+    const searchQuery = overrideQuery !== undefined ? overrideQuery : query;
+    if (!searchQuery.trim()) return;
     
     setLoading(true);
     setSearched(true);
     setError(null);
+    if (overrideQuery !== undefined) setQuery(overrideQuery);
+
     try {
-      const res = await fetch(`${API_BASE_URL}/api/search?q=${encodeURIComponent(query)}`, {
+      const res = await fetch(`${API_BASE_URL}/api/search?q=${encodeURIComponent(searchQuery)}`, {
         headers: { 'X-Aigit-Ui-Token': AIGIT_UI_TOKEN }
       });
+
       if (!res.ok) {
         throw new Error('Failed to communicate with semantic search engine');
       }
@@ -162,8 +166,24 @@ export default function SearchPage() {
               <SearchIcon size={48} color="var(--brand-primary)" aria-hidden="true" />
             </div>
             <h3 className="text-lg">Ready to Search</h3>
-            <p className="text-muted mt-2">Enter a query above to search architectural decisions and code memories.</p>
+            <p className="text-muted mt-2 mb-6">Enter a query above to search architectural decisions and code memories.</p>
+
+            <div className="flex items-center gap-2 flex-wrap justify-center" role="group" aria-label="Suggested search queries">
+              <span className="text-sm text-muted mr-1" aria-hidden="true">Try:</span>
+              {['Authentication flow', 'Retry policy', 'Database schema'].map(suggestion => (
+                <button
+                  key={suggestion}
+                  type="button"
+                  className="btn px-3 py-1.5 rounded-full text-xs"
+                  onClick={() => { setQuery(suggestion); handleSearch(undefined, suggestion); }}
+                  aria-label={`Search for ${suggestion}`}
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
           </div>
+
         )}
 
         {!loading && error && (

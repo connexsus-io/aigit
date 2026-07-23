@@ -9,3 +9,7 @@
 ## 2024-05-19 - Inline Action Accessibility
 **Learning:** Inline icon-only actions (like "Copy") that solely rely on visual indicator changes (like an icon swap) fail to inform screen reader users that the action succeeded.
 **Action:** For visually silent asynchronous or inline actions, use an invisible `aria-live="polite"` region combined with temporary text state updates to ensure assistive technologies announce success.
+
+## 2024-05-20 - Discoverability via Empty State Suggestions
+**Learning:** Plain empty states on search pages force users to guess supported query syntax. Providing clickable suggested queries with proper aria roles (`role="group"`) significantly improves both discoverability and keyboard accessibility.
+**Action:** When implementing search or query inputs, populate the initial empty state with a cluster of interactive `<button>` suggestions rather than relying solely on placeholder text or static instructions.
