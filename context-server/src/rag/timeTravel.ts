@@ -104,10 +104,21 @@ export function queryHistoricalContext(options: {
     const ranked = localRankBySimilarity(query, docs, topK);
 
     // Enrich with original metadata
-    const allEntries = [...(ledger.memories || []), ...(ledger.decisions || [])];
+    // ⚡ Bolt Performance Optimization:
+    // Avoid using the spread operator `[...memories, ...decisions]` which allocates
+    // intermediate arrays and causes unnecessary garbage collection overhead.
     const entryMap = new Map<string, LedgerEntry>();
-    for (const entry of allEntries) {
-        entryMap.set(entry.id, entry);
+    if (ledger.memories) {
+        for (let i = 0; i < ledger.memories.length; i++) {
+            const entry = ledger.memories[i];
+            entryMap.set(entry.id, entry);
+        }
+    }
+    if (ledger.decisions) {
+        for (let i = 0; i < ledger.decisions.length; i++) {
+            const entry = ledger.decisions[i];
+            entryMap.set(entry.id, entry);
+        }
     }
 
     const results = ranked.map((r: any) => {
