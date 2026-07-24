@@ -45,12 +45,18 @@ export default function SearchPage() {
           e.preventDefault();
           inputRef.current?.focus();
         }
+      } else if (e.key === 'Escape' && query.length > 0) {
+        setQuery('');
+        setResults([]);
+        setError(null);
+        setSearched(false);
+        setTimeout(() => inputRef.current?.focus(), 0);
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [query.length]);
 
   const handleSearch = async (e?: React.FormEvent, overrideQuery?: string) => {
     if (e) e.preventDefault();
@@ -224,6 +230,7 @@ export default function SearchPage() {
               }}
             >
               <X size={16} aria-hidden="true" /> Clear Search
+              <kbd aria-hidden="true" className="text-xs text-muted" style={{ marginLeft: '0.5rem', fontFamily: 'monospace' }}>Esc</kbd>
             </button>
           </div>
         )}
